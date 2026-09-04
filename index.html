@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Courier City — GTA Open World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/ui/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Clean, minimalist Messenger-style HUD -->
+  <div id="ui-layer">
+    <!-- Top Left Discreet Brand & Mode -->
+    <header class="messenger-header">
+      <span class="messenger-dot"></span>
+      <span class="messenger-title">Courier</span>
+      <span class="status-sep">/</span>
+      <span class="status-mode" id="mode-badge">Explore</span>
+    </header>
+
+    <!-- Center GPS Waypoint Navigator -->
+    <div id="gps-nav-widget" title="Click or press [M] to open Navigation Map">
+      <span id="gps-icon">✈️</span>
+      <span id="gps-text">Airport: 380m</span>
+      <span id="gps-arrow">↗</span>
+    </div>
+
+    <!-- Top Right Actions & Real Device Clock -->
+    <div class="messenger-actions">
+      <button id="toggle-controls-btn" class="subtle-btn" title="View Game Controls [H]">
+        <span>⌨️ Controls</span>
+      </button>
+      <button id="toggle-map-btn" class="subtle-btn" title="Open Map [M]">
+        <span>🗺️ Map</span>
+      </button>
+      <button id="toggle-view-btn" class="subtle-btn" title="Toggle Camera View [V]">
+        <span id="view-mode-label" class="view-mode-label">Top</span>
+      </button>
+      <span class="time-label" id="clock-display">00:00</span>
+      <button id="toggle-time-btn" class="subtle-btn" title="Toggle Day/Night Ambience">
+        <span id="ambience-label">Day</span>
+      </button>
+    </div>
+
+    <!-- Contextual interaction prompt -->
+    <div id="interaction-prompt" class="hidden">
+      <span class="prompt-text">Click or press <kbd>F</kbd> to drive</span>
+    </div>
+
+    <!-- Clean, minimal speed label (Only when driving) -->
+    <div id="speedo-container" class="hidden">
+      <span class="speed-val" id="speed-val">0</span>
+      <span class="speed-unit">km/h</span>
+    </div>
+
+    <!-- Minimal Radar in corner -->
+    <div id="radar-container">
+      <canvas id="radar-canvas" width="110" height="110"></canvas>
+      <div class="radar-center-dot"></div>
+    </div>
+
+    <!-- Minimal toast message -->
+    <div id="toast-message">Explore the city, visit the Zoo, or fly at the Airport!</div>
+
+    <!-- Dropdown / Collapsible Controls Modal -->
+    <div id="controls-modal" class="controls-modal-hidden">
+      <div class="controls-card">
+        <div class="controls-header">
+          <div class="controls-title-group">
+            <span class="controls-badge">GUIDE</span>
+            <h3>Game Controls & Keys</h3>
+          </div>
+          <button id="close-controls-btn" class="controls-close-btn">&times;</button>
+        </div>
+
+        <div class="controls-grid">
+          <div class="ctrl-group">
+            <div class="ctrl-cat">🏃 On Foot</div>
+            <div class="ctrl-row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Walk / Run</span></div>
+            <div class="ctrl-row"><kbd>Shift</kbd> <span>Sprint Boost</span></div>
+            <div class="ctrl-row"><kbd>Space</kbd> <span>Jump</span></div>
+            <div class="ctrl-row"><kbd>F</kbd> <span>Enter Vehicle / Aircraft</span></div>
+            <div class="ctrl-row"><kbd>E</kbd> <span>Elevator to Summit (Eiffel/Liberty/Taj)</span></div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-cat">🚗 Driving Cars</div>
+            <div class="ctrl-row"><kbd>W</kbd> <span>Accelerate</span></div>
+            <div class="ctrl-row"><kbd>S</kbd> <span>Brake / Reverse</span></div>
+            <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Steer</span></div>
+            <div class="ctrl-row"><kbd>Space</kbd> <span>Handbrake Drift</span></div>
+            <div class="ctrl-row"><kbd>C</kbd> <span>Spawn Sports Car</span></div>
+            <div class="ctrl-row"><kbd>L</kbd> <span>Toggle Headlights</span></div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-cat">✈️ Airplane & Helicopter</div>
+            <div class="ctrl-row"><kbd>Space</kbd> <span>Climb / Lift Off Up</span></div>
+            <div class="ctrl-row"><kbd>Shift</kbd> <span>Descend / Land</span></div>
+            <div class="ctrl-row"><kbd>W</kbd> <span>Throttle Forward</span></div>
+            <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Bank & Steer</span></div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-cat">🎥 Camera & Map</div>
+            <div class="ctrl-row"><kbd>V</kbd> <span>Toggle View (Chase / Free / Top)</span></div>
+            <div class="ctrl-row"><kbd>M</kbd> <span>Open Fullscreen Map & GPS</span></div>
+            <div class="ctrl-row"><span>Drag Mouse</span> <span>Orbit / Pitch View</span></div>
+            <div class="ctrl-row"><span>Mouse Wheel</span> <span>Zoom Camera</span></div>
+          </div>
+        </div>
+
+        <div class="controls-footer">
+          <span class="ctrl-tip">Tip: Press <kbd>H</kbd> anytime to open or close this controls guide.</span>
+          <button id="dismiss-controls-btn" class="ctrl-btn-primary">Got it</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
