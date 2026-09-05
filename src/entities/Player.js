@@ -7,8 +7,8 @@ export class Player {
     this.audioManager = audioManager;
     this.bloodVfx = bloodVfx;
 
-    // Character spawn position right on the avenue
-    this.position = new THREE.Vector3(0, 0, 16);
+    // Character spawn position in open Central Plaza (clear overhead view, not under any flyover)
+    this.position = new THREE.Vector3(0, 0, 80);
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.rotation = 0;
     this.movementAngle = 0; // Direction currently walking
@@ -288,8 +288,16 @@ export class Player {
     }
 
     // Resolve collision with buildings AND vehicles
-    const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(newX, newZ, this.position.y) : 0;
-    const resolved = this.resolveCollisions(newX, newY, newZ, vehicles);
+    let checkX = newX;
+    let checkZ = newZ;
+    if (this.physicsWorld.constrainToFlyover && this.position.y > 1.0) {
+      const flyoverConstraint = this.physicsWorld.constrainToFlyover(checkX, checkZ, this.position.y, this.radius);
+      checkX = flyoverConstraint.x;
+      checkZ = flyoverConstraint.z;
+    }
+
+    const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(checkX, checkZ, this.position.y) : 0;
+    const resolved = this.resolveCollisions(checkX, newY, checkZ, vehicles);
     this.position.x = resolved.x;
     this.position.z = resolved.z;
 

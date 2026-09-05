@@ -79,8 +79,8 @@ class Game {
     this.vehicles = [];
 
     const carFleetConfigs = [
-      { pos: new THREE.Vector3(3.5, 0, 16), color: 0xff4757 },    // Start Spawn
-      { pos: new THREE.Vector3(-4.5, 0, 32), color: 0x38bdf8 },   // Central Plaza
+      { pos: new THREE.Vector3(3.5, 0, 80), color: 0xff4757 },    // Start Spawn (Open Central Plaza)
+      { pos: new THREE.Vector3(-4.5, 0, 95), color: 0x38bdf8 },   // Plaza North
       { pos: new THREE.Vector3(45, 0, 4.5), color: 0x22c55e },    // East Highway
       { pos: new THREE.Vector3(-45, 0, -4.5), color: 0xf59e0b },  // West Highway
       { pos: new THREE.Vector3(0, 0, -100), color: 0xa855f7 },    // India Gate Approach

@@ -6,21 +6,21 @@ export class CameraController {
     this.domElement = domElement;
 
     // View modes: 'chase' (rear view), 'free' (orbit), 'topDown' (overhead view)
-    this.viewMode = 'topDown'; // Default to top-down view
+    this.viewMode = 'chase'; // Start in elevated chase view so character is immediately visible!
 
-    // Camera parameters: set for top-down default
+    // Camera parameters: 45 degree elevated look-down view
     this.yaw = 0;
-    this.pitch = 1.38; // Approx 79 degrees downward (near vertical)
-    this.minPitch = 0.52; // Minimum pitch (~30°)
-    this.maxPitch = 1.45; // Maximum pitch (~83°)
+    this.pitch = 0.785; // 45 degree angle looking down towards player
+    this.minPitch = 0.35; // Don't flip under ground
+    this.maxPitch = 1.45; // Up to near-vertical top-down
 
-    this.distance = 28.0; // Default distance for top-down view
-    this.targetDistance = 28.0;
+    this.distance = 12.0; // Distance behind player
+    this.targetDistance = 12.0;
     this.eyeHeight = 2.0;
 
-    // Camera position smoothing - start high above ground
-    this.currentPosition = new THREE.Vector3(0, 14.0, 12.0);
-    this.currentLookAt = new THREE.Vector3(0, 1.0, 0);
+    // Camera position smoothing - start right behind player
+    this.currentPosition = new THREE.Vector3(0, 10.0, 92.0);
+    this.currentLookAt = new THREE.Vector3(0, 1.0, 80.0);
 
     // Mouse drag orbit
     this.isDragging = false;

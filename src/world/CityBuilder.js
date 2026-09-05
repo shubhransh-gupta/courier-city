@@ -1263,6 +1263,34 @@ export class CityBuilder {
     const guardrailMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4, metalness: 0.7 });
     const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.85 });
 
+    // Helper to create sloping guardrail along ramps
+    const addRampGuardrails = (axis, startCoord, endCoord, fixedCoord, width, startH, endH) => {
+      const len = Math.abs(endCoord - startCoord);
+      const hDiff = endH - startH;
+      const angle = Math.atan2(hDiff, len);
+      const midCoord = (startCoord + endCoord) / 2;
+      const midH = (startH + endH) / 2 + 0.9;
+      const halfW = width / 2;
+
+      if (axis === 'X') {
+        const railN = new THREE.Mesh(new THREE.BoxGeometry(len, 1.1, 0.4), guardrailMat);
+        railN.position.set(midCoord, midH, fixedCoord - halfW);
+        railN.rotation.z = Math.atan2(endH - startH, endCoord - startCoord);
+        const railS = new THREE.Mesh(new THREE.BoxGeometry(len, 1.1, 0.4), guardrailMat);
+        railS.position.set(midCoord, midH, fixedCoord + halfW);
+        railS.rotation.z = Math.atan2(endH - startH, endCoord - startCoord);
+        flyoverGroup.add(railN, railS);
+      } else if (axis === 'Z') {
+        const railW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, len), guardrailMat);
+        railW.position.set(fixedCoord - halfW, midH, midCoord);
+        railW.rotation.x = -Math.atan2(endH - startH, endCoord - startCoord);
+        const railE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, len), guardrailMat);
+        railE.position.set(fixedCoord + halfW, midH, midCoord);
+        railE.rotation.x = -Math.atan2(endH - startH, endCoord - startCoord);
+        flyoverGroup.add(railW, railE);
+      }
+    };
+
     // --------------------------------------------------------
     // A. KORAMANGALA - INDIRANAGAR FLYOVER (z = -50, height = 11.5m)
     // --------------------------------------------------------
@@ -1299,12 +1327,14 @@ export class CityBuilder {
     westRamp.position.set(-130 - kRampLen / 2, kHeight / 2, -50);
     westRamp.rotation.z = Math.atan2(kHeight, kRampLen);
     flyoverGroup.add(westRamp);
+    addRampGuardrails('X', -200, -130, -50, kWidth, 0, kHeight);
 
     // East Off-Ramp (x = 130 to 200, height 11.5 -> 0m)
     const eastRamp = new THREE.Mesh(new THREE.BoxGeometry(kRampLen, 1.0, kWidth), flyoverMat);
     eastRamp.position.set(130 + kRampLen / 2, kHeight / 2, -50);
     eastRamp.rotation.z = -Math.atan2(kHeight, kRampLen);
     flyoverGroup.add(eastRamp);
+    addRampGuardrails('X', 130, 200, -50, kWidth, kHeight, 0);
 
     // Register Koramangala Flyover in PhysicsWorld
     this.physicsWorld.addFlyover('koramangala_flyover', 0, -50, kLen, kWidth, kHeight, 'X');
@@ -1338,11 +1368,13 @@ export class CityBuilder {
     s1WestRamp.position.set(-150 - s1RampLen / 2, s1Height / 2, 20);
     s1WestRamp.rotation.z = Math.atan2(s1Height, s1RampLen);
     flyoverGroup.add(s1WestRamp);
+    addRampGuardrails('X', -220, -150, 20, s1Width, 0, s1Height);
 
     const s1EastRamp = new THREE.Mesh(new THREE.BoxGeometry(s1RampLen, 1.0, s1Width), flyoverMat);
     s1EastRamp.position.set(150 + s1RampLen / 2, s1Height / 2, 20);
     s1EastRamp.rotation.z = -Math.atan2(s1Height, s1RampLen);
     flyoverGroup.add(s1EastRamp);
+    addRampGuardrails('X', 150, 220, 20, s1Width, s1Height, 0);
 
     this.physicsWorld.addFlyover('silkboard_l1', 0, 20, s1Len, s1Width, s1Height, 'X');
     this.physicsWorld.addFlyoverRamp('sb_ramp_west', 'X', -220, -150, 20, s1Width, 0, s1Height);
@@ -1373,31 +1405,42 @@ export class CityBuilder {
     s2NorthRamp.position.set(0, s2Height / 2, 20 - 160 - s2RampLen / 2);
     s2NorthRamp.rotation.x = -Math.atan2(s2Height, s2RampLen);
     flyoverGroup.add(s2NorthRamp);
+    addRampGuardrails('Z', 20 - 230, 20 - 160, 0, s2Width, 0, s2Height);
 
     const s2SouthRamp = new THREE.Mesh(new THREE.BoxGeometry(s2Width, 1.0, s2RampLen), flyoverMat);
     s2SouthRamp.position.set(0, s2Height / 2, 20 + 160 + s2RampLen / 2);
     s2SouthRamp.rotation.x = Math.atan2(s2Height, s2RampLen);
     flyoverGroup.add(s2SouthRamp);
+    addRampGuardrails('Z', 20 + 160, 20 + 230, 0, s2Width, s2Height, 0);
 
     this.physicsWorld.addFlyover('silkboard_l2', 0, 20, s2Len, s2Width, s2Height, 'Z');
     this.physicsWorld.addFlyoverRamp('sb_ramp_north', 'Z', 20 - 230, 20 - 160, 0, s2Width, 0, s2Height);
     this.physicsWorld.addFlyoverRamp('sb_ramp_south', 'Z', 20 + 160, 20 + 230, 0, s2Width, s2Height, 0);
 
-    // Tall Heavy Support Columns for Silk Board Elevated Expressway
+    // Support Columns for Silk Board Elevated Expressway
+    // Realistic Portal Straddle Bents: placed at sides (x = -7.2, x = +7.2) so central road and ramps are completely free!
     for (let pz = -120; pz <= 160; pz += 60) {
-      if (Math.abs(pz - 20) > 15) { // Leave Level 1 underpass open
-        const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 2.2, s2Height, 14), pillarMat);
-        pillar.position.set(0, s2Height / 2, pz);
-        pillar.castShadow = true;
-        flyoverGroup.add(pillar);
-        this.physicsWorld.addStaticBox(0, s2Height / 2, pz, 1.8, s2Height / 2, 1.8);
+      if (Math.abs(pz - 20) > 15) { // Leave Level 1 underpass intersection open
+        [-7.2, 7.2].forEach(px => {
+          const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, s2Height, 12), pillarMat);
+          pillar.position.set(px, s2Height / 2, pz);
+          pillar.castShadow = true;
+          flyoverGroup.add(pillar);
+          this.physicsWorld.addStaticBox(px, s2Height / 2, pz, 1.2, s2Height / 2, 1.2);
+        });
+
+        // Crosshead beam connecting the two piers under Level 2 deck
+        const crossBeam = new THREE.Mesh(new THREE.BoxGeometry(15.5, 1.4, 2.4), pillarMat);
+        crossBeam.position.set(0, s2Height - 1.2, pz);
+        crossBeam.castShadow = true;
+        flyoverGroup.add(crossBeam);
       }
     }
 
     // --------------------------------------------------------
     // C. SILK BOARD GROUND JUNCTION & NAMMA METRO CORRIDOR
     // --------------------------------------------------------
-    // Overhead Green Highway Signboard
+    // Overhead Green Highway Signboard (mounted on tall overhead gantry arch at y = 22m above Level 2 deck)
     const signBoardCanvas = document.createElement('canvas');
     signBoardCanvas.width = 1024;
     signBoardCanvas.height = 256;
@@ -1420,8 +1463,17 @@ export class CityBuilder {
       new THREE.BoxGeometry(22, 5.5, 0.4),
       new THREE.MeshBasicMaterial({ map: sbSignTex })
     );
-    sbSignMesh.position.set(0, 7.2, 5);
+    // Positioned safely above Level 2 deck at y = 22.0m, no collision with traffic!
+    sbSignMesh.position.set(0, 22.0, 20);
     flyoverGroup.add(sbSignMesh);
+
+    // Gantry frame posts for signboard
+    const gantryPostMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8 });
+    [-10, 10].forEach(gx => {
+      const gPost = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 6.0, 8), gantryPostMat);
+      gPost.position.set(gx, 20.0, 20);
+      flyoverGroup.add(gPost);
+    });
 
     // BANGALORE NAMMA METRO VIADUCT & TRAIN (running parallel at y = 12.5m, x = 24)
     const metroViaduct = new THREE.Mesh(
@@ -1510,18 +1562,20 @@ export class CityBuilder {
     hSouthRamp.position.set(200, hHeight / 2, -120 + hRampLen / 2);
     hSouthRamp.rotation.x = Math.atan2(hHeight, hRampLen);
     flyoverGroup.add(hSouthRamp);
+    addRampGuardrails('Z', -50, -120, 200, hWidth, 0, hHeight);
 
     // North Off-Ramp towards Airport (z: -380 to -450)
     const hNorthRamp = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 1.0, hRampLen), flyoverMat);
     hNorthRamp.position.set(200, hHeight / 2, -380 - hRampLen / 2);
     hNorthRamp.rotation.x = -Math.atan2(hHeight, hRampLen);
     flyoverGroup.add(hNorthRamp);
+    addRampGuardrails('Z', -380, -450, 200, hWidth, hHeight, 0);
 
     this.physicsWorld.addFlyover('hebbal_flyover', 200, -250, hLen, hWidth, hHeight, 'Z');
     this.physicsWorld.addFlyoverRamp('hebbal_ramp_south', 'Z', -50, -120, 200, hWidth, 0, hHeight);
     this.physicsWorld.addFlyoverRamp('hebbal_ramp_north', 'Z', -380, -450, 200, hWidth, hHeight, 0);
 
-    // Hebbal Flyover Green Signboard
+    // Hebbal Flyover Green Signboard (mounted on high gantry at y = 15m)
     const hebbalCanvas = document.createElement('canvas');
     hebbalCanvas.width = 512;
     hebbalCanvas.height = 128;
@@ -1539,7 +1593,7 @@ export class CityBuilder {
       new THREE.PlaneGeometry(16, 3.2),
       new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(hebbalCanvas) })
     );
-    hebbalSign.position.set(200, 7.5, -135);
+    hebbalSign.position.set(200, 15.0, -135);
     flyoverGroup.add(hebbalSign);
 
     // --------------------------------------------------------
@@ -1574,11 +1628,13 @@ export class CityBuilder {
     dNorthRamp.position.set(40, dHeight / 2, 90 - dRampLen / 2);
     dNorthRamp.rotation.x = -Math.atan2(dHeight, dRampLen);
     flyoverGroup.add(dNorthRamp);
+    addRampGuardrails('Z', 30, 90, 40, dWidth, 0, dHeight);
 
     const dSouthRamp = new THREE.Mesh(new THREE.BoxGeometry(dWidth, 1.0, dRampLen), flyoverMat);
     dSouthRamp.position.set(40, dHeight / 2, 270 + dRampLen / 2);
     dSouthRamp.rotation.x = Math.atan2(dHeight, dRampLen);
     flyoverGroup.add(dSouthRamp);
+    addRampGuardrails('Z', 270, 330, 40, dWidth, dHeight, 0);
 
     this.physicsWorld.addFlyover('double_road_flyover', 40, 180, dLen, dWidth, dHeight, 'Z');
     this.physicsWorld.addFlyoverRamp('dr_ramp_north', 'Z', 30, 90, 40, dWidth, 0, dHeight);
@@ -1616,11 +1672,13 @@ export class CityBuilder {
     yNorthRamp.position.set(240, yHeight / 2, 190 - yRampLen / 2);
     yNorthRamp.rotation.x = -Math.atan2(yHeight, yRampLen);
     flyoverGroup.add(yNorthRamp);
+    addRampGuardrails('Z', 130, 190, 240, yWidth, 0, yHeight);
 
     const ySouthRamp = new THREE.Mesh(new THREE.BoxGeometry(yWidth, 1.0, yRampLen), flyoverMat);
     ySouthRamp.position.set(240, yHeight / 2, 370 + yRampLen / 2);
     ySouthRamp.rotation.x = Math.atan2(yHeight, yRampLen);
     flyoverGroup.add(ySouthRamp);
+    addRampGuardrails('Z', 370, 430, 240, yWidth, yHeight, 0);
 
     this.physicsWorld.addFlyover('yeshwanthpur_flyover', 240, 280, yLen, yWidth, yHeight, 'Z');
     this.physicsWorld.addFlyoverRamp('yp_ramp_north', 'Z', 130, 190, 240, yWidth, 0, yHeight);
@@ -1658,11 +1716,13 @@ export class CityBuilder {
     vWestRamp.position.set(-230 - vRampLen / 2, vHeight / 2, -70);
     vWestRamp.rotation.z = Math.atan2(vHeight, vRampLen);
     flyoverGroup.add(vWestRamp);
+    addRampGuardrails('X', -290, -230, -70, vWidth, 0, vHeight);
 
     const vEastRamp = new THREE.Mesh(new THREE.BoxGeometry(vRampLen, 1.0, vWidth), flyoverMat);
     vEastRamp.position.set(-70 + vRampLen / 2, vHeight / 2, -70);
     vEastRamp.rotation.z = -Math.atan2(vHeight, vRampLen);
     flyoverGroup.add(vEastRamp);
+    addRampGuardrails('X', -70, -10, -70, vWidth, vHeight, 0);
 
     this.physicsWorld.addFlyover('vidhana_ub_link', -150, -70, vLen, vWidth, vHeight, 'X');
     this.physicsWorld.addFlyoverRamp('vub_ramp_west', 'X', -290, -230, -70, vWidth, 0, vHeight);
@@ -1700,11 +1760,13 @@ export class CityBuilder {
     btmWestRamp.position.set(-160 - btmRampLen / 2, btmHeight / 2, 140);
     btmWestRamp.rotation.z = Math.atan2(btmHeight, btmRampLen);
     flyoverGroup.add(btmWestRamp);
+    addRampGuardrails('X', -210, -160, 140, btmWidth, 0, btmHeight);
 
     const btmEastRamp = new THREE.Mesh(new THREE.BoxGeometry(btmRampLen, 1.0, btmWidth), flyoverMat);
     btmEastRamp.position.set(-20 + btmRampLen / 2, btmHeight / 2, 140);
     btmEastRamp.rotation.z = -Math.atan2(btmHeight, btmRampLen);
     flyoverGroup.add(btmEastRamp);
+    addRampGuardrails('X', -20, 30, 140, btmWidth, btmHeight, 0);
 
     this.physicsWorld.addFlyover('btm_jayadeva_flyover', -90, 140, btmLen, btmWidth, btmHeight, 'X');
     this.physicsWorld.addFlyoverRamp('btm_ramp_west', 'X', -210, -160, 140, btmWidth, 0, btmHeight);

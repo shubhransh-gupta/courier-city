@@ -293,6 +293,9 @@ export class Vehicle {
       // Check stunt ramp jump elevation
       const rampCheck = this.checkRamps(proposedX, proposedZ);
 
+      // Check active flyover structure
+      const flyoverInfo = this.physicsWorld.getFlyoverAt ? this.physicsWorld.getFlyoverAt(proposedX, proposedZ, this.position.y) : null;
+
       if (rampCheck.onRamp) {
         // Car climbs up stunt ramp smoothly!
         this.position.y = rampCheck.height;
@@ -304,7 +307,20 @@ export class Vehicle {
         this.position.y = surfaceHeight;
         this.verticalVelocity = 0;
         this.isAirborne = false;
-        this.pitch *= Math.max(0, 1 - 6 * dt);
+
+        // Realistic pitch adaptation on flyover ramps
+        if (flyoverInfo && flyoverInfo.type === 'ramp') {
+          const r = flyoverInfo.ramp;
+          const deltaH = r.endHeight - r.startHeight;
+          const deltaDist = r.endCoord - r.startCoord;
+          const rampAngle = Math.atan2(deltaH, Math.abs(deltaDist));
+          const fwdDot = r.axis === 'X' ? Math.sin(this.yaw) : Math.cos(this.yaw);
+          const slopeDir = (deltaDist > 0 ? 1 : -1) * (deltaH > 0 ? 1 : -1);
+          const targetPitch = -rampAngle * fwdDot * slopeDir * 0.7;
+          this.pitch += (targetPitch - this.pitch) * Math.min(1, dt * 10);
+        } else {
+          this.pitch *= Math.max(0, 1 - 6 * dt);
+        }
       } else if (this.isAirborne || this.position.y > surfaceHeight + 0.05) {
         // Airborne jump trajectory through the air!
         this.isAirborne = true;
@@ -322,8 +338,21 @@ export class Vehicle {
         this.pitch *= Math.max(0, 1 - 6 * dt);
       }
 
+      // Constrain position to flyover deck/ramp so cars cannot slip or fall off the edges!
+      let constrainedX = proposedX;
+      let constrainedZ = proposedZ;
+      if (this.physicsWorld.constrainToFlyover && (this.position.y > 1.0 || surfaceHeight > 1.0)) {
+        const flyoverConstraint = this.physicsWorld.constrainToFlyover(proposedX, proposedZ, this.position.y, this.radius);
+        constrainedX = flyoverConstraint.x;
+        constrainedZ = flyoverConstraint.z;
+        if (flyoverConstraint.constrained) {
+          // Soft collision bounce against flyover guardrail
+          this.currentSpeed *= 0.96;
+        }
+      }
+
       // Obstacle collision
-      const resolved = this.resolveCollisions(proposedX, proposedZ);
+      const resolved = this.resolveCollisions(constrainedX, constrainedZ);
       this.position.x = resolved.x;
       this.position.z = resolved.z;
 
