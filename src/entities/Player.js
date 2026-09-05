@@ -353,8 +353,12 @@ export class Player {
       }
 
       // 2. Impenetrable solid wall collision (height overlap)
-      // Skip if player is completely below (e.g. walking under flyover) or above obstacle
-      if (finalY + 1.8 < minY || finalY > maxY + 0.5) {
+      // If obstacle is a flyover pillar and player is elevated on flyover deck/ramp, skip it!
+      if (b.isPillar && finalY > 1.5) {
+        continue;
+      }
+      // Skip if player is completely below (e.g. walking under flyover) or standing on top
+      if (finalY + 0.3 < minY || finalY >= maxY - 0.2) {
         continue;
       }
         const isInsideX = (finalX >= b.x - b.hx) && (finalX <= b.x + b.hx);

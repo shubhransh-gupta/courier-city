@@ -22,6 +22,7 @@ export class Airplane {
     this.isAirborne = false;
     this.propeller = null;
     this.isAirplane = true;
+    this.color = 0x2563eb;
 
     this.radius = 3.6;
 

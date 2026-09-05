@@ -271,11 +271,16 @@ export class Vehicle {
       }
 
       // Steering
-      const targetSteer = -turnInput * this.maxSteerAngle;
+      // Steering direction aligned with input: positive turnInput (right) → positive steer
+      const targetSteer = turnInput * this.maxSteerAngle;
       this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 10);
 
-      if (Math.abs(this.currentSpeed) > 0.3) {
-        const turnMult = this.currentSpeed >= 0 ? 1 : -1;
+      // Always allow steering if the car has any throttle/brake input or motion!
+      const isTryingToMove = (input.isDown('KeyW') || input.isDown('ArrowUp') || input.isDown('KeyS') || input.isDown('ArrowDown'));
+      const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), isTryingToMove ? 3.5 : 0);
+
+      if (effectiveSpeed > 0.1) {
+        const turnMult = (this.currentSpeed < -0.1) ? -1 : 1;
         const driftFactor = handbrake ? 1.8 : 1.0;
         this.yaw += this.steerAngle * this.turnRate * turnMult * driftFactor * dt;
       }
@@ -346,8 +351,16 @@ export class Vehicle {
         constrainedX = flyoverConstraint.x;
         constrainedZ = flyoverConstraint.z;
         if (flyoverConstraint.constrained) {
-          // Soft collision bounce against flyover guardrail
-          this.currentSpeed *= 0.96;
+          const nx = flyoverConstraint.normalX || 0;
+          const nz = flyoverConstraint.normalZ || 0;
+          const dot = fwdX * nx + fwdZ * nz;
+          if (dot < 0) {
+            // Heading into the rail: softly rotate parallel to the rail (wall glide)
+            const cross = fwdX * nz - fwdZ * nx;
+            this.yaw += cross * dt * 4.0;
+            // Retain forward glide momentum rather than killing speed
+            this.currentSpeed *= 0.96;
+          }
         }
       }
 
@@ -357,6 +370,25 @@ export class Vehicle {
       this.position.z = resolved.z;
 
       if (resolved.collided) {
+        const impactSpeed = Math.abs(this.currentSpeed);
+        if (impactSpeed > 2.5) {
+          // Play impact sound based on speed
+          if (this.audioManager) {
+            if (resolved.isTree) {
+              this.audioManager.playTreeHit();
+            } else {
+              this.audioManager.playImpact(Math.min(1.5, impactSpeed / 12));
+            }
+          }
+
+          // Trigger physical haptic vibration feedback for mobile & gamepad
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            try {
+              const vibTime = Math.min(180, Math.floor(impactSpeed * 6));
+              navigator.vibrate(vibTime);
+            } catch (e) {}
+          }
+        }
         this.currentSpeed *= 0.35;
       }
 
@@ -387,9 +419,13 @@ export class Vehicle {
     this.frontRightWheel.rotation.y = Math.PI + this.steerAngle;
 
     if (this.shadow) {
-      this.shadow.position.set(this.position.x, this.position.y + 0.03, this.position.z);
-      const shadowScale = Math.max(0.4, 1.0 - (this.position.y * 0.15));
-      this.shadow.scale.set(shadowScale, shadowScale, shadowScale);
+      // Throttle shadow updates to every other frame for performance
+      this._shadowFrame = (this._shadowFrame || 0) + 1;
+      if (this._shadowFrame % 2 === 0) {
+        this.shadow.position.set(this.position.x, this.position.y + 0.03, this.position.z);
+        const shadowScale = Math.max(0.4, 1.0 - (this.position.y * 0.15));
+        this.shadow.scale.set(shadowScale, shadowScale, shadowScale);
+      }
     }
   }
 
@@ -425,6 +461,7 @@ export class Vehicle {
     let finalX = x;
     let finalZ = z;
     let collided = false;
+    let isTree = false;
 
     const obstacles = this.physicsWorld.obstacles || [];
     const r = this.radius;
@@ -433,10 +470,15 @@ export class Vehicle {
     for (const b of obstacles) {
       if (b.isRamp) continue; // Don't block ramp entrance!
 
-      // 3D vertical clearance: If car is completely above or below obstacle, skip horizontal collision!
+      // If obstacle is a flyover pillar and vehicle is elevated on a ramp or flyover deck, skip it!
+      if (b.isPillar && vehicleY > 1.5) {
+        continue;
+      }
+
+      // 3D vertical clearance: If car's base is at or above the obstacle's top surface, skip horizontal collision!
       const minY = b.y - b.hy;
       const maxY = b.y + b.hy;
-      if (vehicleY + 1.4 < minY || vehicleY > maxY + 0.5) {
+      if (vehicleY + 0.3 < minY || vehicleY >= maxY - 0.25) {
         continue;
       }
 
@@ -449,6 +491,7 @@ export class Vehicle {
 
       if (distSq < r * r) {
         collided = true;
+        if (b.isTree) isTree = true;
         const dist = Math.sqrt(distSq);
         if (dist > 0.0001) {
           const overlap = r - dist;
@@ -460,7 +503,7 @@ export class Vehicle {
       }
     }
 
-    return { x: finalX, z: finalZ, collided };
+    return { x: finalX, z: finalZ, collided, isTree };
   }
 
   getExitPosition() {

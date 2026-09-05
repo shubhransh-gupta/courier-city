@@ -70,13 +70,24 @@ export class HUD {
 
   updateGps(gpsData, playerAngle = 0) {
     if (!this.gpsWidget || !gpsData) return;
-    if (this.gpsIcon) this.gpsIcon.textContent = gpsData.icon || '✈️';
-    if (this.gpsText) this.gpsText.textContent = `${gpsData.name.split(' ')[1] || 'Target'}: ${gpsData.distance}m`;
+    const targetName = gpsData.name.split(' ')[1] || 'Target';
+    const distText = `${targetName}: ${gpsData.distance}m`;
+
+    if (this._lastGpsText !== distText) {
+      this._lastGpsText = distText;
+      if (this.gpsIcon && this.gpsIcon.textContent !== gpsData.icon) {
+        this.gpsIcon.textContent = gpsData.icon || '✈️';
+      }
+      if (this.gpsText) this.gpsText.textContent = distText;
+    }
 
     if (this.gpsArrow) {
       let relativeAngle = gpsData.angle - playerAngle;
       const deg = Math.round((relativeAngle * 180) / Math.PI);
-      this.gpsArrow.style.transform = `rotate(${deg}deg)`;
+      if (this._lastGpsDeg !== deg) {
+        this._lastGpsDeg = deg;
+        this.gpsArrow.style.transform = `rotate(${deg}deg)`;
+      }
     }
   }
 
@@ -93,8 +104,11 @@ export class HUD {
 
   showPrompt(htmlText) {
     if (!this.interactionPrompt) return;
-    const span = this.interactionPrompt.querySelector('.prompt-text');
-    if (span) span.innerHTML = htmlText;
+    if (this._lastPromptHtml !== htmlText) {
+      this._lastPromptHtml = htmlText;
+      const span = this.interactionPrompt.querySelector('.prompt-text');
+      if (span) span.innerHTML = htmlText;
+    }
     this.interactionPrompt.classList.remove('hidden');
   }
 
@@ -104,12 +118,16 @@ export class HUD {
 
   hideInteraction() {
     if (!this.interactionPrompt) return;
+    this._lastPromptHtml = '';
     this.interactionPrompt.classList.add('hidden');
   }
 
   updateSpeed(speedKmh) {
     if (!this.speedVal) return;
-    this.speedVal.textContent = speedKmh;
+    if (this._lastSpeed !== speedKmh) {
+      this._lastSpeed = speedKmh;
+      this.speedVal.textContent = speedKmh;
+    }
   }
 
   showToast(message, duration = 3000) {

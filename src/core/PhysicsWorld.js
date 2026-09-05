@@ -9,7 +9,7 @@ export class PhysicsWorld {
     this.world.defaultContactMaterial.friction = 0.35;
     this.world.defaultContactMaterial.restitution = 0.05;
 
-    // Static obstacles, interactive ramps, and elevated flyover network
+    // Static obstacles, interactive ramps
     this.obstacles = [];
     this.ramps = [];
     this.flyovers = [];
@@ -29,7 +29,7 @@ export class PhysicsWorld {
     this.world.step(1 / 60, dt, 3);
   }
 
-  addStaticBox(x, y, z, hx, hy, hz, isRamp = false) {
+  addStaticBox(x, y, z, hx, hy, hz, isRamp = false, isPillar = false, isTree = false) {
     const shape = new CANNON.Box(new CANNON.Vec3(hx, hy, hz));
     const body = new CANNON.Body({
       mass: 0,
@@ -38,7 +38,7 @@ export class PhysicsWorld {
     });
     this.world.addBody(body);
 
-    this.obstacles.push({ x, y, z, hx, hy, hz, isRamp });
+    this.obstacles.push({ x, y, z, hx, hy, hz, isRamp, isPillar, isTree });
     return body;
   }
 
@@ -128,10 +128,12 @@ export class PhysicsWorld {
     let finalX = x;
     let finalZ = z;
     let constrained = false;
+    let normalX = 0;
+    let normalZ = 0;
 
     // Only apply lateral guardrails if entity is elevated above ground level
     if (currentY < 1.0) {
-      return { x: finalX, z: finalZ, constrained: false };
+      return { x: finalX, z: finalZ, constrained: false, normalX: 0, normalZ: 0 };
     }
 
     // 1. Check if entity is on a ramp
@@ -144,17 +146,19 @@ export class PhysicsWorld {
           const rampH = ramp.startHeight + (ramp.endHeight - ramp.startHeight) * t;
           if (Math.abs(currentY - rampH) < 5.0) {
             // Constrain lateral Z inside ramp width
-            const halfW = ramp.width / 2 - entityRadius * 0.4;
+            const halfW = ramp.width / 2 - entityRadius * 0.35;
             const minZ = ramp.fixedCoord - halfW;
             const maxZ = ramp.fixedCoord + halfW;
             if (finalZ < minZ) {
-              finalZ = minZ;
+              finalZ = minZ + 0.15;
+              normalZ = 1.0;
               constrained = true;
             } else if (finalZ > maxZ) {
-              finalZ = maxZ;
+              finalZ = maxZ - 0.15;
+              normalZ = -1.0;
               constrained = true;
             }
-            return { x: finalX, z: finalZ, constrained };
+            return { x: finalX, z: finalZ, constrained, normalX, normalZ };
           }
         }
       } else if (ramp.axis === 'Z') {
@@ -165,17 +169,19 @@ export class PhysicsWorld {
           const rampH = ramp.startHeight + (ramp.endHeight - ramp.startHeight) * t;
           if (Math.abs(currentY - rampH) < 5.0) {
             // Constrain lateral X inside ramp width
-            const halfW = ramp.width / 2 - entityRadius * 0.4;
+            const halfW = ramp.width / 2 - entityRadius * 0.35;
             const minX = ramp.fixedCoord - halfW;
             const maxX = ramp.fixedCoord + halfW;
             if (finalX < minX) {
-              finalX = minX;
+              finalX = minX + 0.15;
+              normalX = 1.0;
               constrained = true;
             } else if (finalX > maxX) {
-              finalX = maxX;
+              finalX = maxX - 0.15;
+              normalX = -1.0;
               constrained = true;
             }
-            return { x: finalX, z: finalZ, constrained };
+            return { x: finalX, z: finalZ, constrained, normalX, normalZ };
           }
         }
       }
@@ -186,30 +192,33 @@ export class PhysicsWorld {
       if (Math.abs(currentY - deck.height) < 4.0 || currentY >= deck.height - 1.5) {
         if (deck.axis === 'X') {
           // Deck runs along X (minX to maxX), cross-axis is Z
-          // If within longitudinal span or near ends
           if (finalX >= deck.minX - 3.0 && finalX <= deck.maxX + 3.0) {
-            const halfW = deck.width / 2 - entityRadius * 0.4;
+            const halfW = deck.width / 2 - entityRadius * 0.35;
             const minZ = deck.z - halfW;
             const maxZ = deck.z + halfW;
             if (finalZ < minZ) {
-              finalZ = minZ;
+              finalZ = minZ + 0.15;
+              normalZ = 1.0;
               constrained = true;
             } else if (finalZ > maxZ) {
-              finalZ = maxZ;
+              finalZ = maxZ - 0.15;
+              normalZ = -1.0;
               constrained = true;
             }
           }
         } else if (deck.axis === 'Z') {
           // Deck runs along Z (minZ to maxZ), cross-axis is X
           if (finalZ >= deck.minZ - 3.0 && finalZ <= deck.maxZ + 3.0) {
-            const halfW = deck.width / 2 - entityRadius * 0.4;
+            const halfW = deck.width / 2 - entityRadius * 0.35;
             const minX = deck.x - halfW;
             const maxX = deck.x + halfW;
             if (finalX < minX) {
-              finalX = minX;
+              finalX = minX + 0.15;
+              normalX = 1.0;
               constrained = true;
             } else if (finalX > maxX) {
-              finalX = maxX;
+              finalX = maxX - 0.15;
+              normalX = -1.0;
               constrained = true;
             }
           }
@@ -217,7 +226,7 @@ export class PhysicsWorld {
       }
     }
 
-    return { x: finalX, z: finalZ, constrained };
+    return { x: finalX, z: finalZ, constrained, normalX, normalZ };
   }
 
   getSurfaceHeight(x, z, currentY = 0) {

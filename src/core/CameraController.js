@@ -164,15 +164,18 @@ export class CameraController {
       this.yaw -= keyRotSpeed * dt;
     }
 
-    // 3. Smooth zoom damping
-    this.distance += (this.targetDistance - this.distance) * Math.min(1, dt * 6);
+    // 3. Smooth zoom damping with exponential decay
+    const zoomAlpha = 1 - Math.exp(-8 * dt);
+    this.distance += (this.targetDistance - this.distance) * zoomAlpha;
 
-    // 4. Safe FOV
+    // 4. Smooth dynamic FOV
     const safeSpeed = (Number.isFinite(speedKmh) && speedKmh > 0) ? speedKmh : 0;
     const baseFov = 54;
-    const extraFov = Math.min(safeSpeed * 0.14, 15);
+    const extraFov = Math.min(safeSpeed * 0.12, 12);
+    const targetFov = baseFov + extraFov;
+    const fovAlpha = 1 - Math.exp(-5 * dt);
     const currentFov = (Number.isFinite(this.camera.fov) && this.camera.fov > 10) ? this.camera.fov : baseFov;
-    this.camera.fov = currentFov + (baseFov + extraFov - currentFov) * Math.min(1, dt * 4);
+    this.camera.fov = currentFov + (targetFov - currentFov) * fovAlpha;
     this.camera.updateProjectionMatrix();
 
     // 5. Spherical camera offset calculations
@@ -184,9 +187,7 @@ export class CameraController {
     const offsetY = sinPitch * this.distance + this.eyeHeight;
     const offsetZ = Math.cos(this.yaw) * cosPitch * this.distance;
 
-    // Camera Y: follow player's elevation closely (don't force high above ground)
-    // This ensures the camera stays WITH the character when under flyovers
-    const minCamY = targetPos.y + 2.5; // Minimum: just above character head
+    const minCamY = targetPos.y + 2.2;
     const desiredCamY = targetPos.y + offsetY;
 
     const desiredCamPos = new THREE.Vector3(
@@ -195,13 +196,16 @@ export class CameraController {
       targetPos.z + offsetZ
     );
 
-    this.currentPosition.lerp(desiredCamPos, Math.min(1, dt * 12));
+    // Frame-rate independent exponential smoothing (butter smooth, zero jitter)
+    const posAlpha = 1 - Math.exp(-14 * dt);
+    this.currentPosition.lerp(desiredCamPos, posAlpha);
     this.camera.position.copy(this.currentPosition);
 
-    // Look at vehicle / character center (slightly above ground so camera faces down towards ground)
+    // Look at vehicle / character center with smooth exponential tracking
     const lookTargetY = targetPos.y + Math.min(1.2, this.eyeHeight * 0.6);
     const desiredLookAt = new THREE.Vector3(targetPos.x, lookTargetY, targetPos.z);
-    this.currentLookAt.lerp(desiredLookAt, Math.min(1, dt * 14));
+    const lookAlpha = 1 - Math.exp(-16 * dt);
+    this.currentLookAt.lerp(desiredLookAt, lookAlpha);
     this.camera.lookAt(this.currentLookAt);
   }
 }
