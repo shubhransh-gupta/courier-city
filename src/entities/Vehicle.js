@@ -419,13 +419,9 @@ export class Vehicle {
     this.frontRightWheel.rotation.y = Math.PI + this.steerAngle;
 
     if (this.shadow) {
-      // Throttle shadow updates to every other frame for performance
-      this._shadowFrame = (this._shadowFrame || 0) + 1;
-      if (this._shadowFrame % 2 === 0) {
-        this.shadow.position.set(this.position.x, this.position.y + 0.03, this.position.z);
-        const shadowScale = Math.max(0.4, 1.0 - (this.position.y * 0.15));
-        this.shadow.scale.set(shadowScale, shadowScale, shadowScale);
-      }
+      this.shadow.position.set(this.position.x, this.position.y + 0.03, this.position.z);
+      const shadowScale = Math.max(0.4, 1.0 - (this.position.y * 0.15));
+      this.shadow.scale.set(shadowScale, shadowScale, shadowScale);
     }
   }
 

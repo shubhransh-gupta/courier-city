@@ -584,15 +584,17 @@ class Game {
     const dt = Math.min((currentTime - this.lastTime) * 0.001, 0.08);
     this.lastTime = currentTime;
 
-    // Throttle expensive system updates to every other frame for performance
+    // Traffic and crowd must update every frame for smooth movement
+    this.trafficSystem.update(dt, this.activeVehicle, this.player);
+    this.crowdSystem.update(dt);
+    this.metroSystem.update(dt);
+
+    // Throttle distant/decorative systems to every other frame
     this._sysFrame = (this._sysFrame || 0) + 1;
     if (this._sysFrame % 2 === 0) {
-      this.trafficSystem.update(dt, this.activeVehicle, this.player);
-      this.crowdSystem.update(dt);
       if (this.skyCreatures) this.skyCreatures.update(dt, currentTime * 0.001);
       if (this.animalSystem) this.animalSystem.update(dt, currentTime * 0.001);
     }
-    this.metroSystem.update(dt);
     this.handleVehicleInteractions();
     this.handleObservationElevators();
     this.updateWaypointAnimation(dt, currentTime);
