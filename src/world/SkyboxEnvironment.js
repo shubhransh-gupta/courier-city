@@ -20,17 +20,17 @@ export class SkyboxEnvironment {
     this.sunLight = new THREE.DirectionalLight(0xfff3d6, 1.5);
     this.sunLight.position.set(40, 60, 35);
     this.sunLight.castShadow = true;
-    this.sunLight.shadow.mapSize.width = 2048;
-    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.mapSize.width = 1024;
+    this.sunLight.shadow.mapSize.height = 1024;
     this.sunLight.shadow.camera.near = 1;
-    this.sunLight.shadow.camera.far = 250;
+    this.sunLight.shadow.camera.far = 240;
 
-    const shadowDist = 80;
+    const shadowDist = 70;
     this.sunLight.shadow.camera.left = -shadowDist;
     this.sunLight.shadow.camera.right = shadowDist;
     this.sunLight.shadow.camera.top = shadowDist;
     this.sunLight.shadow.camera.bottom = -shadowDist;
-    this.sunLight.shadow.bias = -0.0003;
+    this.sunLight.shadow.bias = -0.0005;
 
     this.scene.add(this.sunLight);
   }

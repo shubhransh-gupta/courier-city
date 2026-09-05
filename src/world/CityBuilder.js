@@ -81,7 +81,17 @@ export class CityBuilder {
     this.buildStatueOfLiberty();    // Far-East Liberty Island (440, 80)
 
     this.createNightclubDistrict(); // Neon Nightclub & Rooftop Lounge (-80, -60)
-    this.createHighwayFlyovers();   // Multi-level elevated overpasses (Silk Board & Koramangala)
+    this.buildIndianNationalFlag(); // Monumental 55m Tiranga in Central Plaza (0, -20)
+    this.buildBdaParks();           // BDA Public Parks in HSR, Koramangala & Indiranagar
+    this.buildBdaComplexes();       // BDA Commercial Shopping Complexes (HSR & Koramangala)
+    this.buildRoadRoundaboutsChorahas(); // Grand roundabouts/chorahas with Kamal (Lotus) monuments
+    this.buildBangaloreColleges();  // BMS College of Engineering & IISc Heritage Campus
+    this.buildBnmInstitute();       // BNM Institute of Technology (BNMIT) in South Bangalore (-140, 160)
+    this.buildKumaraswamyLayout();  // Kumaraswamy Layout Civic District & Viewpoint (-200, 180)
+    this.buildFoundersBuildingStarkTower(); // Unique Stark Tower Design in BTM Layout (-70, 130)
+    this.buildHinduTemples();       // Sri Someshwara Rajagopuram, Bull Temple & ISKCON
+    this.buildIndianAirForceHQ();   // IAF HQ Training Command with fighter jet monument (180, -240)
+    this.buildIndianArmyHQ();       // Indian Army Cantonment HQ with battle tank monument (-180, 220)
     this.buildVidhanaSoudha();      // Majestic Karnataka State Legislature (-240, -40)
     this.buildUBCity();             // UB City Tower & Luxury Amphitheatre (-60, -100)
     this.buildOrionMall();          // Orion Mall & World Trade Center Bangalore (240, 320)
@@ -90,6 +100,10 @@ export class CityBuilder {
     this.buildTownHall();           // Bangalore Town Hall (40, 200)
     this.createBangaloreDistricts(); // Koramangala, HSR, BTM & Auto-rickshaw stands
     this.createCityVegetation();    // 350+ multi-species trees, parks & street props
+    this.buildTipuSultanSummerPalace();
+    this.buildMysorePalace();
+    this.buildVvPuramFoodStreet();
+    this.buildRussellMarketAndCommercialStreet();
 
     this.createJumpRamps();
   }
@@ -222,7 +236,6 @@ export class CityBuilder {
 
     const ridgeMesh = new THREE.Mesh(ridgeGeo, this.materials.rock);
     ridgeMesh.position.set(0, 0, -510);
-    ridgeMesh.castShadow = true;
     ridgeMesh.receiveShadow = true;
     this.scene.add(ridgeMesh);
 
@@ -244,7 +257,6 @@ export class CityBuilder {
       rockMesh.scale.set(s.scale[0], s.scale[1], s.scale[2]);
       rockMesh.rotation.set(0.1, s.rotY, -0.08);
       rockMesh.position.set(s.x, s.scale[1] * 0.48, s.z);
-      rockMesh.castShadow = true;
       rockMesh.receiveShadow = true;
       this.scene.add(rockMesh);
 
@@ -254,7 +266,6 @@ export class CityBuilder {
       snowMesh.scale.set(s.scale[0] * 0.58, s.scale[1] * 0.46, s.scale[2] * 0.58);
       snowMesh.rotation.set(0.08, s.rotY + 0.2, -0.06);
       snowMesh.position.set(s.x, s.scale[1] * 0.76, s.z);
-      snowMesh.castShadow = true;
       this.scene.add(snowMesh);
 
       // Mountain base collision box
@@ -568,15 +579,16 @@ export class CityBuilder {
   }
 
   createRoadNetwork() {
-    const highwayW = 16;
+    // Upgraded from 2-lane (16m) to spacious 4-lane grand boulevard (28m wide)
+    const highwayW = 28;
     const len = 1100;
 
-    // North-South Central Spine
+    // North-South Central Spine (4 lanes)
     this.addHighway(0, 0, highwayW, len, 0);
-    // East-West Grand Arterial
+    // East-West Grand Arterial (4 lanes)
     this.addHighway(0, 0, len, highwayW, 0);
 
-    // Regional connecting routes
+    // Regional connecting 4-lane arterial routes
     this.addHighway(-200, 0, highwayW, len, 0);
     this.addHighway(200, 0, highwayW, len, 0);
     this.addHighway(0, -200, len, highwayW, 0);
@@ -588,6 +600,7 @@ export class CityBuilder {
     group.position.set(x, 0.04, z);
     group.rotation.y = rotY;
 
+    // Broad 4-lane asphalt roadbed
     const road = new THREE.Mesh(new THREE.PlaneGeometry(width, length), this.materials.road);
     road.rotation.x = -Math.PI / 2;
     road.receiveShadow = true;
@@ -596,16 +609,54 @@ export class CityBuilder {
     const isHorizontal = width > length;
     const roadLen = Math.max(width, length);
     const count = Math.floor(roadLen / 8);
-    const dashGeo = isHorizontal ? new THREE.PlaneGeometry(4.5, 0.45) : new THREE.PlaneGeometry(0.45, 4.5);
 
-    for (let i = -count / 2; i <= count / 2; i++) {
-      const dash = new THREE.Mesh(dashGeo, this.materials.roadMarking);
-      dash.rotation.x = -Math.PI / 2;
-      dash.position.y = 0.008;
-      if (isHorizontal) dash.position.x = i * 8;
-      else dash.position.z = i * 8;
-      group.add(dash);
-    }
+    // Center divider double yellow line
+    const centerLineGeo = isHorizontal ? new THREE.PlaneGeometry(roadLen, 0.35) : new THREE.PlaneGeometry(0.35, roadLen);
+    const centerLine1 = new THREE.Mesh(centerLineGeo, this.materials.roadMarking);
+    centerLine1.rotation.x = -Math.PI / 2;
+    centerLine1.position.y = 0.007;
+    if (isHorizontal) centerLine1.position.z = -0.25;
+    else centerLine1.position.x = -0.25;
+
+    const centerLine2 = new THREE.Mesh(centerLineGeo, this.materials.roadMarking);
+    centerLine2.rotation.x = -Math.PI / 2;
+    centerLine2.position.y = 0.007;
+    if (isHorizontal) centerLine2.position.z = 0.25;
+    else centerLine2.position.x = 0.25;
+    group.add(centerLine1, centerLine2);
+
+    // Dashed white lane dividers separating the 2 lanes in each direction
+    // Width is 28m -> lane offsets at ±6.5m from center
+    const dashGeo = isHorizontal ? new THREE.PlaneGeometry(4.5, 0.35) : new THREE.PlaneGeometry(0.35, 4.5);
+    const laneOffsets = [-6.5, 6.5];
+
+    laneOffsets.forEach(offset => {
+      for (let i = -count / 2; i <= count / 2; i++) {
+        const dash = new THREE.Mesh(dashGeo, this.materials.roadWhite);
+        dash.rotation.x = -Math.PI / 2;
+        dash.position.y = 0.008;
+        if (isHorizontal) {
+          dash.position.x = i * 8;
+          dash.position.z = offset;
+        } else {
+          dash.position.x = offset;
+          dash.position.z = i * 8;
+        }
+        group.add(dash);
+      }
+    });
+
+    // Solid white outer road boundary lines (at ±12.8m)
+    const edgeOffsets = [-12.8, 12.8];
+    const edgeLineGeo = isHorizontal ? new THREE.PlaneGeometry(roadLen, 0.3) : new THREE.PlaneGeometry(0.3, roadLen);
+    edgeOffsets.forEach(edgeOff => {
+      const edgeLine = new THREE.Mesh(edgeLineGeo, this.materials.roadWhite);
+      edgeLine.rotation.x = -Math.PI / 2;
+      edgeLine.position.y = 0.007;
+      if (isHorizontal) edgeLine.position.z = edgeOff;
+      else edgeLine.position.x = edgeOff;
+      group.add(edgeLine);
+    });
 
     const curbW = 2.5;
     const curbH = 0.22;
@@ -1230,15 +1281,12 @@ export class CityBuilder {
       group.add(speaker);
     });
 
-    // Pulsing Colorful Stage Spotlights
+    // Vibrant Stage Spotlight
     this.partyLights = [];
-    const lightColors = [0xff0055, 0x00ffcc, 0x9900ff, 0xffcc00];
-    lightColors.forEach((col, idx) => {
-      const light = new THREE.PointLight(col, 2.5, 18);
-      light.position.set(-6 + idx * 4, 11, -4);
-      group.add(light);
-      this.partyLights.push(light);
-    });
+    const light = new THREE.PointLight(0xff0055, 3.0, 26);
+    light.position.set(0, 11, -4);
+    group.add(light);
+    this.partyLights.push(light);
 
     // Cocktail Bar & Stools
     const bar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 7), darkMat);
@@ -1251,533 +1299,1162 @@ export class CityBuilder {
   }
 
   // ========================================================
-  // 8. ELEVATED HIGHWAY FLYOVERS & OVERPASSES
+  // 8. AUTHENTIC BANGALORE LANDMARKS & CIVIC INFRASTRUCTURE
+  // (BDA Parks, BDA Complexes, Colleges, Hindu Temples, Flag, IAF & Army HQ)
   // ========================================================
-  // ========================================================
-  // 8. BENGALURU MULTI-TIER FLYOVERS & SILK BOARD INTERCHANGE
-  // ========================================================
-  createHighwayFlyovers() {
-    const flyoverGroup = new THREE.Group();
-    const flyoverMat = new THREE.MeshStandardMaterial({ color: 0x1f2421, roughness: 0.85 });
-    const pillarMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.6 });
-    const guardrailMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4, metalness: 0.7 });
-    const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.85 });
 
-    // Helper to create sloping guardrail along ramps
-    const addRampGuardrails = (axis, startCoord, endCoord, fixedCoord, width, startH, endH) => {
-      const len = Math.abs(endCoord - startCoord);
-      const hDiff = endH - startH;
-      const angle = Math.atan2(hDiff, len);
-      const midCoord = (startCoord + endCoord) / 2;
-      const midH = (startH + endH) / 2 + 0.9;
-      const halfW = width / 2;
+  // A. MONUMENTAL 55M INDIAN NATIONAL FLAG (Central Plaza: 0, -20)
+  buildIndianNationalFlag() {
+    const group = new THREE.Group();
+    group.position.set(0, 0, -20);
 
-      if (axis === 'X') {
-        const railN = new THREE.Mesh(new THREE.BoxGeometry(len, 1.1, 0.4), guardrailMat);
-        railN.position.set(midCoord, midH, fixedCoord - halfW);
-        railN.rotation.z = Math.atan2(endH - startH, endCoord - startCoord);
-        const railS = new THREE.Mesh(new THREE.BoxGeometry(len, 1.1, 0.4), guardrailMat);
-        railS.position.set(midCoord, midH, fixedCoord + halfW);
-        railS.rotation.z = Math.atan2(endH - startH, endCoord - startCoord);
-        flyoverGroup.add(railN, railS);
-      } else if (axis === 'Z') {
-        const railW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, len), guardrailMat);
-        railW.position.set(fixedCoord - halfW, midH, midCoord);
-        railW.rotation.x = -Math.atan2(endH - startH, endCoord - startCoord);
-        const railE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, len), guardrailMat);
-        railE.position.set(fixedCoord + halfW, midH, midCoord);
-        railE.rotation.x = -Math.atan2(endH - startH, endCoord - startCoord);
-        flyoverGroup.add(railW, railE);
-      }
-    };
+    // 1. Grand tiered octagonal polished granite base
+    const plinthGeo = new THREE.CylinderGeometry(8.5, 9.5, 1.2, 8);
+    const plinthMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.4, metalness: 0.2 });
+    const plinth = new THREE.Mesh(plinthGeo, plinthMat);
+    plinth.position.y = 0.6;
+    plinth.receiveShadow = true;
+    group.add(plinth);
 
-    // --------------------------------------------------------
-    // A. KORAMANGALA - INDIRANAGAR FLYOVER (z = -50, height = 11.5m)
-    // --------------------------------------------------------
-    const kLen = 260;
-    const kWidth = 14;
-    const kHeight = 11.5;
+    const stepGeo = new THREE.CylinderGeometry(6.5, 7.5, 0.8, 8);
+    const stepMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.5 });
+    const step = new THREE.Mesh(stepGeo, stepMat);
+    step.position.y = 1.6;
+    step.receiveShadow = true;
+    group.add(step);
 
-    // Deck
-    const kDeck = new THREE.Mesh(new THREE.BoxGeometry(kLen, 1.2, kWidth), flyoverMat);
-    kDeck.position.set(0, kHeight, -50);
-    kDeck.castShadow = true;
-    kDeck.receiveShadow = true;
-    flyoverGroup.add(kDeck);
+    // 2. Stainless steel 55-meter monumental mast (flagpole)
+    const mastGeo = new THREE.CylinderGeometry(0.35, 0.85, 55, 16);
+    const mastMat = new THREE.MeshStandardMaterial({ color: 0xf4f4f5, roughness: 0.2, metalness: 0.95 });
+    const mast = new THREE.Mesh(mastGeo, mastMat);
+    mast.position.y = 29.5;
+    mast.castShadow = true;
+    group.add(mast);
 
-    // Guardrails
-    const kRailN = new THREE.Mesh(new THREE.BoxGeometry(kLen, 1.1, 0.4), guardrailMat);
-    kRailN.position.set(0, kHeight + 0.9, -50 - kWidth / 2);
-    const kRailS = new THREE.Mesh(new THREE.BoxGeometry(kLen, 1.1, 0.4), guardrailMat);
-    kRailS.position.set(0, kHeight + 0.9, -50 + kWidth / 2);
-    flyoverGroup.add(kRailN, kRailS);
+    // Golden Kalasa / Finial ball at top
+    const finialGeo = new THREE.SphereGeometry(1.1, 16, 16);
+    const finialMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2, metalness: 0.9 });
+    const finial = new THREE.Mesh(finialGeo, finialMat);
+    finial.position.y = 57.2;
+    group.add(finial);
 
-    // Support Pillars with underpass clearance
-    for (let px = -100; px <= 100; px += 50) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.8, kHeight, 12), pillarMat);
-      pillar.position.set(px, kHeight / 2, -50);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(px, kHeight / 2, -50, 1.4, kHeight / 2, 1.4);
+    // Blinking red aviation warning beacon on top
+    const beaconLight = new THREE.PointLight(0xff0000, 2.5, 45);
+    beaconLight.position.set(0, 57.5, 0);
+    group.add(beaconLight);
+
+    // 3. Indian National Tricolor (Tiranga) canvas texture
+    const flagCanvas = document.createElement('canvas');
+    flagCanvas.width = 720;
+    flagCanvas.height = 480;
+    const fctx = flagCanvas.getContext('2d');
+
+    // Saffron top band
+    fctx.fillStyle = '#FF9933';
+    fctx.fillRect(0, 0, 720, 160);
+    // White middle band
+    fctx.fillStyle = '#FFFFFF';
+    fctx.fillRect(0, 160, 720, 160);
+    // Green bottom band
+    fctx.fillStyle = '#138808';
+    fctx.fillRect(0, 320, 720, 160);
+
+    // 24-spoke navy Ashoka Chakra
+    fctx.strokeStyle = '#000080';
+    fctx.lineWidth = 6;
+    fctx.beginPath();
+    fctx.arc(360, 240, 55, 0, Math.PI * 2);
+    fctx.stroke();
+
+    fctx.fillStyle = '#000080';
+    fctx.beginPath();
+    fctx.arc(360, 240, 10, 0, Math.PI * 2);
+    fctx.fill();
+
+    for (let i = 0; i < 24; i++) {
+      const angle = (i * Math.PI * 2) / 24;
+      fctx.beginPath();
+      fctx.moveTo(360, 240);
+      fctx.lineTo(360 + Math.cos(angle) * 55, 240 + Math.sin(angle) * 55);
+      fctx.lineWidth = 3.5;
+      fctx.stroke();
     }
 
-    // West On-Ramp (x = -200 to -130, height 0 -> 11.5m)
-    const kRampLen = 70;
-    const westRamp = new THREE.Mesh(new THREE.BoxGeometry(kRampLen, 1.0, kWidth), flyoverMat);
-    westRamp.position.set(-130 - kRampLen / 2, kHeight / 2, -50);
-    westRamp.rotation.z = Math.atan2(kHeight, kRampLen);
-    flyoverGroup.add(westRamp);
-    addRampGuardrails('X', -200, -130, -50, kWidth, 0, kHeight);
-
-    // East Off-Ramp (x = 130 to 200, height 11.5 -> 0m)
-    const eastRamp = new THREE.Mesh(new THREE.BoxGeometry(kRampLen, 1.0, kWidth), flyoverMat);
-    eastRamp.position.set(130 + kRampLen / 2, kHeight / 2, -50);
-    eastRamp.rotation.z = -Math.atan2(kHeight, kRampLen);
-    flyoverGroup.add(eastRamp);
-    addRampGuardrails('X', 130, 200, -50, kWidth, kHeight, 0);
-
-    // Register Koramangala Flyover in PhysicsWorld
-    this.physicsWorld.addFlyover('koramangala_flyover', 0, -50, kLen, kWidth, kHeight, 'X');
-    this.physicsWorld.addFlyoverRamp('k_ramp_west', 'X', -200, -130, -50, kWidth, 0, kHeight);
-    this.physicsWorld.addFlyoverRamp('k_ramp_east', 'X', 130, 200, -50, kWidth, kHeight, 0);
-
-    // --------------------------------------------------------
-    // B. FAMOUS SILK BOARD MULTI-TIER INTERCHANGE (x = 0, z = 20)
-    // --------------------------------------------------------
-    // LEVEL 1: Outer Ring Road Flyover (East-West at y = 8.5m)
-    const s1Len = 300;
-    const s1Width = 14;
-    const s1Height = 8.5;
-
-    const s1Deck = new THREE.Mesh(new THREE.BoxGeometry(s1Len, 1.2, s1Width), flyoverMat);
-    s1Deck.position.set(0, s1Height, 20);
-    s1Deck.castShadow = true;
-    s1Deck.receiveShadow = true;
-    flyoverGroup.add(s1Deck);
-
-    // Outer Ring Road Guardrails
-    const s1RailN = new THREE.Mesh(new THREE.BoxGeometry(s1Len, 1.1, 0.4), guardrailMat);
-    s1RailN.position.set(0, s1Height + 0.9, 20 - s1Width / 2);
-    const s1RailS = new THREE.Mesh(new THREE.BoxGeometry(s1Len, 1.1, 0.4), guardrailMat);
-    s1RailS.position.set(0, s1Height + 0.9, 20 + s1Width / 2);
-    flyoverGroup.add(s1RailN, s1RailS);
-
-    // Level 1 Ramps
-    const s1RampLen = 70;
-    const s1WestRamp = new THREE.Mesh(new THREE.BoxGeometry(s1RampLen, 1.0, s1Width), flyoverMat);
-    s1WestRamp.position.set(-150 - s1RampLen / 2, s1Height / 2, 20);
-    s1WestRamp.rotation.z = Math.atan2(s1Height, s1RampLen);
-    flyoverGroup.add(s1WestRamp);
-    addRampGuardrails('X', -220, -150, 20, s1Width, 0, s1Height);
-
-    const s1EastRamp = new THREE.Mesh(new THREE.BoxGeometry(s1RampLen, 1.0, s1Width), flyoverMat);
-    s1EastRamp.position.set(150 + s1RampLen / 2, s1Height / 2, 20);
-    s1EastRamp.rotation.z = -Math.atan2(s1Height, s1RampLen);
-    flyoverGroup.add(s1EastRamp);
-    addRampGuardrails('X', 150, 220, 20, s1Width, s1Height, 0);
-
-    this.physicsWorld.addFlyover('silkboard_l1', 0, 20, s1Len, s1Width, s1Height, 'X');
-    this.physicsWorld.addFlyoverRamp('sb_ramp_west', 'X', -220, -150, 20, s1Width, 0, s1Height);
-    this.physicsWorld.addFlyoverRamp('sb_ramp_east', 'X', 150, 220, 20, s1Width, s1Height, 0);
-
-    // LEVEL 2: Electronic City Elevated Expressway (North-South at y = 16.5m)
-    // Soaring directly over Level 1 at the Silk Board intersection!
-    const s2Len = 320;
-    const s2Width = 14;
-    const s2Height = 16.5;
-
-    const s2Deck = new THREE.Mesh(new THREE.BoxGeometry(s2Width, 1.4, s2Len), flyoverMat);
-    s2Deck.position.set(0, s2Height, 20);
-    s2Deck.castShadow = true;
-    s2Deck.receiveShadow = true;
-    flyoverGroup.add(s2Deck);
-
-    // Level 2 Guardrails
-    const s2RailW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, s2Len), guardrailMat);
-    s2RailW.position.set(-s2Width / 2, s2Height + 1.0, 20);
-    const s2RailE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, s2Len), guardrailMat);
-    s2RailE.position.set(s2Width / 2, s2Height + 1.0, 20);
-    flyoverGroup.add(s2RailW, s2RailE);
-
-    // Level 2 Ramps (North & South)
-    const s2RampLen = 70;
-    const s2NorthRamp = new THREE.Mesh(new THREE.BoxGeometry(s2Width, 1.0, s2RampLen), flyoverMat);
-    s2NorthRamp.position.set(0, s2Height / 2, 20 - 160 - s2RampLen / 2);
-    s2NorthRamp.rotation.x = -Math.atan2(s2Height, s2RampLen);
-    flyoverGroup.add(s2NorthRamp);
-    addRampGuardrails('Z', 20 - 230, 20 - 160, 0, s2Width, 0, s2Height);
-
-    const s2SouthRamp = new THREE.Mesh(new THREE.BoxGeometry(s2Width, 1.0, s2RampLen), flyoverMat);
-    s2SouthRamp.position.set(0, s2Height / 2, 20 + 160 + s2RampLen / 2);
-    s2SouthRamp.rotation.x = Math.atan2(s2Height, s2RampLen);
-    flyoverGroup.add(s2SouthRamp);
-    addRampGuardrails('Z', 20 + 160, 20 + 230, 0, s2Width, s2Height, 0);
-
-    this.physicsWorld.addFlyover('silkboard_l2', 0, 20, s2Len, s2Width, s2Height, 'Z');
-    this.physicsWorld.addFlyoverRamp('sb_ramp_north', 'Z', 20 - 230, 20 - 160, 0, s2Width, 0, s2Height);
-    this.physicsWorld.addFlyoverRamp('sb_ramp_south', 'Z', 20 + 160, 20 + 230, 0, s2Width, s2Height, 0);
-
-    // Support Columns for Silk Board Elevated Expressway
-    // Realistic Portal Straddle Bents: placed at sides (x = -7.2, x = +7.2) so central road and ramps are completely free!
-    for (let pz = -120; pz <= 160; pz += 60) {
-      if (Math.abs(pz - 20) > 15) { // Leave Level 1 underpass intersection open
-        [-7.2, 7.2].forEach(px => {
-          const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, s2Height, 12), pillarMat);
-          pillar.position.set(px, s2Height / 2, pz);
-          pillar.castShadow = true;
-          flyoverGroup.add(pillar);
-          this.physicsWorld.addStaticBox(px, s2Height / 2, pz, 1.2, s2Height / 2, 1.2);
-        });
-
-        // Crosshead beam connecting the two piers under Level 2 deck
-        const crossBeam = new THREE.Mesh(new THREE.BoxGeometry(15.5, 1.4, 2.4), pillarMat);
-        crossBeam.position.set(0, s2Height - 1.2, pz);
-        crossBeam.castShadow = true;
-        flyoverGroup.add(crossBeam);
-      }
-    }
-
-    // --------------------------------------------------------
-    // C. SILK BOARD GROUND JUNCTION & NAMMA METRO CORRIDOR
-    // --------------------------------------------------------
-    // Overhead Green Highway Signboard (mounted on tall overhead gantry arch at y = 22m above Level 2 deck)
-    const signBoardCanvas = document.createElement('canvas');
-    signBoardCanvas.width = 1024;
-    signBoardCanvas.height = 256;
-    const sbCtx = signBoardCanvas.getContext('2d');
-    sbCtx.fillStyle = '#15803d'; // Indian Highway Green
-    sbCtx.fillRect(0, 0, 1024, 256);
-    sbCtx.strokeStyle = '#ffffff';
-    sbCtx.lineWidth = 10;
-    sbCtx.strokeRect(12, 12, 1000, 232);
-    sbCtx.fillStyle = '#ffffff';
-    sbCtx.font = 'bold 44px "Inter", sans-serif';
-    sbCtx.textAlign = 'center';
-    sbCtx.fillText('ಸಾರಿಗೆ ಜಂಕ್ಷನ್ • SILK BOARD JUNCTION', 512, 85);
-    sbCtx.font = '32px "Inter", sans-serif';
-    sbCtx.fillText('⬆ ELECTRONIC CITY FLYOVER   ⬅ KORAMANGALA   ➡ HSR LAYOUT', 512, 155);
-    sbCtx.fillText('⬇ BTM LAYOUT 2ND STAGE & BANNERGHATTA ROAD', 512, 210);
-
-    const sbSignTex = new THREE.CanvasTexture(signBoardCanvas);
-    const sbSignMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(22, 5.5, 0.4),
-      new THREE.MeshBasicMaterial({ map: sbSignTex })
-    );
-    // Positioned safely above Level 2 deck at y = 22.0m, no collision with traffic!
-    sbSignMesh.position.set(0, 22.0, 20);
-    flyoverGroup.add(sbSignMesh);
-
-    // Gantry frame posts for signboard
-    const gantryPostMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8 });
-    [-10, 10].forEach(gx => {
-      const gPost = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 6.0, 8), gantryPostMat);
-      gPost.position.set(gx, 20.0, 20);
-      flyoverGroup.add(gPost);
+    const flagTex = new THREE.CanvasTexture(flagCanvas);
+    const flagMat = new THREE.MeshStandardMaterial({
+      map: flagTex,
+      side: THREE.DoubleSide,
+      roughness: 0.65
     });
 
-    // BANGALORE NAMMA METRO VIADUCT & TRAIN (running parallel at y = 12.5m, x = 24)
-    const metroViaduct = new THREE.Mesh(
-      new THREE.BoxGeometry(7, 1.5, 240),
-      new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 })
-    );
-    metroViaduct.position.set(24, 12.5, 20);
-    flyoverGroup.add(metroViaduct);
-
-    // Metro Pillars
-    for (let mz = -80; mz <= 120; mz += 45) {
-      const mPillar = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 12.5, 10), pillarMat);
-      mPillar.position.set(24, 6.25, mz);
-      flyoverGroup.add(mPillar);
-      this.physicsWorld.addStaticBox(24, 6.25, mz, 1.2, 6.25, 1.2);
+    // Massive 18m x 12m Tiranga blowing gracefully in the wind
+    const flagGeo = new THREE.PlaneGeometry(18, 12, 16, 8);
+    const pos = flagGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const u = pos.getX(i);
+      const ripple = Math.sin(u * 0.45) * 0.9 + Math.cos(u * 0.8) * 0.4;
+      pos.setZ(i, ripple);
     }
+    flagGeo.computeVertexNormals();
 
-    // 3-Car Namma Metro Train in Green & Purple Livery
-    const trainGroup = new THREE.Group();
-    trainGroup.position.set(24, 14.5, 10);
-    const trainMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
-    const purpleMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, roughness: 0.4 });
-    const greenLineMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.4 });
-    const glassMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.9 });
+    const flagMesh = new THREE.Mesh(flagGeo, flagMat);
+    flagMesh.position.set(9.2, 50.5, 0); // Attached to mast
+    flagMesh.castShadow = true;
+    group.add(flagMesh);
 
-    for (let c = -1; c <= 1; c++) {
-      const car = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.2, 22), trainMat);
-      car.position.set(0, 0, c * 24);
-      trainGroup.add(car);
+    // 4. Amar Jawan Jyoti (Eternal Flame Memorial Plinth)
+    const ajGeo = new THREE.BoxGeometry(2.4, 1.4, 2.4);
+    const ajMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.3 });
+    const ajPlinth = new THREE.Mesh(ajGeo, ajMat);
+    ajPlinth.position.set(0, 2.3, 4.2);
+    group.add(ajPlinth);
 
-      // Purple & Green Stripe
-      const pStripe = new THREE.Mesh(new THREE.BoxGeometry(3.65, 0.4, 22), purpleMat);
-      pStripe.position.set(0, -0.4, c * 24);
-      trainGroup.add(pStripe);
+    // Inverted golden rifle with army helmet
+    const rifleMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3, metalness: 0.8 });
+    const rifle = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.2, 8), rifleMat);
+    rifle.position.set(0, 3.8, 4.2);
+    group.add(rifle);
 
-      const gStripe = new THREE.Mesh(new THREE.BoxGeometry(3.65, 0.3, 22), greenLineMat);
-      gStripe.position.set(0, 0.4, c * 24);
-      trainGroup.add(gStripe);
+    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 8), rifleMat);
+    helmet.position.set(0, 4.9, 4.2);
+    group.add(helmet);
 
-      // Windows
-      const win = new THREE.Mesh(new THREE.BoxGeometry(3.7, 1.0, 18), glassMat);
-      win.position.set(0, 0.5, c * 24);
-      trainGroup.add(win);
-    }
-    flyoverGroup.add(trainGroup);
+    // Flame light
+    const flameLight = new THREE.PointLight(0xff6b00, 3.5, 14);
+    flameLight.position.set(0, 4.2, 4.2);
+    group.add(flameLight);
 
-    // BMTC Green/Blue Volvo Vajra City Bus at Silk Board Bus Stop
-    this.createBmtcBus(flyoverGroup, -18, 0, 0);
+    // Ground High-Powered Floodlight illuminating the Tiranga
+    const flagFlood = new THREE.PointLight(0xffffff, 3.0, 75);
+    flagFlood.position.set(0, 4.0, 0);
+    group.add(flagFlood);
 
-    // Auto-Rickshaw Stand with 2 Bangalore Auto-Rickshaws
-    this.createAutoRickshaw(flyoverGroup, 18, -12, 0.3);
-    this.createAutoRickshaw(flyoverGroup, 22, -14, 0.5);
-
-    // --------------------------------------------------------
-    // D. HEBBAL CLOVERLEAF FLYOVER & AIRPORT HIGHWAY (x: 200, z: -250)
-    // --------------------------------------------------------
-    const hLen = 260;
-    const hWidth = 14;
-    const hHeight = 10.0;
-
-    const hDeck = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 1.2, hLen), flyoverMat);
-    hDeck.position.set(200, hHeight, -250);
-    hDeck.castShadow = true;
-    hDeck.receiveShadow = true;
-    flyoverGroup.add(hDeck);
-
-    // Guardrails
-    const hRailW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, hLen), guardrailMat);
-    hRailW.position.set(200 - hWidth / 2, hHeight + 0.9, -250);
-    const hRailE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, hLen), guardrailMat);
-    hRailE.position.set(200 + hWidth / 2, hHeight + 0.9, -250);
-    flyoverGroup.add(hRailW, hRailE);
-
-    // Support Pillars
-    for (let pz = -360; pz <= -140; pz += 50) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.8, hHeight, 10), pillarMat);
-      pillar.position.set(200, hHeight / 2, pz);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(200, hHeight / 2, pz, 1.4, hHeight / 2, 1.4);
-    }
-
-    // South On-Ramp (z: -120 to -50)
-    const hRampLen = 70;
-    const hSouthRamp = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 1.0, hRampLen), flyoverMat);
-    hSouthRamp.position.set(200, hHeight / 2, -120 + hRampLen / 2);
-    hSouthRamp.rotation.x = Math.atan2(hHeight, hRampLen);
-    flyoverGroup.add(hSouthRamp);
-    addRampGuardrails('Z', -50, -120, 200, hWidth, 0, hHeight);
-
-    // North Off-Ramp towards Airport (z: -380 to -450)
-    const hNorthRamp = new THREE.Mesh(new THREE.BoxGeometry(hWidth, 1.0, hRampLen), flyoverMat);
-    hNorthRamp.position.set(200, hHeight / 2, -380 - hRampLen / 2);
-    hNorthRamp.rotation.x = -Math.atan2(hHeight, hRampLen);
-    flyoverGroup.add(hNorthRamp);
-    addRampGuardrails('Z', -380, -450, 200, hWidth, hHeight, 0);
-
-    this.physicsWorld.addFlyover('hebbal_flyover', 200, -250, hLen, hWidth, hHeight, 'Z');
-    this.physicsWorld.addFlyoverRamp('hebbal_ramp_south', 'Z', -50, -120, 200, hWidth, 0, hHeight);
-    this.physicsWorld.addFlyoverRamp('hebbal_ramp_north', 'Z', -380, -450, 200, hWidth, hHeight, 0);
-
-    // Hebbal Flyover Green Signboard (mounted on high gantry at y = 15m)
-    const hebbalCanvas = document.createElement('canvas');
-    hebbalCanvas.width = 512;
-    hebbalCanvas.height = 128;
-    const hctx = hebbalCanvas.getContext('2d');
-    hctx.fillStyle = '#15803d';
-    hctx.fillRect(0, 0, 512, 128);
-    hctx.fillStyle = '#ffffff';
-    hctx.font = 'bold 32px "Inter", sans-serif';
-    hctx.textAlign = 'center';
-    hctx.fillText('ಹೆಬ್ಬಾಳ ಫ್ಲೈಓವರ್ • HEBBAL FLYOVER', 256, 50);
-    hctx.font = '22px "Inter", sans-serif';
-    hctx.fillText('⬆ AIRPORT & NANDI HILLS  |  ⬇ CITY CENTER', 256, 95);
-
-    const hebbalSign = new THREE.Mesh(
-      new THREE.PlaneGeometry(16, 3.2),
-      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(hebbalCanvas) })
-    );
-    hebbalSign.position.set(200, 15.0, -135);
-    flyoverGroup.add(hebbalSign);
-
-    // --------------------------------------------------------
-    // E. DOUBLE ROAD / RICHMOND CIRCLE FLYOVER (x: 40, z: 180)
-    // --------------------------------------------------------
-    const dLen = 180;
-    const dWidth = 14;
-    const dHeight = 9.0;
-
-    const dDeck = new THREE.Mesh(new THREE.BoxGeometry(dWidth, 1.2, dLen), flyoverMat);
-    dDeck.position.set(40, dHeight, 180);
-    dDeck.castShadow = true;
-    dDeck.receiveShadow = true;
-    flyoverGroup.add(dDeck);
-
-    const dRailW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, dLen), guardrailMat);
-    dRailW.position.set(40 - dWidth / 2, dHeight + 0.9, 180);
-    const dRailE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, dLen), guardrailMat);
-    dRailE.position.set(40 + dWidth / 2, dHeight + 0.9, 180);
-    flyoverGroup.add(dRailW, dRailE);
-
-    for (let pz = 110; pz <= 250; pz += 45) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.6, dHeight, 10), pillarMat);
-      pillar.position.set(40, dHeight / 2, pz);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(40, dHeight / 2, pz, 1.3, dHeight / 2, 1.3);
-    }
-
-    const dRampLen = 60;
-    const dNorthRamp = new THREE.Mesh(new THREE.BoxGeometry(dWidth, 1.0, dRampLen), flyoverMat);
-    dNorthRamp.position.set(40, dHeight / 2, 90 - dRampLen / 2);
-    dNorthRamp.rotation.x = -Math.atan2(dHeight, dRampLen);
-    flyoverGroup.add(dNorthRamp);
-    addRampGuardrails('Z', 30, 90, 40, dWidth, 0, dHeight);
-
-    const dSouthRamp = new THREE.Mesh(new THREE.BoxGeometry(dWidth, 1.0, dRampLen), flyoverMat);
-    dSouthRamp.position.set(40, dHeight / 2, 270 + dRampLen / 2);
-    dSouthRamp.rotation.x = Math.atan2(dHeight, dRampLen);
-    flyoverGroup.add(dSouthRamp);
-    addRampGuardrails('Z', 270, 330, 40, dWidth, dHeight, 0);
-
-    this.physicsWorld.addFlyover('double_road_flyover', 40, 180, dLen, dWidth, dHeight, 'Z');
-    this.physicsWorld.addFlyoverRamp('dr_ramp_north', 'Z', 30, 90, 40, dWidth, 0, dHeight);
-    this.physicsWorld.addFlyoverRamp('dr_ramp_south', 'Z', 270, 330, 40, dWidth, dHeight, 0);
-
-    // --------------------------------------------------------
-    // F. YESHWANTHPUR - ORION MALL ELEVATED CORRIDOR (x: 240, z: 280)
-    // --------------------------------------------------------
-    const yLen = 180;
-    const yWidth = 14;
-    const yHeight = 10.5;
-
-    const yDeck = new THREE.Mesh(new THREE.BoxGeometry(yWidth, 1.2, yLen), flyoverMat);
-    yDeck.position.set(240, yHeight, 280);
-    yDeck.castShadow = true;
-    yDeck.receiveShadow = true;
-    flyoverGroup.add(yDeck);
-
-    const yRailW = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, yLen), guardrailMat);
-    yRailW.position.set(240 - yWidth / 2, yHeight + 0.9, 280);
-    const yRailE = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, yLen), guardrailMat);
-    yRailE.position.set(240 + yWidth / 2, yHeight + 0.9, 280);
-    flyoverGroup.add(yRailW, yRailE);
-
-    for (let pz = 210; pz <= 350; pz += 45) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.7, yHeight, 10), pillarMat);
-      pillar.position.set(240, yHeight / 2, pz);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(240, yHeight / 2, pz, 1.4, yHeight / 2, 1.4);
-    }
-
-    const yRampLen = 60;
-    const yNorthRamp = new THREE.Mesh(new THREE.BoxGeometry(yWidth, 1.0, yRampLen), flyoverMat);
-    yNorthRamp.position.set(240, yHeight / 2, 190 - yRampLen / 2);
-    yNorthRamp.rotation.x = -Math.atan2(yHeight, yRampLen);
-    flyoverGroup.add(yNorthRamp);
-    addRampGuardrails('Z', 130, 190, 240, yWidth, 0, yHeight);
-
-    const ySouthRamp = new THREE.Mesh(new THREE.BoxGeometry(yWidth, 1.0, yRampLen), flyoverMat);
-    ySouthRamp.position.set(240, yHeight / 2, 370 + yRampLen / 2);
-    ySouthRamp.rotation.x = Math.atan2(yHeight, yRampLen);
-    flyoverGroup.add(ySouthRamp);
-    addRampGuardrails('Z', 370, 430, 240, yWidth, yHeight, 0);
-
-    this.physicsWorld.addFlyover('yeshwanthpur_flyover', 240, 280, yLen, yWidth, yHeight, 'Z');
-    this.physicsWorld.addFlyoverRamp('yp_ramp_north', 'Z', 130, 190, 240, yWidth, 0, yHeight);
-    this.physicsWorld.addFlyoverRamp('yp_ramp_south', 'Z', 370, 430, 240, yWidth, yHeight, 0);
-
-    // --------------------------------------------------------
-    // G. VIDHANA SOUDHA - UB CITY ELEVATED LINK (z = -70, height = 9.5m)
-    // --------------------------------------------------------
-    const vLen = 160;
-    const vWidth = 14;
-    const vHeight = 9.5;
-
-    const vDeck = new THREE.Mesh(new THREE.BoxGeometry(vLen, 1.2, vWidth), flyoverMat);
-    vDeck.position.set(-150, vHeight, -70);
-    vDeck.castShadow = true;
-    vDeck.receiveShadow = true;
-    flyoverGroup.add(vDeck);
-
-    const vRailN = new THREE.Mesh(new THREE.BoxGeometry(vLen, 1.1, 0.4), guardrailMat);
-    vRailN.position.set(-150, vHeight + 0.9, -70 - vWidth / 2);
-    const vRailS = new THREE.Mesh(new THREE.BoxGeometry(vLen, 1.1, 0.4), guardrailMat);
-    vRailS.position.set(-150, vHeight + 0.9, -70 + vWidth / 2);
-    flyoverGroup.add(vRailN, vRailS);
-
-    for (let px = -210; px <= -90; px += 40) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.6, vHeight, 10), pillarMat);
-      pillar.position.set(px, vHeight / 2, -70);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(px, vHeight / 2, -70, 1.3, vHeight / 2, 1.3);
-    }
-
-    const vRampLen = 60;
-    const vWestRamp = new THREE.Mesh(new THREE.BoxGeometry(vRampLen, 1.0, vWidth), flyoverMat);
-    vWestRamp.position.set(-230 - vRampLen / 2, vHeight / 2, -70);
-    vWestRamp.rotation.z = Math.atan2(vHeight, vRampLen);
-    flyoverGroup.add(vWestRamp);
-    addRampGuardrails('X', -290, -230, -70, vWidth, 0, vHeight);
-
-    const vEastRamp = new THREE.Mesh(new THREE.BoxGeometry(vRampLen, 1.0, vWidth), flyoverMat);
-    vEastRamp.position.set(-70 + vRampLen / 2, vHeight / 2, -70);
-    vEastRamp.rotation.z = -Math.atan2(vHeight, vRampLen);
-    flyoverGroup.add(vEastRamp);
-    addRampGuardrails('X', -70, -10, -70, vWidth, vHeight, 0);
-
-    this.physicsWorld.addFlyover('vidhana_ub_link', -150, -70, vLen, vWidth, vHeight, 'X');
-    this.physicsWorld.addFlyoverRamp('vub_ramp_west', 'X', -290, -230, -70, vWidth, 0, vHeight);
-    this.physicsWorld.addFlyoverRamp('vub_ramp_east', 'X', -70, -10, -70, vWidth, vHeight, 0);
-
-    // --------------------------------------------------------
-    // H. BTM - JAYADEVA ELEVATED CORRIDOR (z = 140, height = 8.0m)
-    // --------------------------------------------------------
-    const btmLen = 140;
-    const btmWidth = 14;
-    const btmHeight = 8.0;
-
-    const btmDeck = new THREE.Mesh(new THREE.BoxGeometry(btmLen, 1.2, btmWidth), flyoverMat);
-    btmDeck.position.set(-90, btmHeight, 140);
-    btmDeck.castShadow = true;
-    btmDeck.receiveShadow = true;
-    flyoverGroup.add(btmDeck);
-
-    const btmRailN = new THREE.Mesh(new THREE.BoxGeometry(btmLen, 1.1, 0.4), guardrailMat);
-    btmRailN.position.set(-90, btmHeight + 0.9, 140 - btmWidth / 2);
-    const btmRailS = new THREE.Mesh(new THREE.BoxGeometry(btmLen, 1.1, 0.4), guardrailMat);
-    btmRailS.position.set(-90, btmHeight + 0.9, 140 + btmWidth / 2);
-    flyoverGroup.add(btmRailN, btmRailS);
-
-    for (let px = -140; px <= -40; px += 35) {
-      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, btmHeight, 10), pillarMat);
-      pillar.position.set(px, btmHeight / 2, 140);
-      pillar.castShadow = true;
-      flyoverGroup.add(pillar);
-      this.physicsWorld.addStaticBox(px, btmHeight / 2, 140, 1.2, btmHeight / 2, 1.2);
-    }
-
-    const btmRampLen = 50;
-    const btmWestRamp = new THREE.Mesh(new THREE.BoxGeometry(btmRampLen, 1.0, btmWidth), flyoverMat);
-    btmWestRamp.position.set(-160 - btmRampLen / 2, btmHeight / 2, 140);
-    btmWestRamp.rotation.z = Math.atan2(btmHeight, btmRampLen);
-    flyoverGroup.add(btmWestRamp);
-    addRampGuardrails('X', -210, -160, 140, btmWidth, 0, btmHeight);
-
-    const btmEastRamp = new THREE.Mesh(new THREE.BoxGeometry(btmRampLen, 1.0, btmWidth), flyoverMat);
-    btmEastRamp.position.set(-20 + btmRampLen / 2, btmHeight / 2, 140);
-    btmEastRamp.rotation.z = -Math.atan2(btmHeight, btmRampLen);
-    flyoverGroup.add(btmEastRamp);
-    addRampGuardrails('X', -20, 30, 140, btmWidth, btmHeight, 0);
-
-    this.physicsWorld.addFlyover('btm_jayadeva_flyover', -90, 140, btmLen, btmWidth, btmHeight, 'X');
-    this.physicsWorld.addFlyoverRamp('btm_ramp_west', 'X', -210, -160, 140, btmWidth, 0, btmHeight);
-    this.physicsWorld.addFlyoverRamp('btm_ramp_east', 'X', -20, 30, 140, btmWidth, btmHeight, 0);
-
-    this.scene.add(flyoverGroup);
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(0, 1.0, -20, 8.5, 1.0, 8.5);
   }
 
-  // ========================================================
-  // 10. CITY SAFARI & WILDLIFE ZOO (-160, -140)
-  // ========================================================
+  // B. BDA PUBLIC PARKS (Bangalore Development Authority Parks)
+  buildBdaParks() {
+    const parkMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.9 });
+    const trackMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.8 }); // Red earth walking track
+    const benchMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.7 });
+
+    const createBdaPark = (px, pz, width, depth, parkNameKannada, parkNameEng) => {
+      const pGroup = new THREE.Group();
+      pGroup.position.set(px, 0, pz);
+
+      // Lush Park Lawn Ground
+      const lawn = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), parkMat);
+      lawn.rotation.x = -Math.PI / 2;
+      lawn.position.y = 0.05;
+      lawn.receiveShadow = true;
+      pGroup.add(lawn);
+
+      // Outer Red-Earth Jogging / Walking Track perimeter
+      const trackW = 3.5;
+      const tNorth = new THREE.Mesh(new THREE.PlaneGeometry(width - 4, trackW), trackMat);
+      tNorth.rotation.x = -Math.PI / 2;
+      tNorth.position.set(0, 0.08, -depth / 2 + trackW / 2 + 1.5);
+      tNorth.receiveShadow = true;
+      pGroup.add(tNorth);
+
+      const tSouth = new THREE.Mesh(new THREE.PlaneGeometry(width - 4, trackW), trackMat);
+      tSouth.rotation.x = -Math.PI / 2;
+      tSouth.position.set(0, 0.08, depth / 2 - trackW / 2 - 1.5);
+      tSouth.receiveShadow = true;
+      pGroup.add(tSouth);
+
+      const tWest = new THREE.Mesh(new THREE.PlaneGeometry(trackW, depth - 4), trackMat);
+      tWest.rotation.x = -Math.PI / 2;
+      tWest.position.set(-width / 2 + trackW / 2 + 1.5, 0.08, 0);
+      tWest.receiveShadow = true;
+      pGroup.add(tWest);
+
+      const tEast = new THREE.Mesh(new THREE.PlaneGeometry(trackW, depth - 4), trackMat);
+      tEast.rotation.x = -Math.PI / 2;
+      tEast.position.set(width / 2 - trackW / 2 - 1.5, 0.08, 0);
+      tEast.receiveShadow = true;
+      pGroup.add(tEast);
+
+      // Classical Central BDA Park Octagonal Gazebo / Bandstand
+      const gazGeo = new THREE.CylinderGeometry(4.5, 5.0, 0.8, 8);
+      const gazPlinth = new THREE.Mesh(gazGeo, wallMat);
+      gazPlinth.position.y = 0.4;
+      pGroup.add(gazPlinth);
+
+      // Gazebo Pillars & Roof
+      for (let i = 0; i < 8; i++) {
+        const ang = (i * Math.PI * 2) / 8;
+        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 3.8, 8), wallMat);
+        col.position.set(Math.cos(ang) * 4.0, 2.3, Math.sin(ang) * 4.0);
+        col.castShadow = true;
+        pGroup.add(col);
+      }
+
+      const roofGeo = new THREE.ConeGeometry(5.2, 2.2, 8);
+      const roofMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.6 }); // Mangalore tile red
+      const roof = new THREE.Mesh(roofGeo, roofMat);
+      roof.position.y = 4.8;
+      roof.castShadow = true;
+      pGroup.add(roof);
+
+      // Central Fountain inside Gazebo
+      const fBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.5, 12), wallMat);
+      fBasin.position.y = 1.0;
+      pGroup.add(fBasin);
+      const fWater = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 0.2, 12), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1 }));
+      fWater.position.y = 1.2;
+      pGroup.add(fWater);
+
+      // Benches along walking track
+      const benchOffsets = [
+        { x: -width * 0.3, z: -depth * 0.35, rot: 0 },
+        { x: width * 0.3, z: -depth * 0.35, rot: 0 },
+        { x: -width * 0.3, z: depth * 0.35, rot: Math.PI },
+        { x: width * 0.3, z: depth * 0.35, rot: Math.PI },
+        { x: -width * 0.38, z: 0, rot: Math.PI / 2 },
+        { x: width * 0.38, z: 0, rot: -Math.PI / 2 }
+      ];
+      benchOffsets.forEach(b => {
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 0.7), benchMat);
+        seat.position.set(b.x, 0.4, b.z);
+        seat.rotation.y = b.rot;
+        seat.castShadow = true;
+        pGroup.add(seat);
+      });
+
+      // Shaded Bangalore Trees (Gulmohar and Pink Tabebuia) inside park
+      const treeLocs = [
+        { x: -width * 0.25, z: -depth * 0.15, col: 0x15803d },
+        { x: width * 0.25, z: -depth * 0.15, col: 0xbe185d }, // Tabebuia pink
+        { x: -width * 0.22, z: depth * 0.2, col: 0xdc2626 },  // Gulmohar orange-red
+        { x: width * 0.22, z: depth * 0.2, col: 0x16a34a },
+        { x: 0, z: -depth * 0.32, col: 0x059669 }
+      ];
+      treeLocs.forEach(tl => {
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 4.5, 8), new THREE.MeshStandardMaterial({ color: 0x451a03 }));
+        trunk.position.set(tl.x, 2.25, tl.z);
+        trunk.castShadow = true;
+        pGroup.add(trunk);
+
+        const foliage = new THREE.Mesh(new THREE.SphereGeometry(2.8, 8, 8), new THREE.MeshStandardMaterial({ color: tl.col, roughness: 0.85 }));
+        foliage.position.set(tl.x, 5.5, tl.z);
+        foliage.castShadow = true;
+        pGroup.add(foliage);
+      });
+
+      // Decorative BDA Entrance Arch with Bilingual Signboard
+      const archL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4.8, 0.8), wallMat);
+      archL.position.set(-4.5, 2.4, depth / 2 - 1.0);
+      const archR = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4.8, 0.8), wallMat);
+      archR.position.set(4.5, 2.4, depth / 2 - 1.0);
+      const archTop = new THREE.Mesh(new THREE.BoxGeometry(9.8, 0.8, 0.8), wallMat);
+      archTop.position.set(0, 4.8, depth / 2 - 1.0);
+      pGroup.add(archL, archR, archTop);
+
+      // Signboard Canvas
+      const signCanvas = document.createElement('canvas');
+      signCanvas.width = 512;
+      signCanvas.height = 128;
+      const sctx = signCanvas.getContext('2d');
+      sctx.fillStyle = '#166534'; // Forest green BDA municipal board
+      sctx.fillRect(0, 0, 512, 128);
+      sctx.lineWidth = 6;
+      sctx.strokeStyle = '#facc15';
+      sctx.strokeRect(4, 4, 504, 120);
+
+      sctx.fillStyle = '#fef08a';
+      sctx.font = 'bold 30px "Noto Sans Kannada", sans-serif';
+      sctx.textAlign = 'center';
+      sctx.fillText(parkNameKannada, 256, 50);
+
+      sctx.fillStyle = '#ffffff';
+      sctx.font = 'bold 24px Inter, sans-serif';
+      sctx.fillText(parkNameEng, 256, 95);
+
+      const signTex = new THREE.CanvasTexture(signCanvas);
+      const signMesh = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 2.0), new THREE.MeshBasicMaterial({ map: signTex }));
+      signMesh.position.set(0, 6.0, depth / 2 - 1.0);
+      pGroup.add(signMesh);
+
+      this.scene.add(pGroup);
+
+      // Physics boundary for central gazebo
+      this.physicsWorld.addStaticBox(px, 2.0, pz, 4.5, 2.0, 4.5);
+    };
+
+    // 1. HSR Sector 2 BDA Park (80, 40)
+    createBdaPark(80, 40, 70, 60, 'ಬಿ.ಡಿ.ಎ ಉದ್ಯಾನವನ • ಎಚ್.ಎಸ್.ಆರ್ ಬಡಾವಣೆ', 'BDA PUBLIC PARK • HSR LAYOUT SEC 2');
+
+    // 2. Koramangala 4th Block BDA Park (-140, 60)
+    createBdaPark(-140, 60, 65, 55, 'ಕೋರಮಂಗಲ ಬಿ.ಡಿ.ಎ ಉದ್ಯಾನವನ', 'KORAMANGALA 4TH BLOCK BDA PARK');
+
+    // 3. Indiranagar Defence Colony BDA Park (120, -60)
+    createBdaPark(120, -60, 60, 50, 'ಇಂದಿರಾನಗರ ಬಿ.ಡಿ.ಎ ಪಾರ್ಕ್', 'INDIRANAGAR DEFENCE COLONY BDA PARK');
+  }
+
+  // C. BDA COMMERCIAL SHOPPING COMPLEXES
+  buildBdaComplexes() {
+    const concreteMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.7 });
+    const redBrickMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.8 });
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.8 });
+    const signFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+
+    const createBdaComplex = (bx, bz, complexKannada, complexEng, storesList) => {
+      const group = new THREE.Group();
+      group.position.set(bx, 0, bz);
+
+      // Main 4-Storey Civic Complex Building (52m wide x 18m tall x 38m deep)
+      const mainGeo = new THREE.BoxGeometry(52, 18, 38);
+      const mainMesh = new THREE.Mesh(mainGeo, concreteMat);
+      mainMesh.position.y = 9;
+      mainMesh.castShadow = true;
+      mainMesh.receiveShadow = true;
+      group.add(mainMesh);
+
+      // Terraced Red Brick Façade accents
+      const brickGeo = new THREE.BoxGeometry(53, 4, 39);
+      const brickFloor1 = new THREE.Mesh(brickGeo, redBrickMat);
+      brickFloor1.position.y = 2.5;
+      const brickFloor3 = new THREE.Mesh(brickGeo, redBrickMat);
+      brickFloor3.position.y = 11.5;
+      group.add(brickFloor1, brickFloor3);
+
+      // Commercial Shop Windows & Glass Entrances on Ground Floor
+      for (let sx = -20; sx <= 20; sx += 10) {
+        const shopWindow = new THREE.Mesh(new THREE.BoxGeometry(7.5, 3.2, 0.4), glassMat);
+        shopWindow.position.set(sx, 2.2, 19.2);
+        group.add(shopWindow);
+
+        // Shop canopy / awning
+        const canopy = new THREE.Mesh(new THREE.BoxGeometry(8.0, 0.3, 2.2), new THREE.MeshStandardMaterial({ color: (sx % 20 === 0) ? 0x2563eb : 0xd97706 }));
+        canopy.position.set(sx, 4.0, 20.0);
+        group.add(canopy);
+      }
+
+      // Upper floor horizontal ribbon glass windows
+      [7.0, 15.0].forEach(wy => {
+        const ribbonWin = new THREE.Mesh(new THREE.BoxGeometry(48, 2.4, 0.4), glassMat);
+        ribbonWin.position.set(0, wy, 19.2);
+        group.add(ribbonWin);
+      });
+
+      // Rooftop solar water heaters & water storage tanks
+      for (let tx = -16; tx <= 16; tx += 16) {
+        const tank = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 3.2, 12), new THREE.MeshStandardMaterial({ color: 0x1e3a8a }));
+        tank.position.set(tx, 19.6, -6);
+        group.add(tank);
+      }
+
+      // Huge Iconic Rooftop BDA Complex Signboard (Bilingual)
+      const bdaCanvas = document.createElement('canvas');
+      bdaCanvas.width = 1024;
+      bdaCanvas.height = 256;
+      const bctx = bdaCanvas.getContext('2d');
+
+      bctx.fillStyle = '#0f172a';
+      bctx.fillRect(0, 0, 1024, 256);
+      bctx.lineWidth = 8;
+      bctx.strokeStyle = '#f59e0b';
+      bctx.strokeRect(6, 6, 1012, 244);
+
+      bctx.fillStyle = '#fbbf24';
+      bctx.font = 'bold 54px "Noto Sans Kannada", sans-serif';
+      bctx.textAlign = 'center';
+      bctx.fillText(complexKannada, 512, 90);
+
+      bctx.fillStyle = '#ffffff';
+      bctx.font = 'bold 44px Inter, sans-serif';
+      bctx.fillText(complexEng, 512, 165);
+
+      bctx.fillStyle = '#38bdf8';
+      bctx.font = 'bold 24px monospace';
+      bctx.fillText(storesList, 512, 220);
+
+      const bdaTex = new THREE.CanvasTexture(bdaCanvas);
+      const bdaSign = new THREE.Mesh(new THREE.PlaneGeometry(36, 9), new THREE.MeshBasicMaterial({ map: bdaTex }));
+      bdaSign.position.set(0, 23.5, 19.2);
+      group.add(bdaSign);
+
+      // Backside of sign
+      const bdaSignBack = new THREE.Mesh(new THREE.BoxGeometry(36.2, 9.2, 0.5), signFrameMat);
+      bdaSignBack.position.set(0, 23.5, 19.0);
+      group.add(bdaSignBack);
+
+      // Ground Floor Parking Lot & Kannada Bangalore One Booth
+      const parkingLot = new THREE.Mesh(
+        new THREE.PlaneGeometry(60, 24),
+        new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 })
+      );
+      parkingLot.rotation.x = -Math.PI / 2;
+      parkingLot.position.set(0, 0.05, 30);
+      parkingLot.receiveShadow = true;
+      group.add(parkingLot);
+
+      // Parking bay yellow stripes
+      for (let px = -24; px <= 24; px += 6) {
+        const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 10), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+        stripe.rotation.x = -Math.PI / 2;
+        stripe.position.set(px, 0.07, 30);
+        group.add(stripe);
+      }
+
+      this.scene.add(group);
+      this.physicsWorld.addStaticBox(bx, 9, bz, 26, 9, 19);
+    };
+
+    // 1. HSR Layout BDA Shopping Complex (60, 100)
+    createBdaComplex(
+      60, 100,
+      'ಬಿ.ಡಿ.ಎ ವಾಣಿಜ್ಯ ಸಂಕೀರ್ಣ • ಎಚ್.ಎಸ್.ಆರ್ ಲೇಔಟ್',
+      'BDA SHOPPING COMPLEX • HSR LAYOUT',
+      'BANGLORE ONE • KARNATAKA BANK • POST OFFICE • SUPERMARKET'
+    );
+
+    // 2. Koramangala BDA Complex (-100, 120)
+    createBdaComplex(
+      -100, 120,
+      'ಬಿ.ಡಿ.ಎ ಶಾಪಿಂಗ್ ಕಾಂಪ್ಲೆಕ್ಸ್ • ಕೋರಮಂಗಲ',
+      'BDA COMMERCIAL HUB • KORAMANGALA',
+      'FOOD COURT • CANARA BANK • TEXTILES • BOOKS & ELECTRONICS'
+    );
+  }
+
+  // D. BANGALORE COLLEGES & UNIVERSITIES
+  buildBangaloreColleges() {
+    const brickMat = new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.75 }); // Deep heritage red brick
+    const stoneTrimMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
+
+    // 1. BMS COLLEGE OF ENGINEERING / RVCE TECH CAMPUS (-120, -120)
+    const collegeGroup = new THREE.Group();
+    collegeGroup.position.set(-120, 0, -120);
+
+    // Main Academic Quad Central Building (56m x 20m x 22m)
+    const mainBuilding = new THREE.Mesh(new THREE.BoxGeometry(56, 18, 24), brickMat);
+    mainBuilding.position.y = 9;
+    mainBuilding.castShadow = true;
+    mainBuilding.receiveShadow = true;
+    collegeGroup.add(mainBuilding);
+
+    // Left Wing (Dept of Computer Science & AI)
+    const leftWing = new THREE.Mesh(new THREE.BoxGeometry(22, 14, 38), brickMat);
+    leftWing.position.set(-34, 7, 7);
+    leftWing.castShadow = true;
+    collegeGroup.add(leftWing);
+
+    // Right Wing (Dept of Electronics & Robotics)
+    const rightWing = new THREE.Mesh(new THREE.BoxGeometry(22, 14, 38), brickMat);
+    rightWing.position.set(34, 7, 7);
+    rightWing.castShadow = true;
+    collegeGroup.add(rightWing);
+
+    // Grand Heritage Clock Tower in center rising to 38m
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(8.5, 34, 8.5), brickMat);
+    tower.position.set(0, 17, 12);
+    tower.castShadow = true;
+    collegeGroup.add(tower);
+
+    const spire = new THREE.Mesh(new THREE.ConeGeometry(5.2, 9, 4), roofMat);
+    spire.position.set(0, 38.5, 12);
+    spire.rotation.y = Math.PI / 4;
+    collegeGroup.add(spire);
+
+    // Clock faces on 4 sides
+    const clockMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    [-1, 1].forEach(dir => {
+      const c1 = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 0.2, 16), clockMat);
+      c1.rotation.x = Math.PI / 2;
+      c1.position.set(0, 30, 12 + dir * 4.3);
+      collegeGroup.add(c1);
+
+      const c2 = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 0.2, 16), clockMat);
+      c2.rotation.z = Math.PI / 2;
+      c2.position.set(dir * 4.3, 30, 12);
+      collegeGroup.add(c2);
+    });
+
+    // College Gate Signboard Canvas
+    const colCanvas = document.createElement('canvas');
+    colCanvas.width = 1024;
+    colCanvas.height = 256;
+    const cctx = colCanvas.getContext('2d');
+    cctx.fillStyle = '#4c0519';
+    cctx.fillRect(0, 0, 1024, 256);
+    cctx.strokeStyle = '#fef08a';
+    cctx.lineWidth = 8;
+    cctx.strokeRect(6, 6, 1012, 244);
+
+    cctx.fillStyle = '#fef08a';
+    cctx.font = 'bold 50px "Noto Sans Kannada", sans-serif';
+    cctx.textAlign = 'center';
+    cctx.fillText('ಬಿ.ಎಂ.ಎಸ್ ಎಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು • ಬೆಂಗಳೂರು', 512, 85);
+
+    cctx.fillStyle = '#ffffff';
+    cctx.font = 'bold 42px Inter, sans-serif';
+    cctx.fillText('B.M.S. COLLEGE OF ENGINEERING (ESTD. 1946)', 512, 160);
+
+    cctx.fillStyle = '#38bdf8';
+    cctx.font = 'bold 24px monospace';
+    cctx.fillText('AUTONOMOUS INSTITUTION • AFFILIATED TO VTU & NAAC A++', 512, 215);
+
+    const colTex = new THREE.CanvasTexture(colCanvas);
+    const colSign = new THREE.Mesh(new THREE.PlaneGeometry(32, 8), new THREE.MeshBasicMaterial({ map: colTex }));
+    colSign.position.set(0, 13, 24.5);
+    collegeGroup.add(colSign);
+
+    // Front campus green lawn with statue
+    const campusLawn = new THREE.Mesh(new THREE.PlaneGeometry(70, 35), new THREE.MeshStandardMaterial({ color: 0x15803d }));
+    campusLawn.rotation.x = -Math.PI / 2;
+    campusLawn.position.set(0, 0.05, 30);
+    campusLawn.receiveShadow = true;
+    collegeGroup.add(campusLawn);
+
+    this.scene.add(collegeGroup);
+    this.physicsWorld.addStaticBox(-120, 9, -120, 28, 9, 12);
+    this.physicsWorld.addStaticBox(-154, 7, -113, 11, 7, 19);
+    this.physicsWorld.addStaticBox(-86, 7, -113, 11, 7, 19);
+    this.physicsWorld.addStaticBox(-120, 17, -108, 4.3, 17, 4.3);
+
+    // 2. IISC / HERITAGE SCIENCE CAMPUS (-60, 180)
+    const sciGroup = new THREE.Group();
+    sciGroup.position.set(-60, 0, 180);
+
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.65 });
+    const sciMain = new THREE.Mesh(new THREE.BoxGeometry(44, 16, 26), stoneMat);
+    sciMain.position.y = 8;
+    sciGroup.add(sciMain);
+
+    // Neoclassical colonnade portico
+    for (let cx = -14; cx <= 14; cx += 7) {
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.8, 14, 12), stoneTrimMat);
+      pillar.position.set(cx, 7, 14.5);
+      sciGroup.add(pillar);
+    }
+    const pediment = new THREE.Mesh(new THREE.ConeGeometry(18, 4.5, 4), stoneTrimMat);
+    pediment.position.set(0, 16.25, 14.5);
+    pediment.rotation.y = Math.PI / 4;
+    sciGroup.add(pediment);
+
+    // Science Faculty Signboard
+    const sciCanvas = document.createElement('canvas');
+    sciCanvas.width = 720;
+    sciCanvas.height = 160;
+    const sctx = sciCanvas.getContext('2d');
+    sctx.fillStyle = '#1c1917';
+    sctx.fillRect(0, 0, 720, 160);
+    sctx.fillStyle = '#f59e0b';
+    sctx.font = 'bold 36px "Noto Sans Kannada", sans-serif';
+    sctx.textAlign = 'center';
+    sctx.fillText('ಭಾರತೀಯ ವಿಜ್ಞಾನ ಸಂಸ್ಥೆ (IISc)', 360, 60);
+    sctx.fillStyle = '#ffffff';
+    sctx.font = 'bold 28px Inter, sans-serif';
+    sctx.fillText('INDIAN INSTITUTE OF SCIENCE • CAMPUS', 360, 115);
+
+    const sciSign = new THREE.Mesh(new THREE.PlaneGeometry(24, 5.3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sciCanvas) }));
+    sciSign.position.set(0, 20.5, 14.5);
+    sciGroup.add(sciSign);
+
+    this.scene.add(sciGroup);
+    this.physicsWorld.addStaticBox(-60, 8, 180, 22, 8, 13);
+  }
+
+  // E. HINDU TEMPLES (Authentic South Indian Dravidian Architecture)
+  buildHinduTemples() {
+    const graniteMat = new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.85 }); // Dark Chola granite
+    const gopuramMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 });  // Ochre/terracotta Rajagopuram
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.85 }); // Golden Kalasas
+    const stoneNandiMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.4 }); // Monolithic black granite
+
+    // -----------------------------------------------------------------
+    // 1. DODDA BASAVANA GUDI / BULL TEMPLE (100, 180)
+    // -----------------------------------------------------------------
+    const bullGroup = new THREE.Group();
+    bullGroup.position.set(100, 0, 180);
+
+    // Temple Mandapa Base (Pillared Hall)
+    const mandapaBase = new THREE.Mesh(new THREE.BoxGeometry(32, 1.4, 38), graniteMat);
+    mandapaBase.position.y = 0.7;
+    mandapaBase.receiveShadow = true;
+    bullGroup.add(mandapaBase);
+
+    // Carved stone pillars
+    for (let px = -12; px <= 12; px += 8) {
+      for (let pz = -14; pz <= 14; pz += 7) {
+        if (Math.abs(px) < 6 && Math.abs(pz) < 5) continue; // Hollow center for Nandi
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.9, 6.5, 0.9), graniteMat);
+        pillar.position.set(px, 4.4, pz);
+        pillar.castShadow = true;
+        bullGroup.add(pillar);
+      }
+    }
+
+    // Mandapa Stone Ceiling
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(33, 1.2, 39), graniteMat);
+    roof.position.y = 8.2;
+    roof.castShadow = true;
+    bullGroup.add(roof);
+
+    // MONOLITHIC BLACK GRANITE NANDI BULL (Huge 6.5m long x 4.2m tall sacred statue)
+    const nandiBody = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.7, 5.2, 14), stoneNandiMat);
+    nandiBody.rotation.x = Math.PI / 2;
+    nandiBody.position.set(0, 3.4, 0);
+    nandiBody.castShadow = true;
+    bullGroup.add(nandiBody);
+
+    // Nandi hump
+    const nandiHump = new THREE.Mesh(new THREE.SphereGeometry(1.4, 12, 12), stoneNandiMat);
+    nandiHump.position.set(0, 5.2, -0.6);
+    bullGroup.add(nandiHump);
+
+    // Nandi head facing north
+    const nandiHead = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.8, 2.4), stoneNandiMat);
+    nandiHead.position.set(0, 4.4, 3.2);
+    bullGroup.add(nandiHead);
+
+    // Nandi horns & ears
+    [-0.8, 0.8].forEach(hx => {
+      const horn = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.6, 8), stoneNandiMat);
+      horn.position.set(hx, 5.8, 3.0);
+      horn.rotation.z = hx > 0 ? -0.4 : 0.4;
+      bullGroup.add(horn);
+    });
+
+    // Golden bells garland around Nandi neck
+    const garland = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.35, 8, 16), goldMat);
+    garland.position.set(0, 3.8, 2.0);
+    garland.rotation.x = Math.PI / 3;
+    bullGroup.add(garland);
+
+    // Tall Brass Deepasthambha (Lamp Pillar) in front
+    const deepa = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.7, 14, 10), goldMat);
+    deepa.position.set(0, 7, 24);
+    bullGroup.add(deepa);
+
+    // Lamp tiers
+    for (let dy = 4; dy <= 13; dy += 2.5) {
+      const tier = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.1, 0.3, 12), goldMat);
+      tier.position.set(0, dy, 24);
+      bullGroup.add(tier);
+    }
+
+    // Sacred Flame at top of Deepasthambha
+    const dLight = new THREE.PointLight(0xff7700, 3.0, 16);
+    dLight.position.set(0, 14.5, 24);
+    bullGroup.add(dLight);
+
+    // Bull Temple Kannada Signboard
+    const bCanvas = document.createElement('canvas');
+    bCanvas.width = 640;
+    bCanvas.height = 160;
+    const btctx = bCanvas.getContext('2d');
+    btctx.fillStyle = '#78350f';
+    btctx.fillRect(0, 0, 640, 160);
+    btctx.strokeStyle = '#fef08a';
+    btctx.lineWidth = 6;
+    btctx.strokeRect(4, 4, 632, 152);
+
+    btctx.fillStyle = '#fef08a';
+    btctx.font = 'bold 36px "Noto Sans Kannada", sans-serif';
+    btctx.textAlign = 'center';
+    btctx.fillText('ದೊಡ್ಡ ಬಸವನ ಗುಡಿ • ಬಸವನಗುಡಿ', 320, 60);
+
+    btctx.fillStyle = '#ffffff';
+    btctx.font = 'bold 28px Inter, sans-serif';
+    btctx.fillText('BULL TEMPLE • BASAVANAGUDI', 320, 115);
+
+    const bSign = new THREE.Mesh(new THREE.PlaneGeometry(14, 3.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(bCanvas) }));
+    bSign.position.set(0, 10.5, 19.5);
+    bullGroup.add(bSign);
+
+    this.scene.add(bullGroup);
+    this.physicsWorld.addStaticBox(100, 4.5, 180, 16, 4.5, 19);
+
+    // -----------------------------------------------------------------
+    // 2. SRI SOMESHWARA DRAVIDIAN TEMPLE WITH RAJAGOPURAM (-60, -160)
+    // -----------------------------------------------------------------
+    const somGroup = new THREE.Group();
+    somGroup.position.set(-60, 0, -160);
+
+    // Outer Temple Prakara Courtyard Wall (Stone perimeter)
+    const courtW = 60;
+    const courtD = 50;
+    const pWallGeo = new THREE.BoxGeometry(courtW, 4.0, 1.2);
+    const wNorth = new THREE.Mesh(pWallGeo, graniteMat);
+    wNorth.position.set(0, 2, -courtD / 2);
+    const wSouthL = new THREE.Mesh(new THREE.BoxGeometry(22, 4.0, 1.2), graniteMat);
+    wSouthL.position.set(-19, 2, courtD / 2);
+    const wSouthR = new THREE.Mesh(new THREE.BoxGeometry(22, 4.0, 1.2), graniteMat);
+    wSouthR.position.set(19, 2, courtD / 2);
+    somGroup.add(wNorth, wSouthL, wSouthR);
+
+    // 5-TIER MAJESTIC DRAVIDIAN RAJAGOPURAM (Temple Gateway Tower rising to 32m)
+    const tiers = [
+      { w: 16, d: 10, h: 6, y: 3 },
+      { w: 13.5, d: 8.5, h: 5.5, y: 8.75 },
+      { w: 11, d: 7.0, h: 5.0, y: 14.0 },
+      { w: 9, d: 5.5, h: 4.5, y: 18.75 },
+      { w: 7, d: 4.5, h: 4.0, y: 23.0 }
+    ];
+
+    tiers.forEach((t, idx) => {
+      const tierMesh = new THREE.Mesh(new THREE.BoxGeometry(t.w, t.h, t.d), gopuramMat);
+      tierMesh.position.set(0, t.y, courtD / 2);
+      tierMesh.castShadow = true;
+      somGroup.add(tierMesh);
+
+      // Dravidian Stucco Niches and cornices
+      const cornice = new THREE.Mesh(new THREE.BoxGeometry(t.w + 1.2, 0.6, t.d + 1.2), graniteMat);
+      cornice.position.set(0, t.y + t.h / 2, courtD / 2);
+      somGroup.add(cornice);
+    });
+
+    // Barrel Vaulted Shikhara Roof (Sala Shikhara)
+    const salaRoof = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 7.5, 12, 1, false, 0, Math.PI), gopuramMat);
+    salaRoof.rotation.z = Math.PI / 2;
+    salaRoof.position.set(0, 26.2, courtD / 2);
+    somGroup.add(salaRoof);
+
+    // Row of 7 Golden Kalasa Finials on Gopuram crest
+    for (let kx = -3.0; kx <= 3.0; kx += 1.0) {
+      const kalasa = new THREE.Mesh(new THREE.ConeGeometry(0.28, 1.4, 8), goldMat);
+      kalasa.position.set(kx, 28.0, courtD / 2);
+      somGroup.add(kalasa);
+    }
+
+    // Inner Sanctum (Garbhagriha with Shiva Lingam plinth)
+    const sanctum = new THREE.Mesh(new THREE.BoxGeometry(18, 10, 18), graniteMat);
+    sanctum.position.set(0, 5, -6);
+    sanctum.castShadow = true;
+    somGroup.add(sanctum);
+
+    const vGold = new THREE.Mesh(new THREE.ConeGeometry(3.5, 6.0, 4), goldMat);
+    vGold.position.set(0, 13.0, -6);
+    vGold.rotation.y = Math.PI / 4;
+    somGroup.add(vGold);
+
+    // Sacred Temple Pond (Kalyani) adjacent to temple
+    const kalyaniGeo = new THREE.BoxGeometry(22, 0.2, 22);
+    const kalyaniWater = new THREE.Mesh(kalyaniGeo, new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.1, metalness: 0.3 }));
+    kalyaniWater.position.set(38, 0.1, 0);
+    somGroup.add(kalyaniWater);
+
+    // Stone steps around Kalyani
+    const kSteps = new THREE.Mesh(new THREE.BoxGeometry(26, 0.6, 26), graniteMat);
+    kSteps.position.set(38, 0.3, 0);
+    somGroup.add(kSteps);
+
+    // Someshwara Temple Signboard
+    const sCanvas = document.createElement('canvas');
+    sCanvas.width = 640;
+    sCanvas.height = 160;
+    const stctx = sCanvas.getContext('2d');
+    stctx.fillStyle = '#b45309';
+    stctx.fillRect(0, 0, 640, 160);
+    stctx.strokeStyle = '#fde047';
+    stctx.lineWidth = 6;
+    stctx.strokeRect(4, 4, 632, 152);
+
+    stctx.fillStyle = '#fde047';
+    stctx.font = 'bold 34px "Noto Sans Kannada", sans-serif';
+    stctx.textAlign = 'center';
+    stctx.fillText('ಶ್ರೀ ಸೋಮೇಶ್ವರ ಸ್ವಾಮಿ ದೇವಾಲಯ', 320, 60);
+
+    stctx.fillStyle = '#ffffff';
+    stctx.font = 'bold 26px Inter, sans-serif';
+    stctx.fillText('SRI SOMESHWARA TEMPLE • CHOLA ERA', 320, 115);
+
+    const sSign = new THREE.Mesh(new THREE.PlaneGeometry(12, 3.0), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sCanvas) }));
+    sSign.position.set(0, 9.0, courtD / 2 + 1.2);
+    somGroup.add(sSign);
+
+    this.scene.add(somGroup);
+    this.physicsWorld.addStaticBox(-60, 14, -160 + courtD / 2, 8, 14, 5);
+    this.physicsWorld.addStaticBox(-60, 5, -166, 9, 5, 9);
+
+    // -----------------------------------------------------------------
+    // 3. ISKCON BANGALORE WHITE & GOLD TEMPLE (220, -120)
+    // -----------------------------------------------------------------
+    const iskGroup = new THREE.Group();
+    iskGroup.position.set(220, 0, -120);
+
+    const whiteMarbleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 });
+
+    // Raised Hillock Platform
+    const hillPlatform = new THREE.Mesh(new THREE.CylinderGeometry(28, 32, 4.0, 16), graniteMat);
+    hillPlatform.position.y = 2.0;
+    hillPlatform.receiveShadow = true;
+    iskGroup.add(hillPlatform);
+
+    // Grand White Marble Prayer Hall
+    const hall = new THREE.Mesh(new THREE.BoxGeometry(40, 12, 28), whiteMarbleMat);
+    hall.position.y = 10.0;
+    hall.castShadow = true;
+    iskGroup.add(hall);
+
+    // Soaring Central Golden Shikhara (rising to 36m)
+    const iskShikhara = new THREE.Mesh(new THREE.ConeGeometry(7.5, 20, 8), goldMat);
+    iskShikhara.position.set(0, 26.0, 0);
+    iskShikhara.castShadow = true;
+    iskGroup.add(iskShikhara);
+
+    // Flanking Shikhara domes
+    [-14, 14].forEach(sx => {
+      const sDome = new THREE.Mesh(new THREE.ConeGeometry(4.5, 12, 8), whiteMarbleMat);
+      sDome.position.set(sx, 22.0, 0);
+      iskGroup.add(sDome);
+    });
+
+    // ISKCON Signboard
+    const iCanvas = document.createElement('canvas');
+    iCanvas.width = 640;
+    iCanvas.height = 140;
+    const ictx = iCanvas.getContext('2d');
+    ictx.fillStyle = '#065f46';
+    ictx.fillRect(0, 0, 640, 140);
+    ictx.strokeStyle = '#fde047';
+    ictx.lineWidth = 6;
+    ictx.strokeRect(4, 4, 632, 132);
+
+    ictx.fillStyle = '#fde047';
+    ictx.font = 'bold 32px "Noto Sans Kannada", sans-serif';
+    ictx.textAlign = 'center';
+    ictx.fillText('ಇಸ್ಕಾನ್ ಬೆಂಗಳೂರು • ಶ್ರೀ ರಾಧಾ ಕೃಷ್ಣ ದೇವಾಲಯ', 320, 52);
+
+    ictx.fillStyle = '#ffffff';
+    ictx.font = 'bold 24px Inter, sans-serif';
+    ictx.fillText('ISKCON BANGALORE • HARE KRISHNA HILL', 320, 102);
+
+    const iSign = new THREE.Mesh(new THREE.PlaneGeometry(16, 3.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(iCanvas) }));
+    iSign.position.set(0, 18.0, 14.2);
+    iskGroup.add(iSign);
+
+    this.scene.add(iskGroup);
+    this.physicsWorld.addStaticBox(220, 10, -120, 20, 10, 14);
+  }
+
+  // F. INDIAN AIR FORCE (IAF) HEADQUARTERS & TRAINING COMMAND (180, -240)
+  buildIndianAirForceHQ() {
+    const iafGroup = new THREE.Group();
+    iafGroup.position.set(180, 0, -240);
+
+    const iafBlueMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.5 }); // IAF Air Force Blue
+    const camoMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+    const aircraftGreyMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.8 }); // Jet fuselage
+
+    // 1. Military Perimeter Base compound (75m x 65m tarmac)
+    const baseGround = new THREE.Mesh(
+      new THREE.PlaneGeometry(75, 65),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 })
+    );
+    baseGround.rotation.x = -Math.PI / 2;
+    baseGround.position.y = 0.05;
+    baseGround.receiveShadow = true;
+    iafGroup.add(baseGround);
+
+    // Perimeter Security Fence / Wall
+    const fenceMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.8 });
+    const fBack = new THREE.Mesh(new THREE.BoxGeometry(75, 3.5, 0.8), fenceMat);
+    fBack.position.set(0, 1.75, -32.5);
+    const fLeft = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.5, 65), fenceMat);
+    fLeft.position.set(-37.5, 1.75, 0);
+    const fRight = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.5, 65), fenceMat);
+    fRight.position.set(37.5, 1.75, 0);
+    iafGroup.add(fBack, fLeft, fRight);
+
+    // Sentry Guardhouse & Security Checkpost
+    const guardhouse = new THREE.Mesh(new THREE.BoxGeometry(6, 4.2, 5), iafBlueMat);
+    guardhouse.position.set(-14, 2.1, 30);
+    iafGroup.add(guardhouse);
+
+    // Boom barrier gate
+    const barrier = new THREE.Mesh(new THREE.BoxGeometry(10, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+    barrier.position.set(-5, 1.2, 30);
+    iafGroup.add(barrier);
+
+    // 2. IAF HQ Training Command Headquarters Building (48m wide x 16m tall x 24m deep)
+    const hqBuilding = new THREE.Mesh(new THREE.BoxGeometry(48, 16, 24), iafBlueMat);
+    hqBuilding.position.set(0, 8, -14);
+    hqBuilding.castShadow = true;
+    hqBuilding.receiveShadow = true;
+    iafGroup.add(hqBuilding);
+
+    // IAF Roundel (Saffron, White, Green concentric circle with Ashoka Chakra)
+    const roundelCanvas = document.createElement('canvas');
+    roundelCanvas.width = 256;
+    roundelCanvas.height = 256;
+    const rctx = roundelCanvas.getContext('2d');
+    // Outer Saffron
+    rctx.fillStyle = '#FF9933';
+    rctx.beginPath();
+    rctx.arc(128, 128, 120, 0, Math.PI * 2);
+    rctx.fill();
+    // Middle White
+    rctx.fillStyle = '#FFFFFF';
+    rctx.beginPath();
+    rctx.arc(128, 128, 80, 0, Math.PI * 2);
+    rctx.fill();
+    // Inner Green
+    rctx.fillStyle = '#138808';
+    rctx.beginPath();
+    rctx.arc(128, 128, 40, 0, Math.PI * 2);
+    rctx.fill();
+
+    const roundelTex = new THREE.CanvasTexture(roundelCanvas);
+    const roundelMesh = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ map: roundelTex }));
+    roundelMesh.position.set(0, 12, -1.8);
+    iafGroup.add(roundelMesh);
+
+    // Spherical Air Defence Radar Dome on HQ Roof
+    const radome = new THREE.Mesh(new THREE.SphereGeometry(4.5, 16, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+    radome.position.set(16, 19.5, -14);
+    iafGroup.add(radome);
+
+    // Red beacon on radome
+    const rBeacon = new THREE.PointLight(0xff0000, 2.0, 30);
+    rBeacon.position.set(16, 24.2, -14);
+    iafGroup.add(rBeacon);
+
+    // 3. MONUMENTAL SUPERSONIC FIGHTER JET (MiG-21 / TEJAS) on 45-degree Launch Pedestal
+    const jetPedestal = new THREE.Mesh(new THREE.BoxGeometry(4.5, 6.0, 7.0), camoMat);
+    jetPedestal.position.set(0, 3.0, 14);
+    iafGroup.add(jetPedestal);
+
+    const jetGroup = new THREE.Group();
+    jetGroup.position.set(0, 7.5, 14);
+    jetGroup.rotation.x = -Math.PI / 6; // Angled 30 degrees upwards in takeoff climb!
+    jetGroup.rotation.y = -Math.PI / 12;
+
+    // Jet Fuselage
+    const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.3, 14, 12), aircraftGreyMat);
+    fuselage.rotation.x = Math.PI / 2;
+    jetGroup.add(fuselage);
+
+    // Radome nose cone
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.9, 3.2, 12), new THREE.MeshStandardMaterial({ color: 0x15803d }));
+    nose.position.z = 8.6;
+    nose.rotation.x = Math.PI / 2;
+    jetGroup.add(nose);
+
+    // Cockpit canopy
+    const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 8), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.9 }));
+    cockpit.scale.set(0.7, 0.8, 2.4);
+    cockpit.position.set(0, 0.9, 3.0);
+    jetGroup.add(cockpit);
+
+    // Supersonic Delta Wings
+    const wingShape = new THREE.Shape();
+    wingShape.moveTo(-6.5, -3.0);
+    wingShape.lineTo(0, 4.0);
+    wingShape.lineTo(6.5, -3.0);
+    wingShape.lineTo(0, -2.0);
+    wingShape.closePath();
+
+    const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.2, bevelEnabled: false });
+    const deltaWing = new THREE.Mesh(wingGeo, aircraftGreyMat);
+    deltaWing.rotation.x = -Math.PI / 2;
+    deltaWing.position.set(0, 0, 0);
+    jetGroup.add(deltaWing);
+
+    // Vertical Stabilizer Fin
+    const finShape = new THREE.Shape();
+    finShape.moveTo(0, 0);
+    finShape.lineTo(0, 3.4);
+    finShape.lineTo(2.4, 0);
+    finShape.closePath();
+
+    const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.18, bevelEnabled: false });
+    const vertFin = new THREE.Mesh(finGeo, aircraftGreyMat);
+    vertFin.rotation.y = Math.PI / 2;
+    vertFin.position.set(0, 0.8, -5.5);
+    jetGroup.add(vertFin);
+
+    // Afterburner engine nozzle
+    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.1, 1.2, 12), new THREE.MeshStandardMaterial({ color: 0x18181b, metalness: 0.9 }));
+    nozzle.rotation.x = Math.PI / 2;
+    nozzle.position.z = -7.4;
+    jetGroup.add(nozzle);
+
+    // Orange afterburner flame glow
+    const jetFlame = new THREE.PointLight(0xff6600, 3.0, 10);
+    jetFlame.position.set(0, 0, -8.5);
+    jetGroup.add(jetFlame);
+
+    iafGroup.add(jetGroup);
+
+    // Bilingual IAF Signboard
+    const iafCanvas = document.createElement('canvas');
+    iafCanvas.width = 1024;
+    iafCanvas.height = 256;
+    const ictx = iafCanvas.getContext('2d');
+    ictx.fillStyle = '#0f172a';
+    ictx.fillRect(0, 0, 1024, 256);
+    ictx.strokeStyle = '#38bdf8';
+    ictx.lineWidth = 8;
+    ictx.strokeRect(6, 6, 1012, 244);
+
+    ictx.fillStyle = '#38bdf8';
+    ictx.font = 'bold 46px "Noto Sans Kannada", sans-serif';
+    ictx.textAlign = 'center';
+    ictx.fillText('ಭಾರತೀಯ ವಾಯು ಸೇನೆ • ಪ್ರಧಾನ ತರಬೇತಿ ಕಮಾಂಡ್', 512, 85);
+
+    ictx.fillStyle = '#ffffff';
+    ictx.font = 'bold 40px Inter, sans-serif';
+    ictx.fillText('INDIAN AIR FORCE — HQ TRAINING COMMAND', 512, 160);
+
+    ictx.fillStyle = '#f59e0b';
+    ictx.font = 'bold 24px monospace';
+    ictx.fillText('TOUCH THE SKY WITH GLORY • ನಭಃ ಸ್ಪೃಶಂ ದೀಪ್ತಮ್', 512, 215);
+
+    const iafSign = new THREE.Mesh(new THREE.PlaneGeometry(28, 7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(iafCanvas) }));
+    iafSign.position.set(0, 18, -1.8);
+    iafGroup.add(iafSign);
+
+    this.scene.add(iafGroup);
+    this.physicsWorld.addStaticBox(180, 8, -254, 24, 8, 12);
+    this.physicsWorld.addStaticBox(180, 3, -226, 3, 3, 4);
+  }
+
+  // G. INDIAN ARMY ASC CENTRE & COLLEGE (Cantonment Garrison: -180, 220)
+  buildIndianArmyHQ() {
+    const armyGroup = new THREE.Group();
+    armyGroup.position.set(-180, 0, 220);
+
+    const armyGreenMat = new THREE.MeshStandardMaterial({ color: 0x365314, roughness: 0.8 }); // Olive Drab Indian Army
+    const stoneWallMat = new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.8 });
+    const tankSteelMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.6, metalness: 0.6 });
+
+    // 1. Army Cantonment Base Parade Ground (80m x 70m)
+    const baseGround = new THREE.Mesh(
+      new THREE.PlaneGeometry(80, 70),
+      new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.9 })
+    );
+    baseGround.rotation.x = -Math.PI / 2;
+    baseGround.position.y = 0.05;
+    baseGround.receiveShadow = true;
+    armyGroup.add(baseGround);
+
+    // Sentry Watchtowers on corners
+    [-36, 36].forEach(wx => {
+      const tower = new THREE.Mesh(new THREE.BoxGeometry(4.0, 12, 4.0), stoneWallMat);
+      tower.position.set(wx, 6, 32);
+      tower.castShadow = true;
+      armyGroup.add(tower);
+
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(4.8, 3.2, 4.8), armyGreenMat);
+      cabin.position.set(wx, 13.6, 32);
+      armyGroup.add(cabin);
+
+      // Searchlight on sentry tower
+      const searchlight = new THREE.SpotLight(0xfef08a, 3.0, 50, Math.PI / 5, 0.4);
+      searchlight.position.set(wx, 14, 32);
+      searchlight.target.position.set(wx, 0, 10);
+      armyGroup.add(searchlight);
+      armyGroup.add(searchlight.target);
+    });
+
+    // 2. Army Garrison Command & Barracks Building (50m wide x 15m tall x 22m deep)
+    const barracks = new THREE.Mesh(new THREE.BoxGeometry(50, 14, 22), armyGreenMat);
+    barracks.position.set(0, 7, -18);
+    barracks.castShadow = true;
+    barracks.receiveShadow = true;
+    armyGroup.add(barracks);
+
+    // Roof parapet
+    const parapet = new THREE.Mesh(new THREE.BoxGeometry(51, 1.4, 23), stoneWallMat);
+    parapet.position.set(0, 14.7, -18);
+    armyGroup.add(parapet);
+
+    // 3. VIJAYANTA / T-90 BHISHMA MAIN BATTLE TANK on Granite Honor Pedestal
+    const tankPlinth = new THREE.Mesh(new THREE.BoxGeometry(8.5, 2.5, 12.0), stoneWallMat);
+    tankPlinth.position.set(0, 1.25, 10);
+    tankPlinth.castShadow = true;
+    armyGroup.add(tankPlinth);
+
+    const tankGroup = new THREE.Group();
+    tankGroup.position.set(0, 2.5, 10);
+
+    // Tank Hull
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(5.4, 1.8, 8.2), tankSteelMat);
+    hull.position.y = 1.3;
+    hull.castShadow = true;
+    tankGroup.add(hull);
+
+    // Left & Right Track Treads
+    [-2.8, 2.8].forEach(tx => {
+      const tread = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.5, 8.6), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.9 }));
+      tread.position.set(tx, 0.8, 0);
+      tankGroup.add(tread);
+
+      // Road wheels
+      for (let wz = -3.5; wz <= 3.5; wz += 1.4) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 1.0, 12), tankSteelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(tx, 0.8, wz);
+        tankGroup.add(wheel);
+      }
+    });
+
+    // Rotating Armored Turret
+    const turret = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 2.2, 1.3, 12), tankSteelMat);
+    turret.position.set(0, 2.8, -0.4);
+    tankGroup.add(turret);
+
+    // 125mm Main Battle Cannon Gun Barrel
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 6.5, 10), tankSteelMat);
+    barrel.rotation.x = Math.PI / 2 - 0.15; // Aimed menacingly up
+    barrel.position.set(0, 2.8, 3.2);
+    tankGroup.add(barrel);
+
+    // Muzzle Brake
+    const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.6, 10), tankSteelMat);
+    muzzle.rotation.x = Math.PI / 2 - 0.15;
+    muzzle.position.set(0, 3.3, 6.4);
+    tankGroup.add(muzzle);
+
+    // Commander Cupola & Machine Gun
+    const cupola = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.6, 10), tankSteelMat);
+    cupola.position.set(0.8, 3.7, -0.8);
+    tankGroup.add(cupola);
+
+    armyGroup.add(tankGroup);
+
+    // Bilingual Indian Army Signboard
+    const aCanvas = document.createElement('canvas');
+    aCanvas.width = 1024;
+    aCanvas.height = 256;
+    const actx = aCanvas.getContext('2d');
+    actx.fillStyle = '#14532d';
+    actx.fillRect(0, 0, 1024, 256);
+    actx.strokeStyle = '#facc15';
+    actx.lineWidth = 8;
+    actx.strokeRect(6, 6, 1012, 244);
+
+    actx.fillStyle = '#facc15';
+    actx.font = 'bold 46px "Noto Sans Kannada", sans-serif';
+    actx.textAlign = 'center';
+    actx.fillText('ಭಾರತೀಯ ಸೇನೆ • ಎ.ಎಸ್.ಸಿ ಸೆಂಟರ್ ಮತ್ತು ಕಾಲೇಜು', 512, 85);
+
+    actx.fillStyle = '#ffffff';
+    actx.font = 'bold 40px Inter, sans-serif';
+    actx.fillText('INDIAN ARMY — ASC CENTRE & COLLEGE (CANTONMENT)', 512, 160);
+
+    actx.fillStyle = '#fde047';
+    actx.font = 'bold 24px monospace';
+    actx.fillText('SEVA ASMAKAM DHARMAH • SERVICE IS OUR CREED', 512, 215);
+
+    const armySign = new THREE.Mesh(new THREE.PlaneGeometry(30, 7.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(aCanvas) }));
+    armySign.position.set(0, 16, -6.8);
+    armyGroup.add(armySign);
+
+    this.scene.add(armyGroup);
+    this.physicsWorld.addStaticBox(-180, 7, 202, 25, 7, 11);
+    this.physicsWorld.addStaticBox(-180, 2.5, 230, 4.3, 2.5, 6.0);
+    this.physicsWorld.addStaticBox(-216, 6, 252, 2.0, 6, 2.0);
+    this.physicsWorld.addStaticBox(-144, 6, 252, 2.0, 6, 2.0);
+  }
+
   createCityZoo() {
     const zooGroup = new THREE.Group();
     zooGroup.position.set(-160, 0, -140);
@@ -2570,20 +3247,20 @@ export class CityBuilder {
     // 1. Procedural Seeded Distribution of 350+ multi-species trees
     const treeSpecies = ['oak', 'maple', 'cherry', 'pine', 'willow', 'palm'];
 
-    // Random clusters across parks, memorial axis, suburbs, riverbanks
+    // Optimized clusters across parks, memorial axis, suburbs, riverbanks
     const zones = [
       // Central Park & Memorial Plaza
-      { cx: -50, cz: -60, count: 55, radius: 65, types: ['cherry', 'oak', 'maple'] },
+      { cx: -50, cz: -60, count: 28, radius: 65, types: ['cherry', 'oak', 'maple'] },
       // Eastern Riverfront & Beach Promenade
-      { cx: 235, cz: -80, count: 65, radius: 95, types: ['willow', 'palm', 'cherry'] },
+      { cx: 235, cz: -80, count: 32, radius: 95, types: ['willow', 'palm', 'cherry'] },
       // Northern Foothills & Pine Ridge
-      { cx: 0, cz: -360, count: 90, radius: 150, types: ['pine', 'oak'] },
+      { cx: 0, cz: -360, count: 42, radius: 150, types: ['pine', 'oak'] },
       // Western Suburbs & Academy Grounds
-      { cx: -200, cz: 80, count: 60, radius: 80, types: ['maple', 'oak', 'pine'] },
+      { cx: -200, cz: 80, count: 30, radius: 80, types: ['maple', 'oak', 'pine'] },
       // Southern Champ de Mars & Liberty Gardens
-      { cx: 160, cz: 180, count: 50, radius: 75, types: ['cherry', 'maple', 'oak'] },
+      { cx: 160, cz: 180, count: 26, radius: 75, types: ['cherry', 'maple', 'oak'] },
       // Zoo Botanical Enclosure
-      { cx: -160, cz: -140, count: 35, radius: 45, types: ['palm', 'oak'] }
+      { cx: -160, cz: -140, count: 20, radius: 45, types: ['palm', 'oak'] }
     ];
 
     let seed = 42;
@@ -2660,6 +3337,7 @@ export class CityBuilder {
     group.add(crown2);
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 2.0, z, 0.55 * s, 2.0, 0.55 * s, false, false, true);
   }
 
   createMapleTree(x, z, s = 1.0) {
@@ -2688,6 +3366,7 @@ export class CityBuilder {
     group.add(crownTop);
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 2.0, z, 0.5 * s, 2.0, 0.5 * s, false, false, true);
   }
 
   createCherryBlossomTree(x, z, s = 1.0) {
@@ -2719,6 +3398,7 @@ export class CityBuilder {
     group.add(c2);
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 1.9, z, 0.45 * s, 1.9, 0.45 * s, false, false, true);
   }
 
   createPineTree(x, z, s = 1.0) {
@@ -2752,6 +3432,7 @@ export class CityBuilder {
     group.add(tier3);
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 2.5, z, 0.45 * s, 2.5, 0.45 * s, false, false, true);
   }
 
   createWillowTree(x, z, s = 1.0) {
@@ -2775,6 +3456,7 @@ export class CityBuilder {
     group.add(dome);
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 2.25, z, 0.6 * s, 2.25, 0.6 * s, false, false, true);
   }
 
   createPalmTree(x, z, s = 1.0) {
@@ -2801,6 +3483,7 @@ export class CityBuilder {
     }
 
     this.scene.add(group);
+    this.physicsWorld.addStaticBox(x, 3.75, z, 0.4 * s, 3.75, 0.4 * s, false, false, true);
   }
 
   // ========================================================
@@ -3047,39 +3730,126 @@ export class CityBuilder {
 
   // ========================================================
   // 16. VIDHANA SOUDHA (KARNATAKA STATE LEGISLATURE) (-240, -40)
+  // High-visibility landmark with grand ceremonial boulevard, 50m illuminated dome & sky beacon
   // ========================================================
   buildVidhanaSoudha() {
     const soudhaGroup = new THREE.Group();
     soudhaGroup.position.set(-240, 0, -40);
 
-    const graniteMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.65 });
-    const darkGranite = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8 });
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.85 });
+    const graniteMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.55 });
+    const darkGranite = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.75 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2, metalness: 0.9 });
+    const lampGlowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
 
-    // Grand 30-Step Granite Staircase Entrance
-    const stairs = new THREE.Mesh(new THREE.BoxGeometry(45, 3.5, 26), darkGranite);
-    stairs.position.set(0, 1.75, 12);
+    // 1. Grand Ceremonial Boulevard connecting West Highway (x = -200) to Vidhana Soudha (x = -240)
+    // Relative coordinates: from x = 40 down to x = 0 (Boulevard width 26m, length 50m)
+    const boulevardMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.6 });
+    const boulevard = new THREE.Mesh(new THREE.BoxGeometry(45, 0.2, 28), boulevardMat);
+    boulevard.position.set(22.5, 0.1, 14);
+    boulevard.receiveShadow = true;
+    soudhaGroup.add(boulevard);
+
+    // Central Garden Fountain & Flowerbeds along boulevard
+    const fountainPlaza = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 6.0, 0.8, 16), darkGranite);
+    fountainPlaza.position.set(22, 0.4, 14);
+    soudhaGroup.add(fountainPlaza);
+
+    const waterMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.8 });
+    const fountainWater = new THREE.Mesh(new THREE.CylinderGeometry(4.8, 4.8, 0.2, 16), waterMat);
+    fountainWater.position.set(22, 0.85, 14);
+    soudhaGroup.add(fountainWater);
+
+    // Boulevard Royal Palm Trees & Heritage Cast-Iron Street Lamps
+    [-11, 11].forEach(sideZ => {
+      for (let bx = 6; bx <= 38; bx += 10) {
+        // Heritage Cast Iron Lamppost
+        const lampPost = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 5.2, 8), darkGranite);
+        lampPost.position.set(bx, 2.6, 14 + sideZ);
+        soudhaGroup.add(lampPost);
+
+        const lantern = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.7), lampGlowMat);
+        lantern.position.set(bx, 5.2, 14 + sideZ);
+        soudhaGroup.add(lantern);
+
+        // Royal Palm Tree
+        const trunk = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.25, 0.35, 9.0, 7),
+          new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 })
+        );
+        trunk.position.set(bx, 4.5, 14 + sideZ * 1.35);
+        soudhaGroup.add(trunk);
+
+        const palmFronds = new THREE.Mesh(
+          new THREE.ConeGeometry(3.5, 2.5, 7),
+          new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 })
+        );
+        palmFronds.position.set(bx, 9.5, 14 + sideZ * 1.35);
+        soudhaGroup.add(palmFronds);
+      }
+    });
+
+    // 2. Highway Entrance Gantry on West Arterial Road (x = -200, z = -40 => relative x = 40)
+    const gantryPillarMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
+    const gPillarL = new THREE.Mesh(new THREE.BoxGeometry(1.2, 8.5, 1.2), gantryPillarMat);
+    gPillarL.position.set(40, 4.25, 14 - 15);
+    const gPillarR = new THREE.Mesh(new THREE.BoxGeometry(1.2, 8.5, 1.2), gantryPillarMat);
+    gPillarR.position.set(40, 4.25, 14 + 15);
+    soudhaGroup.add(gPillarL, gPillarR);
+
+    const gCrossbeam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.2, 31), gantryPillarMat);
+    gCrossbeam.position.set(40, 8.5, 14);
+    soudhaGroup.add(gCrossbeam);
+
+    // Illuminated Highway Directional Signboard
+    const gantryCanvas = document.createElement('canvas');
+    gantryCanvas.width = 1024;
+    gantryCanvas.height = 160;
+    const gctx = gantryCanvas.getContext('2d');
+    gctx.fillStyle = '#065f46'; // Highway green
+    gctx.fillRect(0, 0, 1024, 160);
+    gctx.fillStyle = '#f59e0b'; // Gold border
+    gctx.lineWidth = 10;
+    gctx.strokeRect(6, 6, 1012, 148);
+    gctx.fillStyle = '#ffffff';
+    gctx.font = 'bold 42px "Inter", sans-serif';
+    gctx.textAlign = 'center';
+    gctx.fillText('🏛️ VIDHANA SOUDHA • ವಿಧಾನಸೌಧ', 512, 65);
+    gctx.fillStyle = '#fde047';
+    gctx.font = 'bold 32px "Inter", sans-serif';
+    gctx.fillText('← KARNATAKA STATE LEGISLATURE (WEST GATE)', 512, 118);
+
+    const gantrySignMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(18, 3.2),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gantryCanvas), side: THREE.DoubleSide })
+    );
+    gantrySignMesh.position.set(40, 8.5, 14);
+    gantrySignMesh.rotation.y = Math.PI / 2;
+    soudhaGroup.add(gantrySignMesh);
+
+    // 3. Grand 30-Step Granite Staircase Entrance (Expanded)
+    const stairs = new THREE.Mesh(new THREE.BoxGeometry(56, 4.2, 28), darkGranite);
+    stairs.position.set(0, 2.1, 14);
     stairs.receiveShadow = true;
     soudhaGroup.add(stairs);
 
-    // Majestic Neo-Dravidian 3-Story Main Palace (68m wide x 28m deep x 20m high)
-    const mainPalace = new THREE.Mesh(new THREE.BoxGeometry(68, 18, 28), graniteMat);
-    mainPalace.position.set(0, 11, -4);
+    // 4. Majestic Neo-Dravidian Main Palace (88m wide x 34m deep x 22m high)
+    const mainPalace = new THREE.Mesh(new THREE.BoxGeometry(88, 22, 34), graniteMat);
+    mainPalace.position.set(0, 13, -4);
     mainPalace.castShadow = true;
     soudhaGroup.add(mainPalace);
 
-    // 12 Carved Dravidian Colonnade Columns along Front Portico
-    const colGeo = new THREE.CylinderGeometry(1.0, 1.2, 15, 14);
-    for (let c = -20; c <= 20; c += 3.6) {
+    // 16 Carved Dravidian Colonnade Columns along Front Portico
+    const colGeo = new THREE.CylinderGeometry(1.2, 1.4, 18, 14);
+    for (let c = -24; c <= 24; c += 3.4) {
       const col = new THREE.Mesh(colGeo, graniteMat);
-      col.position.set(c, 10.5, 10);
+      col.position.set(c, 12.5, 13);
       col.castShadow = true;
       soudhaGroup.add(col);
     }
 
     // Portico Roof & Carved Motto Banner
-    const porticoRoof = new THREE.Mesh(new THREE.BoxGeometry(46, 2.5, 8), graniteMat);
-    porticoRoof.position.set(0, 18.5, 10);
+    const porticoRoof = new THREE.Mesh(new THREE.BoxGeometry(54, 3.0, 10), graniteMat);
+    porticoRoof.position.set(0, 22.0, 13);
     soudhaGroup.add(porticoRoof);
 
     const mottoCanvas = document.createElement('canvas');
@@ -3094,60 +3864,81 @@ export class CityBuilder {
     mctx.fillText('ಸರ್ಕಾರದ ಕೆಲಸ ದೇವರ ಕೆಲಸ  •  GOVERNMENT WORK IS GOD\'S WORK', 512, 75);
 
     const mottoMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(36, 2.2),
+      new THREE.PlaneGeometry(42, 2.6),
       new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(mottoCanvas) })
     );
-    mottoMesh.position.set(0, 18.5, 14.1);
+    mottoMesh.position.set(0, 22.0, 18.1);
     soudhaGroup.add(mottoMesh);
 
-    // Monumental Central Dome (Diameter 18m, Height reaches 38m!)
-    const drum = new THREE.Mesh(new THREE.CylinderGeometry(9, 9.5, 6, 24), graniteMat);
-    drum.position.set(0, 23, -4);
+    // 5. Monumental Central Dome (Diameter 24m, Drum reaching height 48m!)
+    const drum = new THREE.Mesh(new THREE.CylinderGeometry(12, 12.5, 9, 28), graniteMat);
+    drum.position.set(0, 28, -4);
     soudhaGroup.add(drum);
 
-    const dome = new THREE.Mesh(new THREE.SphereGeometry(9, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), graniteMat);
-    dome.position.set(0, 26, -4);
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(12, 28, 20, 0, Math.PI * 2, 0, Math.PI / 2), graniteMat);
+    dome.position.set(0, 32.5, -4);
     soudhaGroup.add(dome);
 
-    // 4-Headed Golden Ashoka Lion Capital atop Dome
-    const ashoka = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.2, 4.5, 8), goldMat);
-    ashoka.position.set(0, 37, -4);
+    // Golden Kalasa Finial & 4-Headed Ashoka Lion Capital (Reaches 48m - 52m)
+    const kalasa = new THREE.Mesh(new THREE.ConeGeometry(3.0, 5.0, 12), goldMat);
+    kalasa.position.set(0, 46.5, -4);
+    soudhaGroup.add(kalasa);
+
+    const ashoka = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 1.5, 5.5, 8), goldMat);
+    ashoka.position.set(0, 50.0, -4);
     soudhaGroup.add(ashoka);
 
-    // 4 Corner Chhatri Domed Towers
-    [[-30, -14], [30, -14], [-30, 6], [30, 6]].forEach(([cx, cz]) => {
-      const tower = new THREE.Mesh(new THREE.BoxGeometry(8, 24, 8), graniteMat);
-      tower.position.set(cx, 12, cz);
+    // 6. SKY ARCHITECTURAL BEACON (Luminous vertical beacon visible across entire city skyline!)
+    const beaconGeo = new THREE.CylinderGeometry(2.5, 18.0, 220, 16);
+    const beaconMat = new THREE.MeshBasicMaterial({
+      color: 0xfbbf24,
+      transparent: true,
+      opacity: 0.28,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    const skyBeacon = new THREE.Mesh(beaconGeo, beaconMat);
+    skyBeacon.position.set(0, 150, -4);
+    soudhaGroup.add(skyBeacon);
+
+    // 7. Four Tall Corner Chhatri Domed Towers
+    [[-38, -16], [38, -16], [-38, 8], [38, 8]].forEach(([cx, cz]) => {
+      const tower = new THREE.Mesh(new THREE.BoxGeometry(9, 28, 9), graniteMat);
+      tower.position.set(cx, 14, cz);
       soudhaGroup.add(tower);
 
-      const chhatriDome = new THREE.Mesh(new THREE.SphereGeometry(4, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), goldMat);
-      chhatriDome.position.set(cx, 24, cz);
+      const chhatriDome = new THREE.Mesh(new THREE.SphereGeometry(5.2, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), goldMat);
+      chhatriDome.position.set(cx, 28, cz);
       soudhaGroup.add(chhatriDome);
     });
 
-    // Twin Flag Masts: Indian Tricolor & Karnataka Yellow/Red Flag
+    // 8. Twin Monumental Flag Masts: Indian Tricolor & Karnataka Yellow/Red Flag
     const mastMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.8 });
-    const mast1 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 18), mastMat);
-    mast1.position.set(-6, 9, 23);
+    const mast1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 24), mastMat);
+    mast1.position.set(-8, 12, 26);
     soudhaGroup.add(mast1);
 
-    const flag1 = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.4), new THREE.MeshBasicMaterial({ color: 0xf97316 }));
-    flag1.position.set(-4, 16, 23);
+    const flag1 = new THREE.Mesh(new THREE.PlaneGeometry(6, 3.6), new THREE.MeshBasicMaterial({ color: 0xf97316 }));
+    flag1.position.set(-5, 21, 26);
     soudhaGroup.add(flag1);
 
-    const mast2 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 18), mastMat);
-    mast2.position.set(6, 9, 23);
+    const mast2 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 24), mastMat);
+    mast2.position.set(8, 12, 26);
     soudhaGroup.add(mast2);
 
-    const flag2 = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.4), new THREE.MeshBasicMaterial({ color: 0xeab308 }));
-    flag2.position.set(8, 16, 23);
+    const flag2 = new THREE.Mesh(new THREE.PlaneGeometry(6, 3.6), new THREE.MeshBasicMaterial({ color: 0xeab308 }));
+    flag2.position.set(11, 21, 26);
     soudhaGroup.add(flag2);
 
-    // Station an Auto-Rickshaw at the front plaza
-    this.createAutoRickshaw(soudhaGroup, 24, 24, 0.8);
+    // Station Auto-Rickshaws at the front plaza
+    this.createAutoRickshaw(soudhaGroup, 24, 26, 0.8);
+    this.createAutoRickshaw(soudhaGroup, 28, 28, 0.6);
 
     this.scene.add(soudhaGroup);
-    this.physicsWorld.addStaticBox(-240, 11, -44, 35, 11, 15);
+    this.physicsWorld.addStaticBox(-240, 12, -44, 45, 12, 18);
+    this.physicsWorld.addStaticBox(-200, 4.25, -26, 1.2, 4.25, 1.2);
+    this.physicsWorld.addStaticBox(-200, 4.25, -54, 1.2, 4.25, 1.2);
   }
 
   // ========================================================
@@ -3857,4 +4648,823 @@ export class CityBuilder {
     this.scene.add(ashokaGroup);
     this.physicsWorld.addStaticBox(-235, 7, -70, 1, 7, 1);
   }
+
+  // ========================================================
+  // 23. GRAND CHORAHAS / QUADRANGLE ROUNDABOUTS WITH KAMAL (LOTUS)
+  // ========================================================
+  buildRoadRoundaboutsChorahas() {
+    const intersections = [
+      { x: 0, z: -200, name: 'North Quadrangles Choraha' },
+      { x: 0, z: 200, name: 'South Silk-HSR Choraha' },
+      { x: -200, z: 0, name: 'West Vidhana-Central Choraha' },
+      { x: 200, z: 0, name: 'East Ring Road Choraha' },
+      { x: -200, z: -200, name: 'North-West Tech Choraha' },
+      { x: 200, z: 200, name: 'South-East Commercial Choraha' },
+      { x: -200, z: 200, name: 'South-West Cantonment Choraha' }
+    ];
+
+    const roadCircMat = new THREE.MeshStandardMaterial({ color: 0x242424, roughness: 0.85 });
+    const curbMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 });
+    const lawnMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.85 });
+    const pondMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.4 });
+    const petalPink = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.4, side: THREE.DoubleSide });
+    const petalDeep = new THREE.MeshStandardMaterial({ color: 0xdb2777, roughness: 0.4, side: THREE.DoubleSide });
+    const lotusGold = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.25, metalness: 0.8 });
+
+    intersections.forEach(pt => {
+      const group = new THREE.Group();
+      group.position.set(pt.x, 0, pt.z);
+
+      // 1. Broad Circular Road Asphalt Apron for the Roundabout (Radius 22m)
+      const roadGeo = new THREE.CircleGeometry(28, 36);
+      const roadMesh = new THREE.Mesh(roadGeo, roadCircMat);
+      roadMesh.rotation.x = -Math.PI / 2;
+      roadMesh.position.y = 0.045;
+      roadMesh.receiveShadow = true;
+      group.add(roadMesh);
+
+      // Outer White Dashed Guidance Ring
+      const ringDashGeo = new THREE.RingGeometry(26.5, 27.2, 36);
+      const ringDash = new THREE.Mesh(ringDashGeo, this.materials.roadWhite);
+      ringDash.rotation.x = -Math.PI / 2;
+      ringDash.position.y = 0.05;
+      group.add(ringDash);
+
+      // 2. Raised Central Island Curb & Lawn (Radius 9m)
+      const islandCurb = new THREE.Mesh(new THREE.CylinderGeometry(9.0, 9.4, 0.5, 32), curbMat);
+      islandCurb.position.y = 0.25;
+      islandCurb.receiveShadow = true;
+      group.add(islandCurb);
+
+      const islandLawn = new THREE.Mesh(new THREE.CircleGeometry(8.9, 32), lawnMat);
+      islandLawn.rotation.x = -Math.PI / 2;
+      islandLawn.position.y = 0.51;
+      group.add(islandLawn);
+
+      // 3. Lotus Pond Basin (Radius 5.5m)
+      const basin = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 5.8, 0.6, 24), curbMat);
+      basin.position.y = 0.75;
+      group.add(basin);
+
+      const pondWater = new THREE.Mesh(new THREE.CircleGeometry(5.4, 24), pondMat);
+      pondWater.rotation.x = -Math.PI / 2;
+      pondWater.position.y = 1.05;
+      group.add(pondWater);
+
+      // 4. MAGNIFICENT KAMAL (LOTUS FLOWER) MONUMENT IN THE CENTER
+      const lotusGroup = new THREE.Group();
+      lotusGroup.position.set(0, 1.1, 0);
+
+      // Central Golden Pericarp / Stigma
+      const pericarp = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 0.8, 1.2, 16), lotusGold);
+      pericarp.position.y = 1.0;
+      lotusGroup.add(pericarp);
+
+      // Glowing central jewel inside Kamal with high emissive bloom
+      const jewelGeo = new THREE.SphereGeometry(0.8, 12, 12);
+      const jewelMat = new THREE.MeshBasicMaterial({ color: 0xf472b6 });
+      const lotusJewel = new THREE.Mesh(jewelGeo, jewelMat);
+      lotusJewel.position.set(0, 2.0, 0);
+      lotusGroup.add(lotusJewel);
+
+      // Outer Layer of Large Blooming Lotus Petals (8 petals)
+      for (let i = 0; i < 8; i++) {
+        const ang = (i * Math.PI * 2) / 8;
+        const petalGeo = new THREE.SphereGeometry(1.6, 8, 8, 0, Math.PI);
+        const petal = new THREE.Mesh(petalGeo, petalDeep);
+        petal.scale.set(0.7, 1.5, 0.25);
+        petal.rotation.x = 0.8;
+        petal.rotation.y = 0;
+        petal.rotation.z = 0;
+
+        const pPivot = new THREE.Group();
+        pPivot.rotation.y = ang;
+        petal.position.set(0, 1.0, 2.0);
+        pPivot.add(petal);
+        lotusGroup.add(pPivot);
+      }
+
+      // Inner Layer of Elegant Upright Lotus Petals (8 petals staggered)
+      for (let j = 0; j < 8; j++) {
+        const ang = ((j + 0.5) * Math.PI * 2) / 8;
+        const petalGeo = new THREE.SphereGeometry(1.2, 8, 8, 0, Math.PI);
+        const petal = new THREE.Mesh(petalGeo, petalPink);
+        petal.scale.set(0.6, 1.4, 0.2);
+        petal.rotation.x = 0.45;
+
+        const pPivot = new THREE.Group();
+        pPivot.rotation.y = ang;
+        petal.position.set(0, 1.4, 1.2);
+        pPivot.add(petal);
+        lotusGroup.add(pPivot);
+      }
+
+      // Water Fountain Spouts around the Kamal
+      for (let w = 0; w < 4; w++) {
+        const jetAngle = (w * Math.PI * 2) / 4;
+        const jet = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 1.8, 8), pondMat);
+        jet.position.set(Math.cos(jetAngle) * 3.2, 1.6, Math.sin(jetAngle) * 3.2);
+        lotusGroup.add(jet);
+      }
+
+      group.add(lotusGroup);
+
+      this.scene.add(group);
+
+      // Register solid physics collision for the central Kamal monument & pond
+      this.physicsWorld.addStaticBox(pt.x, 1.5, pt.z, 5.8, 1.5, 5.8);
+    });
+  }
+
+  // ========================================================
+  // 24. BNM INSTITUTE OF TECHNOLOGY (BNMIT) (-140, 160)
+  // South Bangalore Premier Engineering Campus
+  // ========================================================
+  buildBnmInstitute() {
+    const group = new THREE.Group();
+    const bx = -140;
+    const bz = 160;
+    group.position.set(bx, 0, bz);
+
+    const campusBrick = new THREE.MeshStandardMaterial({ color: 0x9f1239, roughness: 0.75 }); // BNMIT clinker brick
+    const campusTrim = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5 });
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.15, metalness: 0.85 });
+
+    // Main Academic Administrative Building (54m wide x 18m tall x 26m deep)
+    const adminBlock = new THREE.Mesh(new THREE.BoxGeometry(54, 18, 26), campusBrick);
+    adminBlock.position.set(0, 9, 0);
+    adminBlock.castShadow = true;
+    adminBlock.receiveShadow = true;
+    group.add(adminBlock);
+
+    // Front Glass Atrium & Engineering Wings
+    const atrium = new THREE.Mesh(new THREE.BoxGeometry(22, 16, 4), glassMat);
+    atrium.position.set(0, 8.5, 14);
+    group.add(atrium);
+
+    // Flanking CS & Mech Wings
+    const leftBlock = new THREE.Mesh(new THREE.BoxGeometry(20, 14, 32), campusBrick);
+    leftBlock.position.set(-34, 7, -4);
+    const rightBlock = new THREE.Mesh(new THREE.BoxGeometry(20, 14, 32), campusBrick);
+    rightBlock.position.set(34, 7, -4);
+    group.add(leftBlock, rightBlock);
+
+    // Central Campanile Tower (rising to 34m)
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(7, 30, 7), campusBrick);
+    tower.position.set(0, 17, 10);
+    tower.castShadow = true;
+    group.add(tower);
+
+    const towerDome = new THREE.Mesh(new THREE.ConeGeometry(4.5, 7, 6), campusTrim);
+    towerDome.position.set(0, 35.5, 10);
+    group.add(towerDome);
+
+    // BNMIT Iconic Entrance Arch & Signboard
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#881337';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#fef08a';
+    ctx.strokeRect(6, 6, 1012, 244);
+
+    ctx.fillStyle = '#fef08a';
+    ctx.font = 'bold 46px "Noto Sans Kannada", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ಬಿ.ಎನ್.ಎಂ ತಾಂತ್ರಿಕ ಮಹಾವಿದ್ಯಾಲಯ • ಬೆಂಗಳೂರು', 512, 85);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 40px Inter, sans-serif';
+    ctx.fillText('B.N.M. INSTITUTE OF TECHNOLOGY (BNMIT)', 512, 160);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 24px monospace';
+    ctx.fillText('ENGINEERING • MBA • AI & RESEARCH CAMPUS (ESTD. 2001)', 512, 215);
+
+    const sign = new THREE.Mesh(
+      new THREE.PlaneGeometry(30, 7.5),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas) })
+    );
+    sign.position.set(0, 15, 16.2);
+    group.add(sign);
+
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(bx, 9, bz, 27, 9, 13);
+    this.physicsWorld.addStaticBox(bx - 34, 7, bz - 4, 10, 7, 16);
+    this.physicsWorld.addStaticBox(bx + 34, 7, bz - 4, 10, 7, 16);
+    this.physicsWorld.addStaticBox(bx, 17, bz + 10, 3.5, 17, 3.5);
+  }
+
+  // ========================================================
+  // 25. KUMARASWAMY LAYOUT CIVIC DISTRICT & VIEWPOINT (-200, 180)
+  // Famous South Bangalore Residential & Hill Temple Sector
+  // ========================================================
+  buildKumaraswamyLayout() {
+    const group = new THREE.Group();
+    const kx = -200;
+    const kz = 180;
+    group.position.set(kx, 0, kz);
+
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 });
+    const terraMat = new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.75 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.6 });
+
+    // Elevated Hillock Terrace Platform (Kumaraswamy Hills 6m high)
+    const hillPlatform = new THREE.Mesh(new THREE.BoxGeometry(65, 6, 60), stoneMat);
+    hillPlatform.position.set(0, 3, 0);
+    hillPlatform.receiveShadow = true;
+    group.add(hillPlatform);
+
+    // Kumaraswamy Temple Complex on Terrace
+    const templeMain = new THREE.Mesh(new THREE.BoxGeometry(26, 10, 24), terraMat);
+    templeMain.position.set(0, 11, -8);
+    templeMain.castShadow = true;
+    group.add(templeMain);
+
+    // Dravidian Shikhara / Gopuram on Temple
+    const gopuram = new THREE.Mesh(new THREE.ConeGeometry(7, 12, 4), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+    gopuram.position.set(0, 21, -8);
+    gopuram.rotation.y = Math.PI / 4;
+    group.add(gopuram);
+
+    // Civic Community Hall & Commercial Buildings
+    const hall = new THREE.Mesh(new THREE.BoxGeometry(34, 9, 18), wallMat);
+    hall.position.set(0, 4.5, 38);
+    hall.castShadow = true;
+    group.add(hall);
+
+    // Kumaraswamy Layout Bilingual Signboard
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#facc15';
+    ctx.strokeRect(6, 6, 1012, 244);
+
+    ctx.fillStyle = '#facc15';
+    ctx.font = 'bold 46px "Noto Sans Kannada", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ಕುಮಾರಸ್ವಾಮಿ ಲೇಔಟ್ • 1ನೇ ಮತ್ತು 2ನೇ ಹಂತ', 512, 85);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 40px Inter, sans-serif';
+    ctx.fillText('KUMARASWAMY LAYOUT (KS LAYOUT)', 512, 160);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 24px monospace';
+    ctx.fillText('DAYANANDA SAGAR CAMPUS ROAD • HILLTOP VIEWPOINT', 512, 215);
+
+    const sign = new THREE.Mesh(
+      new THREE.PlaneGeometry(28, 7),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas) })
+    );
+    sign.position.set(0, 10.5, 47.5);
+    group.add(sign);
+
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(kx, 3, kz, 32.5, 3, 30);
+    this.physicsWorld.addStaticBox(kx, 11, kz - 8, 13, 5, 12);
+    this.physicsWorld.addStaticBox(kx, 4.5, kz + 38, 17, 4.5, 9);
+  }
+
+  // ========================================================
+  // 26. FOUNDER'S BUILDING — STARK TOWER IN BTM LAYOUT (-70, 130)
+  // Magnificent Marvel Stark Tower Architecture for the Founder's Hub
+  // ========================================================
+  buildFoundersBuildingStarkTower() {
+    const group = new THREE.Group();
+    const fx = -70;
+    const fz = 130;
+    group.position.set(fx, 0, fz);
+
+    // Stark Industries Architectural Materials
+    const carbonMat = new THREE.MeshStandardMaterial({
+      color: 0x0f172a,
+      roughness: 0.25,
+      metalness: 0.9
+    });
+    const starkGlass = new THREE.MeshStandardMaterial({
+      color: 0x0284c7,
+      transparent: true,
+      opacity: 0.75,
+      roughness: 0.08,
+      metalness: 0.95
+    });
+    const reactorCyan = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const goldAccent = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.85, roughness: 0.25 });
+
+    // 1. Lower Podium (Tapered Base: 36m wide x 28m tall x 32m deep)
+    const baseBlock = new THREE.Mesh(new THREE.BoxGeometry(36, 28, 32), carbonMat);
+    baseBlock.position.set(0, 14, 0);
+    baseBlock.castShadow = true;
+    baseBlock.receiveShadow = true;
+    group.add(baseBlock);
+
+    // Glass Curtain Wall on base
+    const baseGlass = new THREE.Mesh(new THREE.BoxGeometry(32, 24, 33), starkGlass);
+    baseGlass.position.set(0, 14, 0);
+    group.add(baseGlass);
+
+    // 2. Tower Spine: Angled aerodynamic Stark Monolith rising to 95m
+    const midTower = new THREE.Mesh(new THREE.BoxGeometry(26, 60, 24), carbonMat);
+    midTower.position.set(0, 58, -2);
+    midTower.castShadow = true;
+    group.add(midTower);
+
+    const midGlass = new THREE.Mesh(new THREE.BoxGeometry(24, 58, 25), starkGlass);
+    midGlass.position.set(0, 58, -2);
+    group.add(midGlass);
+
+    // 3. ICONIC STARK TOWER CANTILEVERED PENTHOUSE / HELIPAD DECK (y = 88m)
+    // Projecting forward 24 meters over BTM Layout!
+    const deckGeo = new THREE.CylinderGeometry(14, 11, 4.0, 24, 1, false, 0, Math.PI);
+    const deckMesh = new THREE.Mesh(deckGeo, carbonMat);
+    deckMesh.rotation.x = Math.PI / 2;
+    deckMesh.position.set(0, 88, 14);
+    group.add(deckMesh);
+
+    // Circular Landing Platform / Flight Pad
+    const padLanding = new THREE.Mesh(new THREE.CircleGeometry(11, 24), carbonMat);
+    padLanding.rotation.x = -Math.PI / 2;
+    padLanding.position.set(0, 90.1, 14);
+    group.add(padLanding);
+
+    // Glowing Arc-Reactor Landing Ring on Helipad
+    const padRing = new THREE.Mesh(new THREE.RingGeometry(8, 9.2, 24), reactorCyan);
+    padRing.rotation.x = -Math.PI / 2;
+    padRing.position.set(0, 90.15, 14);
+    group.add(padRing);
+
+    // 'A' / 'F' Founder Monogram on Landing Pad
+    const fRing = new THREE.Mesh(new THREE.RingGeometry(2.5, 3.5, 16), goldAccent);
+    fRing.rotation.x = -Math.PI / 2;
+    fRing.position.set(0, 90.16, 14);
+    group.add(fRing);
+
+    // 4. Slanted Spire Crown & Rooftop Communications Mast (total height 118m)
+    const crownShape = new THREE.Shape();
+    crownShape.moveTo(-10, 0);
+    crownShape.lineTo(10, 0);
+    crownShape.lineTo(2, 24);
+    crownShape.lineTo(-10, 18);
+    crownShape.closePath();
+
+    const crownGeo = new THREE.ExtrudeGeometry(crownShape, { depth: 16, bevelEnabled: false });
+    const crown = new THREE.Mesh(crownGeo, carbonMat);
+    crown.position.set(0, 88, -10);
+    group.add(crown);
+
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.6, 26, 8), goldAccent);
+    mast.position.set(2, 105, -2);
+    group.add(mast);
+
+    // Blinking red aviation warning light on spire
+    const spireLight = new THREE.PointLight(0xff0000, 3.0, 40);
+    spireLight.position.set(2, 118, -2);
+    group.add(spireLight);
+
+    // Glowing Arc Reactor Core Beacon at top
+    const reactorLight = new THREE.PointLight(0x06b6d4, 4.5, 45);
+    reactorLight.position.set(0, 91, 14);
+    group.add(reactorLight);
+
+    // 5. Huge Illuminated Bilingual Signboards: "FOUNDER'S BUILDING"
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 1024;
+    signCanvas.height = 256;
+    const ctx = signCanvas.getContext('2d');
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#38bdf8';
+    ctx.strokeRect(6, 6, 1012, 244);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 44px "Noto Sans Kannada", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ಸಂಸ್ಥಾಪಕರ ಭವನ • ಬಿ.ಟಿ.ಎಂ ಬಡಾವಣೆ', 512, 85);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 46px Inter, sans-serif';
+    ctx.fillText('FOUNDER\'S BUILDING — STARK TOWER', 512, 160);
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 24px monospace';
+    ctx.fillText('HEADQUARTERS & INNOVATION PENTHOUSE • BTM 2ND STAGE', 512, 215);
+
+    const signTex = new THREE.CanvasTexture(signCanvas);
+    const signMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(32, 8),
+      new THREE.MeshBasicMaterial({ map: signTex })
+    );
+    signMesh.position.set(0, 24, 16.5);
+    group.add(signMesh);
+
+    // Register Elevator to Stark Tower Penthouse Flight Deck (y = 90.5m)
+    this.createObservationElevator(
+      'Founder\'s Penthouse Flight Deck',
+      new THREE.Vector3(fx, 1.0, fz + 20),
+      new THREE.Vector3(fx, 91.0, fz + 14)
+    );
+
+    this.scene.add(group);
+
+    // Solid Physics Obstacles
+    this.physicsWorld.addStaticBox(fx, 14, fz, 18, 14, 16);
+    this.physicsWorld.addStaticBox(fx, 58, fz - 2, 13, 30, 12);
+    this.physicsWorld.addStaticBox(fx, 88, fz + 14, 11, 2, 11);
+  }
+
+
+  buildTipuSultanSummerPalace() {
+    const px = -160;
+    const pz = -80;
+    const group = new THREE.Group();
+    group.position.set(px, 0, pz);
+
+    const teakMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.7 }); // Rich dark teakwood
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.8 }); // Floral yellow plaster
+    const stoneBaseMat = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.9 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.8, roughness: 0.2 });
+
+    // 1. Raised Stone Plinth
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(42, 1.4, 28), stoneBaseMat);
+    plinth.position.y = 0.7;
+    plinth.receiveShadow = true;
+    group.add(plinth);
+
+    // Front Grand Entrance Steps
+    const steps = new THREE.Mesh(new THREE.BoxGeometry(16, 0.7, 4.5), stoneBaseMat);
+    steps.position.set(0, 0.35, 15.5);
+    group.add(steps);
+
+    // 2. Ground Floor & First Floor Teakwood Pillared Pavilions
+    // Central enclosed museum chambers
+    const centerBlock = new THREE.Mesh(new THREE.BoxGeometry(24, 9.5, 16), wallMat);
+    centerBlock.position.set(0, 5.8, 0);
+    centerBlock.castShadow = true;
+    group.add(centerBlock);
+
+    // 3. Iconic Teakwood Cusped Arches & Pillars (Surrounding double verandah)
+    for (let colX = -19; colX <= 19; colX += 4.75) {
+      [-12, 12].forEach(colZ => {
+        const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.35, 9.6, 8), teakMat);
+        pillar.position.set(colX, 5.9, colZ);
+        pillar.castShadow = true;
+        group.add(pillar);
+
+        // Cusped bracket capitals
+        const capital = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 1.2), teakMat);
+        capital.position.set(colX, 10.5, colZ);
+        group.add(capital);
+      });
+    }
+
+    // First floor wooden balcony projecting overhang
+    const balcony = new THREE.Mesh(new THREE.BoxGeometry(43, 0.6, 29), teakMat);
+    balcony.position.y = 6.2;
+    balcony.castShadow = true;
+    group.add(balcony);
+
+    // 4. Sloping Eaves (Chhajjas) & Terracotta Style Roof
+    const roofBase = new THREE.Mesh(new THREE.BoxGeometry(45, 1.2, 31), teakMat);
+    roofBase.position.y = 10.9;
+    roofBase.castShadow = true;
+    group.add(roofBase);
+
+    const roofSlope = new THREE.Mesh(new THREE.ConeGeometry(24, 4.5, 4), teakMat);
+    roofSlope.position.set(0, 13.2, 0);
+    roofSlope.rotation.y = Math.PI / 4;
+    group.add(roofSlope);
+
+    // 4 Corner Gold Finials
+    [[-19, -12], [19, -12], [-19, 12], [19, 12]].forEach(([fx, fz]) => {
+      const kalasa = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.35, 1.4, 8), goldMat);
+      kalasa.position.set(fx, 11.8, fz);
+      group.add(kalasa);
+    });
+
+    // 5. Formal Charbagh Palace Gardens
+    const gardenBorder = new THREE.Mesh(new THREE.BoxGeometry(54, 0.25, 40), this.materials.sidewalk);
+    gardenBorder.position.y = 0.12;
+    group.add(gardenBorder);
+
+    // Fountain Pool in front
+    const pool = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4.5, 0.4, 16), this.materials.water);
+    pool.position.set(0, 0.25, 23);
+    group.add(pool);
+
+    // 6. Illuminated Bilingual Signboard
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 1024;
+    signCanvas.height = 256;
+    const ctx = signCanvas.getContext('2d');
+    ctx.fillStyle = '#451a03';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(6, 6, 1012, 244);
+    ctx.fillStyle = '#fef08a';
+    ctx.font = 'bold 42px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ಟಿಪ್ಪು ಸುಲ್ತಾನ್ ಬೇಸಿಗೆ ಅರಮನೆ • ಬೆಂಗಳೂರು ಕೋಟೆ', 512, 85);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 44px sans-serif';
+    ctx.fillText('TIPU SULTAN\'S SUMMER PALACE (1791)', 512, 160);
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 22px monospace';
+    ctx.fillText('INDO-ISLAMIC TEAKWOOD ARCHITECTURE • KALASIPALYA', 512, 215);
+
+    const signMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(16, 4),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(signCanvas) })
+    );
+    signMesh.position.set(0, 3.5, 16.8);
+    group.add(signMesh);
+
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(px, 5, pz, 22, 5, 15);
+  }
+
+  buildMysorePalace() {
+    const px = -300;
+    const pz = 120;
+    const group = new THREE.Group();
+    group.position.set(px, 0, pz);
+
+    const graniteMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.65 }); // Grey fine granite
+    const pinkMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.4 });   // Pink marble domes
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.85, roughness: 0.15 });
+    const archMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.5 });
+
+    // 1. Massive 3-Story Palace Facade (72m length x 32m depth)
+    const baseBuilding = new THREE.Mesh(new THREE.BoxGeometry(72, 16, 32), graniteMat);
+    baseBuilding.position.y = 8;
+    baseBuilding.castShadow = true;
+    baseBuilding.receiveShadow = true;
+    group.add(baseBuilding);
+
+    // Ornate Seven-Arch Arcade across main front facade
+    for (let a = -28; a <= 28; a += 9.3) {
+      const archPillar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 15.5, 1.2), archMat);
+      archPillar.position.set(a, 8, 16.5);
+      archPillar.castShadow = true;
+      group.add(archPillar);
+
+      const archCurve = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 1.2, 12, 1, false, 0, Math.PI), pinkMat);
+      archCurve.position.set(a + 4.65, 14.5, 16.5);
+      archCurve.rotation.z = Math.PI / 2;
+      group.add(archCurve);
+    }
+
+    // 2. Central 42m Tower with Soaring Golden Dome (Gombe Thotti / Durbar Hall)
+    const centralTower = new THREE.Mesh(new THREE.BoxGeometry(18, 22, 18), graniteMat);
+    centralTower.position.set(0, 22, 2);
+    centralTower.castShadow = true;
+    group.add(centralTower);
+
+    // Gold central dome (Amba Vilas)
+    const centralDome = new THREE.Mesh(new THREE.SphereGeometry(7.5, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), goldMat);
+    centralDome.position.set(0, 33, 2);
+    centralDome.castShadow = true;
+    group.add(centralDome);
+
+    const mainSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.8, 6.5, 8), goldMat);
+    mainSpire.position.set(0, 42, 2);
+    group.add(mainSpire);
+
+    // 3. 4 Corner Chhatri Towers with Pink Domes
+    [[-33, -13], [33, -13], [-33, 13], [33, 13]].forEach(([cx, cz]) => {
+      const cornerTower = new THREE.Mesh(new THREE.BoxGeometry(7.5, 20, 7.5), graniteMat);
+      cornerTower.position.set(cx, 12, cz);
+      cornerTower.castShadow = true;
+      group.add(cornerTower);
+
+      const cornerDome = new THREE.Mesh(new THREE.SphereGeometry(4.0, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), pinkMat);
+      cornerDome.position.set(cx, 22, cz);
+      group.add(cornerDome);
+
+      const cornerSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.4, 3.5, 8), goldMat);
+      cornerSpire.position.set(cx, 27, cz);
+      group.add(cornerSpire);
+    });
+
+    // 4. Night Illumination Light Bulbs (Signature Mysore Palace feature - 100,000 bulbs look!)
+    const bulbMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+    for (let bx = -34; bx <= 34; bx += 4) {
+      const b1 = new THREE.Mesh(new THREE.SphereGeometry(0.2, 4, 4), bulbMat);
+      b1.position.set(bx, 16.2, 16.4);
+      const b2 = new THREE.Mesh(new THREE.SphereGeometry(0.2, 4, 4), bulbMat);
+      b2.position.set(bx, 1.2, 16.4);
+      group.add(b1, b2);
+    }
+
+    // 5. Grand Courtyard & Palace Gate (Jayachamarajendra Art Gate)
+    const gateWall = new THREE.Mesh(new THREE.BoxGeometry(84, 0.3, 50), this.materials.sidewalk);
+    gateWall.position.set(0, 0.15, 24);
+    group.add(gateWall);
+
+    // 6. Illuminated Bilingual Signboard
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 1024;
+    signCanvas.height = 256;
+    const ctx = signCanvas.getContext('2d');
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(6, 6, 1012, 244);
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 44px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ಮೈಸೂರು ಅರಮನೆ • ಅಂಬಾ ವಿಲಾಸ', 512, 85);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 46px sans-serif';
+    ctx.fillText('MYSORE PALACE (AMBA VILAS)', 512, 160);
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 22px monospace';
+    ctx.fillText('INDO-SARACENIC MASTERPIECE • WODEYAR DYNASTY', 512, 215);
+
+    const signMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(24, 6),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(signCanvas) })
+    );
+    signMesh.position.set(0, 8, 17.5);
+    group.add(signMesh);
+
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(px, 10, pz, 38, 10, 18);
+  }
+
+  buildVvPuramFoodStreet() {
+    const fx = -40;
+    const fz = 220;
+    const group = new THREE.Group();
+    group.position.set(fx, 0, fz);
+
+    // V.V. Puram Thindi Beedi (Food Street): Cobblestone pedestrian avenue with vibrant food stalls
+    const streetLength = 65;
+    const street = new THREE.Mesh(new THREE.PlaneGeometry(16, streetLength), this.materials.sidewalk);
+    street.rotation.x = -Math.PI / 2;
+    street.position.y = 0.08;
+    group.add(street);
+
+    // Overhead Festive Festoon String Lights across the street
+    for (let sy = -28; sy <= 28; sy += 10) {
+      const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 16, 4), this.materials.road);
+      wire.position.set(0, 5.2, sy);
+      wire.rotation.z = Math.PI / 2;
+      group.add(wire);
+
+      [-6, -3, 0, 3, 6].forEach((bx, idx) => {
+        const colors = [0xf43f5e, 0xfacc15, 0x22c55e, 0x38bdf8, 0xa855f7];
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 6), new THREE.MeshBasicMaterial({ color: colors[idx % colors.length] }));
+        bulb.position.set(bx, 5.0, sy);
+        group.add(bulb);
+      });
+    }
+
+    // Iconic Food Stalls on Left and Right sides
+    const stalls = [
+      { name: 'VB BAKERY', sub: 'Honey Cake & Congress Buns', color: '#b45309', x: -6.5, z: -20 },
+      { name: 'ARYA VAISHYA', sub: 'Butter Masala Dosa & Paddus', color: '#dc2626', x: -6.5, z: -5 },
+      { name: 'BHASKAR\'S GULKAND', sub: 'Pure Gulkand with Ice Cream', color: '#db2777', x: -6.5, z: 10 },
+      { name: 'FILTER COFFEE', sub: 'Degree Coffee & Vada', color: '#78350f', x: -6.5, z: 22 },
+      { name: 'AVAREKAI CORNER', sub: 'Hithakbele Saru & Roti', color: '#15803d', x: 6.5, z: -18 },
+      { name: 'SHIVAJI DOSA', sub: 'Open Butter Masala Dosa', color: '#ea580c', x: 6.5, z: -3 },
+      { name: 'SWEET CORN CHAT', sub: 'Roasted Chana & Sweet Corn', color: '#ca8a04', x: 6.5, z: 12 },
+      { name: 'BENGALURU LASSI', sub: 'Mango Lassi & Rabri', color: '#0284c7', x: 6.5, z: 24 }
+    ];
+
+    stalls.forEach(s => {
+      const stallGroup = new THREE.Group();
+      stallGroup.position.set(s.x, 0, s.z);
+
+      // Stall booth
+      const booth = new THREE.Mesh(new THREE.BoxGeometry(3.5, 3.2, 5.0), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 }));
+      booth.position.y = 1.6;
+      stallGroup.add(booth);
+
+      // Canopy awning
+      const awning = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.25, 5.4), new THREE.MeshStandardMaterial({ color: s.color, roughness: 0.4 }));
+      awning.position.y = 3.3;
+      stallGroup.add(awning);
+
+      // Glowing Signboard
+      const signCanvas = document.createElement('canvas');
+      signCanvas.width = 512;
+      signCanvas.height = 128;
+      const ctx = signCanvas.getContext('2d');
+      ctx.fillStyle = s.color;
+      ctx.fillRect(0, 0, 512, 128);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.name, 256, 60);
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 20px monospace';
+      ctx.fillText(s.sub, 256, 102);
+
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(signCanvas) }));
+      sign.position.set(s.x < 0 ? 1.78 : -1.78, 2.7, 0);
+      sign.rotation.y = s.x < 0 ? Math.PI / 2 : -Math.PI / 2;
+      stallGroup.add(sign);
+
+      group.add(stallGroup);
+      this.physicsWorld.addStaticBox(fx + s.x, 1.6, fz + s.z, 1.8, 1.6, 2.6);
+    });
+
+    // Grand Entrance Arch: V.V. PURAM FOOD STREET
+    const archCanvas = document.createElement('canvas');
+    archCanvas.width = 1024;
+    archCanvas.height = 256;
+    const actx = archCanvas.getContext('2d');
+    actx.fillStyle = '#b91c1c';
+    actx.fillRect(0, 0, 1024, 256);
+    actx.fillStyle = '#fef08a';
+    actx.font = 'bold 42px sans-serif';
+    actx.textAlign = 'center';
+    actx.fillText('ವಿ.ವಿ.ಪುರಂ ತಿಂಡಿ ಬೀದಿ • ಬೆಂಗಳೂರು ಆಹಾರ ಮಾರುಕಟ್ಟೆ', 512, 85);
+    actx.fillStyle = '#ffffff';
+    actx.font = 'bold 46px sans-serif';
+    actx.fillText('V.V. PURAM FOOD STREET (THINDI BEEDI)', 512, 160);
+    actx.fillStyle = '#fef08a';
+    actx.font = 'bold 24px monospace';
+    actx.fillText('AUTHENTIC BENGALURU STREET FOOD HUB', 512, 215);
+
+    const archSign = new THREE.Mesh(new THREE.PlaneGeometry(15, 3.8), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(archCanvas) }));
+    archSign.position.set(0, 6.2, -31);
+    group.add(archSign);
+
+    const archBeam = new THREE.Mesh(new THREE.BoxGeometry(16, 0.8, 1.0), new THREE.MeshStandardMaterial({ color: 0x991b1b }));
+    archBeam.position.set(0, 6.2, -31);
+    group.add(archBeam);
+
+    [-7.5, 7.5].forEach(px => {
+      const archPillar = new THREE.Mesh(new THREE.BoxGeometry(1.0, 6.5, 1.0), new THREE.MeshStandardMaterial({ color: 0x991b1b }));
+      archPillar.position.set(px, 3.2, -31);
+      group.add(archPillar);
+    });
+
+    this.scene.add(group);
+  }
+
+  buildRussellMarketAndCommercialStreet() {
+    const rx = 100;
+    const rz = -140;
+    const group = new THREE.Group();
+    group.position.set(rx, 0, rz);
+
+    const brickMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.75 }); // Colonial red brick
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
+
+    // 1. Russell Market Historic Heritage Hall (1927)
+    const marketHall = new THREE.Mesh(new THREE.BoxGeometry(36, 8, 24), brickMat);
+    marketHall.position.y = 4;
+    marketHall.castShadow = true;
+    group.add(marketHall);
+
+    // Central 28m Colonial Clock Tower
+    const tower = new THREE.Mesh(new THREE.BoxGeometry(6.5, 24, 6.5), brickMat);
+    tower.position.set(0, 12, 10);
+    tower.castShadow = true;
+    group.add(tower);
+
+    // Clock Face
+    const clock = new THREE.Mesh(new THREE.CircleGeometry(1.8, 16), whiteMat);
+    clock.position.set(0, 20, 13.3);
+    group.add(clock);
+
+    // Heritage Market Entrance Arch
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 1024;
+    signCanvas.height = 256;
+    const ctx = signCanvas.getContext('2d');
+    ctx.fillStyle = '#7f1d1d';
+    ctx.fillRect(0, 0, 1024, 256);
+    ctx.fillStyle = '#fef08a';
+    ctx.font = 'bold 44px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ರಸ್ಸೆಲ್ ಮಾರುಕಟ್ಟೆ • ಶಿವಾಜಿನಗರ', 512, 85);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 44px sans-serif';
+    ctx.fillText('RUSSELL MARKET & COMMERCIAL STREET', 512, 160);
+    ctx.fillStyle = '#fef08a';
+    ctx.font = 'bold 22px monospace';
+    ctx.fillText('HISTORIC 1927 HERITAGE BAZAAR & SHOPPING PLAZA', 512, 215);
+
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(18, 4.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(signCanvas) }));
+    sign.position.set(0, 7.5, 12.5);
+    group.add(sign);
+
+    this.scene.add(group);
+    this.physicsWorld.addStaticBox(rx, 4, rz, 19, 4, 13);
+  }
+
 }

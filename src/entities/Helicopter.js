@@ -18,6 +18,7 @@ export class Helicopter {
     this.maxSpeed = 38; // ~135 km/h
     this.isAirborne = false;
     this.isHelicopter = true;
+    this.color = 0x0284c7;
 
     this.radius = 3.2;
 

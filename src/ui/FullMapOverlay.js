@@ -4,31 +4,38 @@ export class FullMapOverlay {
     this.isOpen = false;
 
     this.landmarks = [
-      { id: 'silkboard', name: '🌉 Silk Board Flyover Interchange', x: 0, z: 20, icon: '🌉', color: '#10b981', desc: 'Famous 2-tier flyover interchange, E-City Expressway & Namma Metro!' },
-      { id: 'vidhana', name: '🏛️ Vidhana Soudha', x: -240, z: -40, icon: '🏛️', color: '#f59e0b', desc: 'Karnataka State Legislature with grand dome & Ashoka Lion Capital!' },
+      { id: 'founders_stark', name: "⚡ Founder's Building (Stark Tower)", x: -70, z: 130, icon: '⚡', color: '#38bdf8', desc: "Futuristic Stark Tower with cantilevered penthouse flight deck & Arc Reactor in BTM Layout!" },
+      { id: 'bnmit', name: '🎓 BNM Institute of Technology (BNMIT)', x: -140, z: 160, icon: '🎓', color: '#9f1239', desc: 'Premier engineering campus with academic quad & 34m campanile tower!' },
+      { id: 'ks_layout', name: '⛰️ Kumaraswamy Layout (KS Layout)', x: -200, z: 180, icon: '⛰️', color: '#c2410c', desc: 'Hilltop layout terrace, panoramic views & Sri Kumaraswamy Temple!' },
+      { id: 'indian_flag', name: '🇮🇳 Monumental Indian National Flag (55m)', x: 0, z: -20, icon: '🇮🇳', color: '#f97316', desc: '55m high Tiranga waving over Amar Jawan Jyoti and Central Plaza!' },
+      { id: 'iaf_hq', name: '🛩️ Indian Air Force (IAF) HQ Command', x: 180, z: -240, icon: '🛩️', color: '#0284c7', desc: 'IAF Training Command HQ with supersonic MiG-21 / Tejas jet & radar dome!' },
+      { id: 'army_hq', name: '🎖️ Indian Army Cantonment & ASC Centre', x: -180, z: 220, icon: '🎖️', color: '#15803d', desc: 'Army Cantonment HQ with battle tank memorial, sentry towers & parade ground!' },
+      { id: 'someshwara_temple', name: '🛕 Sri Someshwara Chola Temple', x: -60, z: -160, icon: '🛕', color: '#d97706', desc: 'Ancient Dravidian temple with 32m 5-tier Rajagopuram, Kalasas & Kalyani tank!' },
+      { id: 'bull_temple', name: '🐂 Dodda Basavana Gudi (Bull Temple)', x: 100, z: 180, icon: '🐂', color: '#78350f', desc: 'Sacred Basavanagudi shrine with monolithic black granite Nandi & Deepasthambha!' },
+      { id: 'iskcon_temple', name: '✨ ISKCON Bangalore Sri Radha Krishna', x: 220, z: -120, icon: '✨', color: '#eab308', desc: 'White marble temple atop Hare Krishna hill with soaring gold Shikhara!' },
+      { id: 'bms_college', name: '🎓 BMS College of Engineering (1946)', x: -120, z: -120, icon: '🎓', color: '#991b1b', desc: 'Historic red-brick engineering quad with 38m clock tower & library!' },
+      { id: 'iisc_campus', name: '🔬 IISc Heritage Science Campus', x: -60, z: 180, icon: '🔬', color: '#475569', desc: 'Classical colonial stone science quad with Tuscan colonnade & research hall!' },
+      { id: 'hsr_bda_complex', name: '🏢 HSR BDA Shopping Complex', x: 60, z: 100, icon: '🏢', color: '#0284c7', desc: '4-story civic commercial complex with Bangalore One, bank & shops!' },
+      { id: 'koramangala_bda_complex', name: '🏢 Koramangala BDA Hub', x: -100, z: 120, icon: '🏢', color: '#d97706', desc: 'Koramangala commercial centre with stores, cafes & civic plaza!' },
+      { id: 'hsr_bda_park', name: '🌳 HSR Sector 2 BDA Public Park', x: 80, z: 40, icon: '🌳', color: '#16a34a', desc: 'BDA park with red-earth walking track, gazebo bandstand & Tabebuia blooms!' },
+      { id: 'koramangala_bda_park', name: '🌳 Koramangala 4th Block BDA Park', x: -140, z: 60, icon: '🌳', color: '#15803d', desc: 'Landscaped public walking gardens with ornamental gazebo & benches!' },
+      { id: 'indiranagar_bda_park', name: '🌳 Indiranagar Defence BDA Park', x: 120, z: -60, icon: '🌳', color: '#059669', desc: 'Serene BDA park with jogging trail, fountain & flowering trees!' },
+      { id: 'silkboard_metro', name: '🚊 Silk Board Metro Station', x: 24, z: 20, icon: '🚊', color: '#10b981', desc: 'Elevated Namma Metro station connecting Outer Ring Road & Hosur Road!' },
+      { id: 'hsr_metro', name: '🚊 HSR Layout Metro Station', x: 24, z: 180, icon: '🚊', color: '#059669', desc: 'Elevated modern station with canopy concourse & 27th Main connectivity!' },
+      { id: 'vidhana', name: '🏛️ Vidhana Soudha', x: -240, z: -40, icon: '🏛️', color: '#f59e0b', desc: 'Karnataka State Legislature with 50m illuminated dome & grand boulevard!' },
       { id: 'ubcity', name: '🏙️ UB City Tower (120m)', x: -60, z: -100, icon: '🏙️', color: '#eab308', desc: 'Luxury skyscraper, rooftop helipad & boutique amphitheatre piazza!' },
       { id: 'orion', name: '🛍️ Orion Mall & WTC Bangalore', x: 240, z: 320, icon: '🛍️', color: '#ec4899', desc: 'Contemporary glass shopping mall, 92m WTC tower & lake boardwalk!' },
       { id: 'lalbagh', name: '🌿 Lalbagh Royal Glass House', x: -140, z: 280, icon: '🌿', color: '#16a34a', desc: 'Crystal Palace conservatory, flower shows & Kempegowda rock tower!' },
       { id: 'nandihills', name: '⛰️ Nandi Hills Ghats & Viewpoint', x: 440, z: -460, icon: '⛰️', color: '#8b5cf6', desc: 'Drive/walk 75m winding ghat road to panoramic sunrise cliff!' },
-      { id: 'townhall', name: '🏛️ Bangalore Town Hall', x: 40, z: 200, icon: '🏛️', color: '#f97316', desc: 'Historic 1935 neoclassical landmark with Tuscan colonnade columns!' },
-      { id: 'koramangala', name: '☕ Koramangala Startup Hub', x: -120, z: 80, icon: '☕', color: '#b45309', desc: 'Third Wave Coffee, tech startup garages & 80 Feet Road!' },
-      { id: 'hsr', name: '🌳 HSR Layout (27th Main)', x: 60, z: 60, icon: '🌳', color: '#059669', desc: 'Planned residential sectors, pink Tabebuia blooms & startup garages!' },
-      { id: 'btm', name: '🍛 BTM Layout Food Street', x: -80, z: 160, icon: '🍛', color: '#dc2626', desc: 'BTM 2nd Stage, Sri Krishna Sagar dosa & filter coffee street!' },
       { id: 'airport', name: '✈️ International Airport & Runway', x: 300, z: -380, icon: '✈️', color: '#2563eb', desc: 'Take off in airplanes down the 280m runway!' },
-      { id: 'helipad', name: '🚁 Airport Helipad', x: 340, z: -352, icon: '🚁', color: '#f59e0b', desc: 'Board the executive helicopter for vertical lift off!' },
-      { id: 'zoo', name: '🦁 Wildlife Safari & City Zoo', x: -160, z: -140, icon: '🦁', color: '#65a30d', desc: 'Lion pride rock, giraffes, zebras and elephant pool!' },
-      { id: 'bank', name: '🏦 Grand Reserve Bank', x: -60, z: 40, icon: '🏦', color: '#d97706', desc: 'Neoclassical vaults and armored cash transit truck!' },
-      { id: 'school', name: '🏫 Springfield High Academy', x: -180, z: 120, icon: '🏫', color: '#b91c1c', desc: 'Red-brick academy, clock tower, buses and athletic field!' },
-      { id: 'gas', name: '⛽ Ron Oil & Burger Diner', x: -100, z: 20, icon: '⛽', color: '#e11d48', desc: 'Gas pumps, 24/7 convenience mart and giant rooftop burger!' },
-      { id: 'hospital', name: '🏥 Emergency Hospital & Police', x: 60, z: 140, icon: '🏥', color: '#0ea5e9', desc: 'Metro hospital helipad, ER ambulances and police cruisers!' },
-      { id: 'yeti', name: '❄️ Yeti Cave & Glaciers', x: 35, z: -485, icon: '❄️', color: '#0284c7', desc: 'Mythical 4.2m Yeti in ice cavern & roaming polar bears!' },
-      { id: 'eiffel', name: '🗼 Eiffel Tower (95m)', x: 180, z: 260, icon: '🗼', color: '#475569', desc: 'Ascend by lift to the 90m summit observation deck!' },
-      { id: 'taj', name: '🕌 Taj Mahal', x: 320, z: -180, icon: '🕌', color: '#0284c7', desc: 'Marble masterpiece with reflecting pools & dome terrace!' },
-      { id: 'liberty', name: '🗽 Statue of Liberty', x: 440, z: 80, icon: '🗽', color: '#10b981', desc: 'Liberty Island fortress with 48m torch balcony!' },
-      { id: 'indiagate', name: '🏛️ India Gate', x: 0, z: -140, icon: '🏛️', color: '#d97706', desc: '42m Triumphal Arch with Amar Jawan Jyoti eternal flame!' }
+      { id: 'tipu_palace', name: "🏰 Tipu Sultan's Summer Palace", x: -160, z: -80, icon: '🏰', color: '#b45309', desc: 'Historic 1791 Indo-Islamic teakwood palace & museum in Kalasipalya!' },
+      { id: 'mysore_palace', name: '👑 Mysore Palace (Amba Vilas)', x: -300, z: 120, icon: '👑', color: '#f59e0b', desc: 'Grand royal palace with 42m golden dome, pink chhatris & 100k night lights!' },
+      { id: 'vvpuram_food', name: '🍲 V.V. Puram Food Street (Thindi Beedi)', x: -40, z: 220, icon: '🍲', color: '#ef4444', desc: 'Bengaluru street food hub: VB Bakery, Hot Butter Dosa, Gulkand & Filter Coffee!' },
+      { id: 'russell_market', name: '🏛️ Russell Market & Commercial St', x: 100, z: -140, icon: '🏛️', color: '#991b1b', desc: 'Colonial 1927 clock tower & bustling Commercial Street shopping alleys!' }
     ];
 
-    this.gpsTarget = this.landmarks[0]; // Default GPS targets the Silk Board Interchange!
+    // Default target: Vidhana Soudha!
+    this.gpsTarget = this.landmarks.find(l => l.id === 'vidhana') || this.landmarks[0];
 
     this.createDom();
     this.initEvents();
@@ -44,9 +51,11 @@ export class FullMapOverlay {
         <div class="map-header">
           <div class="map-title-group">
             <span class="map-badge">NAMMA BENGALURU GPS</span>
-            <h2>City Navigation Map</h2>
+            <h2>Interactive City Navigation Map</h2>
           </div>
-          <button id="close-map-btn" class="map-close-btn">&times;</button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="close-map-btn" class="map-close-btn">&times;</button>
+          </div>
         </div>
 
         <div class="map-canvas-wrapper">
@@ -56,16 +65,27 @@ export class FullMapOverlay {
 
         <div class="map-footer">
           <div class="map-legend">
-            <span><span class="legend-dot" style="background:#10b981;"></span> 🌉 Silk Board</span>
+            <span><span class="legend-dot" style="background:#38bdf8;"></span> ⚡ Founder's (Stark)</span>
+            <span><span class="legend-dot" style="background:#9f1239;"></span> 🎓 BNMIT</span>
+            <span><span class="legend-dot" style="background:#c2410c;"></span> ⛰️ KS Layout</span>
+            <span><span class="legend-dot" style="background:#f97316;"></span> 🇮🇳 Flag</span>
+            <span><span class="legend-dot" style="background:#0284c7;"></span> 🛩️ IAF HQ</span>
+            <span><span class="legend-dot" style="background:#15803d;"></span> 🎖️ Army HQ</span>
+            <span><span class="legend-dot" style="background:#d97706;"></span> 🛕 Someshwara Temple</span>
+            <span><span class="legend-dot" style="background:#78350f;"></span> 🐂 Bull Temple</span>
+            <span><span class="legend-dot" style="background:#991b1b;"></span> 🎓 BMS College</span>
+            <span><span class="legend-dot" style="background:#16a34a;"></span> 🌳 BDA Parks</span>
+            <span><span class="legend-dot" style="background:#0284c7;"></span> 🏢 BDA Complexes</span>
+            <span><span class="legend-dot" style="background:#10b981;"></span> 🚊 Namma Metro</span>
             <span><span class="legend-dot" style="background:#f59e0b;"></span> 🏛️ Vidhana Soudha</span>
-            <span><span class="legend-dot" style="background:#eab308;"></span> 🏙️ UB City</span>
-            <span><span class="legend-dot" style="background:#ec4899;"></span> 🛍️ Orion</span>
-            <span><span class="legend-dot" style="background:#16a34a;"></span> 🌿 Lalbagh</span>
-            <span><span class="legend-dot" style="background:#8b5cf6;"></span> ⛰️ Nandi Hills</span>
-            <span><span class="legend-dot" style="background:#b45309;"></span> ☕ Koramangala</span>
-            <span><span class="legend-dot" style="background:#2563eb;"></span> ✈️ Airport</span>
+            <span><span class="legend-dot" style="background:#b45309;"></span> 🏰 Tipu Palace</span>
+            <span><span class="legend-dot" style="background:#f59e0b;"></span> 👑 Mysore Palace</span>
+            <span><span class="legend-dot" style="background:#ef4444;"></span> 🍲 Food Street</span>
+            <span><span class="legend-dot" style="background:#991b1b;"></span> 🏛️ Russell Market</span>
           </div>
-          <div class="map-hint">Click any landmark to set GPS navigation &middot; Press <kbd>M</kbd> to close</div>
+          <div class="map-hint" style="font-weight: 600; color: #0284c7;">
+            🎯 Tap ANYWHERE or on any landmark to set GPS directions on your Minimap &middot; Press <kbd>M</kbd> to return to driving
+          </div>
         </div>
       </div>
     `;
@@ -94,17 +114,45 @@ export class FullMapOverlay {
       const originX = this.canvas.width / 2;
       const originY = this.canvas.height / 2;
 
+      let nearestLandmark = null;
+      let minDistanceSq = 24 * 24;
+
       for (const lm of this.landmarks) {
         const lx = originX + lm.x * mapScale;
         const ly = originY + lm.z * mapScale;
         const distSq = (clickX - lx) * (clickX - lx) + (clickY - ly) * (clickY - ly);
 
-        if (distSq < 22 * 22) {
-          this.gpsTarget = lm;
-          this.game.hud.showToast(`GPS set to ${lm.name}!`);
-          this.render();
-          break;
+        if (distSq < minDistanceSq) {
+          minDistanceSq = distSq;
+          nearestLandmark = lm;
         }
+      }
+
+      if (nearestLandmark) {
+        this.gpsTarget = nearestLandmark;
+        this.game.hud.showToast(`GPS Route set to ${nearestLandmark.name}! Following on Minimap.`);
+      } else {
+        // Clicked open ground / street -> Create Custom Waypoint Pin
+        const worldX = Math.round((clickX - originX) / mapScale);
+        const worldZ = Math.round((clickY - originY) / mapScale);
+
+        this.gpsTarget = {
+          id: 'custom_pin',
+          name: `📍 Custom Waypoint (${worldX}, ${worldZ})`,
+          x: worldX,
+          z: worldZ,
+          icon: '📍',
+          color: '#06b6d4',
+          desc: 'Custom GPS navigation waypoint'
+        };
+        this.game.hud.showToast(`GPS Waypoint set to (${worldX}, ${worldZ})! Follow the Minimap trail.`);
+      }
+
+      this.render();
+
+      // Notify game to update in-world 3D waypoint beacon
+      if (this.game && this.game.onGpsTargetChanged) {
+        this.game.onGpsTargetChanged(this.gpsTarget);
       }
     });
   }
@@ -146,13 +194,66 @@ export class FullMapOverlay {
       ctx.fillRect(0, cy + (c - 8) * scale, w, 16 * scale);
     });
 
-    // Elevated Flyover overpass
-    ctx.fillStyle = '#6366f1';
-    ctx.fillRect(cx - 130 * scale, cy - 56 * scale, 260 * scale, 12 * scale);
+    // BDA Public Parks on map
+    ctx.fillStyle = '#86efac';
+    ctx.fillRect(cx + (80 - 35) * scale, cy + (40 - 30) * scale, 70 * scale, 60 * scale);   // HSR Park
+    ctx.fillRect(cx + (-140 - 32) * scale, cy + (60 - 27) * scale, 65 * scale, 55 * scale); // Koramangala Park
+    ctx.fillRect(cx + (120 - 30) * scale, cy + (-60 - 25) * scale, 60 * scale, 50 * scale); // Indiranagar Park
+
+    // Namma Metro Elevated Viaduct Corridor (x = 24, z = -60 to 260)
+    ctx.fillStyle = '#16a34a'; // Green line
+    ctx.fillRect(cx + (24 - 3) * scale, cy - 60 * scale, 6 * scale, 320 * scale);
+    ctx.fillStyle = '#7e22ce'; // Purple stripe
+    ctx.fillRect(cx + (24 - 1) * scale, cy - 60 * scale, 2 * scale, 320 * scale);
+
+    // Grand Vidhana Soudha Ceremonial Boulevard (x = -200 to -240 at z = -40)
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(cx - 240 * scale, cy - 48 * scale, 40 * scale, 16 * scale);
 
     // Airport Runway
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(cx + 160 * scale, cy - 390 * scale, 280 * scale, 24 * scale);
+
+    // Active Player Position
+    let px = cx, py = cy;
+    let playerPos = null;
+    if (this.game && this.game.player) {
+      playerPos = (this.game.player.isDriving && this.game.activeVehicle)
+        ? this.game.activeVehicle.position
+        : this.game.player.position;
+      px = cx + playerPos.x * scale;
+      py = cy + playerPos.z * scale;
+    }
+
+    // Draw active GPS navigation route line from player to target
+    if (this.gpsTarget && playerPos) {
+      const tx = cx + this.gpsTarget.x * scale;
+      const ty = cy + this.gpsTarget.z * scale;
+
+      ctx.save();
+      ctx.strokeStyle = '#06b6d4';
+      ctx.lineWidth = 3.5;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+
+      // Distance tag midway along route line
+      const midX = (px + tx) / 2;
+      const midY = (py + ty) / 2;
+      const distM = Math.round(Math.hypot(this.gpsTarget.x - playerPos.x, this.gpsTarget.z - playerPos.z));
+
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.roundRect(midX - 32, midY - 11, 64, 22, 6);
+      ctx.fill();
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${distM}m`, midX, midY + 4);
+      ctx.restore();
+    }
 
     // Draw all landmark pins
     this.landmarks.forEach(lm => {
@@ -164,7 +265,7 @@ export class FullMapOverlay {
       if (lm.id === 'airport' || isTarget) {
         ctx.beginPath();
         ctx.arc(lx, ly, 18, 0, Math.PI * 2);
-        ctx.fillStyle = isTarget ? 'rgba(239, 68, 68, 0.25)' : 'rgba(37, 99, 235, 0.25)';
+        ctx.fillStyle = isTarget ? 'rgba(6, 182, 212, 0.35)' : 'rgba(37, 99, 235, 0.25)';
         ctx.fill();
       }
 
@@ -183,12 +284,35 @@ export class FullMapOverlay {
       ctx.fillText(`${lm.icon} ${lm.name.split(' ')[1] || lm.name}`, lx, ly - 15);
     });
 
+    // If target is a custom pin, render custom pin marker
+    if (this.gpsTarget && this.gpsTarget.id === 'custom_pin') {
+      const tx = cx + this.gpsTarget.x * scale;
+      const ty = cy + this.gpsTarget.z * scale;
+
+      ctx.beginPath();
+      ctx.arc(tx, ty, 20, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.35)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(tx, ty, 12, 0, Math.PI * 2);
+      ctx.fillStyle = '#06b6d4';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(this.gpsTarget.name, tx, ty - 16);
+    }
+
     // Current player position marker
     if (this.game && this.game.player) {
-      const pPos = this.game.player.position;
-      const pYaw = this.game.player.rotation;
-      const px = cx + pPos.x * scale;
-      const py = cy + pPos.z * scale;
+      const pYaw = (this.game.player.isDriving && this.game.activeVehicle)
+        ? this.game.activeVehicle.yaw
+        : this.game.player.rotation;
 
       ctx.save();
       ctx.translate(px, py);

@@ -1,8 +1,8 @@
 :root {
   --text-primary: #1a1a1a;
-  --text-muted: #737373;
-  --bg-translucent: rgba(255, 255, 255, 0.85);
-  --border-subtle: rgba(0, 0, 0, 0.08);
+  --text-muted: #525252;
+  --bg-translucent: rgba(255, 255, 255, 0.94);
+  --border-subtle: rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -61,12 +61,10 @@ html, body {
   font-weight: 500;
   letter-spacing: -0.01em;
   background: var(--bg-translucent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   padding: 6px 14px;
   border-radius: 9999px;
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .messenger-dot {
@@ -107,7 +105,6 @@ html, body {
   font-weight: 500;
   color: var(--text-muted);
   background: var(--bg-translucent);
-  backdrop-filter: blur(16px);
   padding: 6px 12px;
   border-radius: 9999px;
   border: 1px solid var(--border-subtle);
@@ -115,7 +112,6 @@ html, body {
 
 .subtle-btn {
   background: var(--bg-translucent);
-  backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
   border-radius: 9999px;
   padding: 6px 14px;
@@ -138,22 +134,15 @@ html, body {
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(18, 18, 18, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(18, 18, 18, 0.92);
   color: #ffffff;
   padding: 8px 18px;
   border-radius: 9999px;
   font-size: 0.82rem;
   font-weight: 500;
   letter-spacing: -0.01em;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  animation: gentleHover 2.5s infinite ease-in-out;
-}
-
-@keyframes gentleHover {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -4px); }
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 #interaction-prompt kbd {
@@ -171,15 +160,15 @@ html, body {
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(18, 18, 18, 0.92);
   border-radius: 9999px;
   padding: 6px 20px;
   display: flex;
   align-items: baseline;
   gap: 6px;
   color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .speed-val {
@@ -201,14 +190,14 @@ html, body {
   position: absolute;
   bottom: 24px;
   left: 28px;
-  background: var(--bg-translucent);
-  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.94);
   padding: 6px 14px;
   border-radius: 9999px;
   border: 1px solid var(--border-subtle);
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-muted);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* 6. Radar */
@@ -218,12 +207,11 @@ html, body {
   right: 28px;
   width: 100px;
   height: 100px;
-  background: var(--bg-translucent);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
+  background: #0f172a;
+  border: 2px solid #38bdf8;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,14 +237,14 @@ html, body {
   top: 75px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(20px);
+  background: rgba(18, 18, 18, 0.94);
   color: #ffffff;
   padding: 7px 20px;
   border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 500;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   opacity: 1;
   transition: opacity 0.4s ease, transform 0.4s ease;
   pointer-events: none;
@@ -281,9 +269,10 @@ html, body {
 }
 
 .map-overlay-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .map-modal {
@@ -442,9 +431,10 @@ html, body {
 }
 
 .controls-modal-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .controls-card {
@@ -585,4 +575,151 @@ html, body {
 
 .ctrl-btn-primary:hover {
   background: #0369a1;
+}
+
+/* Welcome / Landing Splash Screen Modal */
+.welcome-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: auto;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.welcome-modal-overlay.welcome-hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.welcome-card {
+  max-width: 580px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 36px 32px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  margin-bottom: 16px;
+}
+
+.welcome-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.welcome-presented-by {
+  font-size: 1.05rem;
+  color: #475569;
+  margin-bottom: 24px;
+}
+
+.welcome-presented-by strong {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.welcome-features-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.welcome-features-pills .pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 9999px;
+}
+
+.welcome-controls-brief {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.brief-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.brief-item kbd {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.welcome-start-btn {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 14px 34px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.welcome-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -5px rgba(2, 132, 199, 0.55);
+}
+
+.welcome-start-btn:active {
+  transform: translateY(0);
 }

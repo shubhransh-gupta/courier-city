@@ -3,6 +3,7 @@
 </p>
 
 <h1 align="center">🏙️ Courier City — Browser-Based Open World Game</h1>
+<h3 align="center">✨ Presented by Shubhransh Gupta ✨</h3>
 
 <p align="center">
   <b>A GTA-inspired 3D open world city game built entirely in the browser with Three.js and Cannon-ES physics.</b>
@@ -266,6 +267,8 @@ If you enjoyed playing Courier City, please give it a ⭐ on GitHub! It helps ot
 ---
 
 <p align="center">
+  <b>Courier City — Presented by Shubhransh Gupta</b>
+  <br/>
   <b>Built with ❤️ using Three.js, Cannon-ES & Vite</b>
   <br/>
   <sub>A browser-based open world game — no downloads required</sub>
