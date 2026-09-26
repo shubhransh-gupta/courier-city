@@ -227,23 +227,12 @@ export class BmtcBus {
       this.mesh.add(headlight, taillight);
     });
 
-    this.spotLight = new THREE.SpotLight(0xfffa65, 0, 70, Math.PI / 5, 0.35);
-    this.spotLight.position.set(0, 1.2, 5.95);
-    this.spotLightTarget = new THREE.Object3D();
-    this.spotLightTarget.position.set(0, 0.2, 30);
-    this.mesh.add(this.spotLightTarget);
-    this.spotLight.target = this.spotLightTarget;
-    this.mesh.add(this.spotLight);
-
     this.mesh.userData = { vehicle: this };
     this.scene.add(this.mesh);
   }
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    if (this.spotLight) {
-      this.spotLight.intensity = on ? 4.0 : 0;
-    }
   }
 
   update(dt, input, isPlayerControlling) {
@@ -256,7 +245,8 @@ export class BmtcBus {
       const boost = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
 
       const throttle = forward - reverse;
-      const turnInput = steerLeft - steerRight;
+      // D / ArrowRight = +1 (Right), A / ArrowLeft = -1 (Left)
+      const turnInput = steerRight - steerLeft;
 
       const currentMax = boost ? this.boostMaxSpeed : this.maxSpeed;
 
@@ -284,9 +274,9 @@ export class BmtcBus {
         this.currentSpeed *= Math.max(0, 1 - 3.5 * dt);
       }
 
-      // Steering
-      const targetSteer = -turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 8);
+      // Steering: responsive bus transit steering (Right = +steer, Left = -steer)
+      const targetSteer = turnInput * this.maxSteerAngle;
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 14);
 
       const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), (throttle !== 0) ? 2.5 : 0);
       if (effectiveSpeed > 0.1) {
@@ -300,9 +290,9 @@ export class BmtcBus {
       const proposedX = this.position.x + fwdX * this.currentSpeed * dt;
       const proposedZ = this.position.z + fwdZ * this.currentSpeed * dt;
 
-      // Surface height check
+      // Surface height check: road level is at 0.04m
       const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(proposedX, proposedZ, this.position.y) : 0;
-      this.position.y = surfaceHeight;
+      this.position.y = Math.max(0.04, surfaceHeight);
       this.pitch *= Math.max(0, 1 - 6 * dt);
 
       // Collision avoidance

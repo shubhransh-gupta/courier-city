@@ -23,8 +23,8 @@ export class SkyboxEnvironment {
     this.sunLight = new THREE.DirectionalLight(0xfff6e6, 1.85);
     this.sunLight.position.set(45, 65, 38);
     this.sunLight.castShadow = true;
-    this.sunLight.shadow.mapSize.width = 2048;
-    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.mapSize.width = 1024;
+    this.sunLight.shadow.mapSize.height = 1024;
     this.sunLight.shadow.camera.near = 1;
     this.sunLight.shadow.camera.far = 160;
 
@@ -120,11 +120,20 @@ export class SkyboxEnvironment {
   update(dt, targetPos) {
     if (!targetPos) return;
 
-    // Follow-sun: Position the directional light and shadow frustum directly over the player
-    // This guarantees 2048x2048 shadow density right where the player is anywhere across Bangalore!
-    this.sunLight.position.set(targetPos.x + 45, targetPos.y + 65, targetPos.z + 38);
-    this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
-    this.sunLight.target.updateMatrixWorld();
+    // Follow-sun: Position the directional light and shadow frustum over the player
+    // Threshold updates to avoid thrashing shadow buffers on fractional sub-pixel movements
+    if (!this.lastShadowPos) {
+      this.lastShadowPos = new THREE.Vector3();
+      this.sunLight.position.set(targetPos.x + 45, targetPos.y + 65, targetPos.z + 38);
+      this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
+      this.sunLight.target.updateMatrixWorld();
+      this.lastShadowPos.copy(targetPos);
+    } else if (targetPos.distanceToSquared(this.lastShadowPos) > 64.0) {
+      this.sunLight.position.set(targetPos.x + 45, targetPos.y + 65, targetPos.z + 38);
+      this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
+      this.sunLight.target.updateMatrixWorld();
+      this.lastShadowPos.copy(targetPos);
+    }
 
     this.clouds.forEach(cloud => {
       cloud.position.x += dt * 1.4;

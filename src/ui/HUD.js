@@ -41,13 +41,45 @@ export class HUD {
     const closeBtn = document.getElementById('close-controls-btn');
     const dismissBtn = document.getElementById('dismiss-controls-btn');
 
+    const handleClose = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      this.toggleControls(false);
+    };
+
     if (toggleBtn) toggleBtn.addEventListener('click', () => this.toggleControls());
-    if (closeBtn) closeBtn.addEventListener('click', () => this.toggleControls(false));
-    if (dismissBtn) dismissBtn.addEventListener('click', () => this.toggleControls(false));
+    if (closeBtn) {
+      closeBtn.addEventListener('click', handleClose);
+      closeBtn.addEventListener('pointerdown', handleClose);
+      closeBtn.addEventListener('touchend', handleClose);
+    }
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', handleClose);
+      dismissBtn.addEventListener('pointerdown', handleClose);
+      dismissBtn.addEventListener('touchend', handleClose);
+    }
+
+    // Close on backdrop click (outside card)
+    if (this.controlsModal) {
+      this.controlsModal.addEventListener('click', (e) => {
+        if (e.target === this.controlsModal) {
+          this.toggleControls(false);
+        }
+      });
+      this.controlsModal.addEventListener('touchend', (e) => {
+        if (e.target === this.controlsModal) {
+          this.toggleControls(false);
+        }
+      });
+    }
 
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyH') {
         this.toggleControls();
+      } else if (e.code === 'Escape' && this.isControlsOpen) {
+        this.toggleControls(false);
       }
     });
   }
@@ -130,16 +162,22 @@ export class HUD {
     }
   }
 
-  showToast(message, duration = 3000) {
+  showToast(message, duration = 3200) {
     if (!this.toastMessage) return;
-    this.toastMessage.textContent = message;
+    this.toastMessage.innerHTML = message;
+    this.toastMessage.style.visibility = 'visible';
     this.toastMessage.style.opacity = '1';
     this.toastMessage.style.transform = 'translate(-50%, 0)';
 
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => {
       this.toastMessage.style.opacity = '0';
-      this.toastMessage.style.transform = 'translate(-50%, -10px)';
+      this.toastMessage.style.transform = 'translate(-50%, -14px)';
+      setTimeout(() => {
+        if (this.toastMessage && this.toastMessage.style.opacity === '0') {
+          this.toastMessage.style.visibility = 'hidden';
+        }
+      }, 260);
     }, duration);
   }
 }

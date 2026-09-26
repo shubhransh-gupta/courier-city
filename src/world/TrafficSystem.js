@@ -5,17 +5,19 @@ export class TrafficSystem {
     this.scene = scene;
     this.vehicles = vehicles.filter(v => v.isTrafficCar && !v.isAirplane && !v.isHelicopter);
 
-    // Routes across the highways
-    // 4-Lane traffic routing: lanes 1 & 2 northbound/eastbound, lanes 3 & 4 southbound/westbound
+    // Routes across 6-lane grand highways (width 38m, 3 lanes each direction)
+    // Lane 1 (fast): ±3.0m, Lane 2 (cruising): ±9.0m, Lane 3 (slow): ±14.5m
     this.routes = [
-      { waypoints: [new THREE.Vector3(4.0, 0, 450), new THREE.Vector3(4.0, 0, -450)], speed: 16.0 },
-      { waypoints: [new THREE.Vector3(9.5, 0, 450), new THREE.Vector3(9.5, 0, -450)], speed: 13.0 },
-      { waypoints: [new THREE.Vector3(-4.0, 0, -450), new THREE.Vector3(-4.0, 0, 450)], speed: 16.0 },
-      { waypoints: [new THREE.Vector3(-9.5, 0, -450), new THREE.Vector3(-9.5, 0, 450)], speed: 13.0 },
-      { waypoints: [new THREE.Vector3(450, 0, 4.0), new THREE.Vector3(-450, 0, 4.0)], speed: 16.0 },
-      { waypoints: [new THREE.Vector3(-450, 0, -4.0), new THREE.Vector3(450, 0, -4.0)], speed: 16.0 },
-      { waypoints: [new THREE.Vector3(200 + 5.0, 0, -400), new THREE.Vector3(200 + 5.0, 0, 400)], speed: 17.0 },
-      { waypoints: [new THREE.Vector3(-200 - 5.0, 0, 400), new THREE.Vector3(-200 - 5.0, 0, -400)], speed: 17.0 }
+      { waypoints: [new THREE.Vector3(3.0, 0, 480), new THREE.Vector3(3.0, 0, -480)], speed: 18.0 },
+      { waypoints: [new THREE.Vector3(9.0, 0, 480), new THREE.Vector3(9.0, 0, -480)], speed: 15.0 },
+      { waypoints: [new THREE.Vector3(14.5, 0, 480), new THREE.Vector3(14.5, 0, -480)], speed: 12.0 },
+      { waypoints: [new THREE.Vector3(-3.0, 0, -480), new THREE.Vector3(-3.0, 0, 480)], speed: 18.0 },
+      { waypoints: [new THREE.Vector3(-9.0, 0, -480), new THREE.Vector3(-9.0, 0, 480)], speed: 15.0 },
+      { waypoints: [new THREE.Vector3(-14.5, 0, -480), new THREE.Vector3(-14.5, 0, 480)], speed: 12.0 },
+      { waypoints: [new THREE.Vector3(480, 0, 9.0), new THREE.Vector3(-480, 0, 9.0)], speed: 16.0 },
+      { waypoints: [new THREE.Vector3(-480, 0, -9.0), new THREE.Vector3(480, 0, -9.0)], speed: 16.0 },
+      { waypoints: [new THREE.Vector3(200 + 9.0, 0, -450), new THREE.Vector3(200 + 9.0, 0, 450)], speed: 17.0 },
+      { waypoints: [new THREE.Vector3(-200 - 9.0, 0, 450), new THREE.Vector3(-200 - 9.0, 0, -450)], speed: 17.0 }
     ];
 
     this.carStates = [];

@@ -392,9 +392,9 @@ export class BrunoToyCar {
         this.currentSpeed *= Math.max(0, 1 - 3.2 * dt);
       }
 
-      // 2. Smooth, responsive steering
+      // 2. Smooth, sharp, responsive arcade steering
       const targetSteer = turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 12.0);
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 20.0);
 
       const isTryingToMove = (input.isDown('KeyW') || input.isDown('ArrowUp') || input.isDown('KeyS') || input.isDown('ArrowDown'));
       const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), isTryingToMove ? 3.5 : 0);
@@ -444,14 +444,15 @@ export class BrunoToyCar {
         this.verticalVelocity -= this.gravity * dt;
         this.position.y += this.verticalVelocity * dt;
 
-        if (this.position.y <= surfaceHeight) {
-          this.position.y = surfaceHeight;
+        const roadFloor = Math.max(0.04, surfaceHeight);
+        if (this.position.y <= roadFloor) {
+          this.position.y = roadFloor;
           this.verticalVelocity = 0;
           this.isAirborne = false;
           this.pitch = 0;
         }
       } else {
-        this.position.y = surfaceHeight;
+        this.position.y = Math.max(0.04, surfaceHeight);
         this.pitch *= Math.max(0, 1 - 6 * dt);
       }
 

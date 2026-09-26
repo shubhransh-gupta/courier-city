@@ -57,18 +57,18 @@ class Game {
       stencil: false
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // Cap pixelRatio at 1.5 for Retina displays to avoid 4x fragment shader fillrate bottleneck
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    // Cap pixelRatio at 1.25 for Retina/HiDPI displays to eliminate fillrate stall
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
   }
 
   initScene() {
     this.scene = new THREE.Scene();
-    // Bruno Simon low-FOV diorama camera lens (38 deg base)
-    this.camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1600);
+    // Bruno Simon low-FOV diorama camera lens (38 deg base) with tight 450m cull distance
+    this.camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 450);
     this.camera.position.set(0, 8.0, 16.0);
   }
 
@@ -76,6 +76,7 @@ class Game {
     this.physicsWorld = new PhysicsWorld();
     this.input = new Input();
     this.cameraController = new CameraController(this.camera, this.canvas);
+    this.cameraController.setPhysicsWorld(this.physicsWorld);
     this.audioManager = new AudioManager();
     this.bloodVfx = new BloodVFX(this.scene);
     this.environment = new SkyboxEnvironment(this.scene, this.renderer);
@@ -83,6 +84,8 @@ class Game {
     this.metroSystem = new MetroSystem(this.scene, this.physicsWorld, this.audioManager);
     this.crowdSystem = new CrowdSystem(this.scene);
     this.skidSystem = new SkidMarkSystem(this.scene);
+    this.skyCreatures = new SkyCreatures(this.scene);
+    this.animalSystem = new AnimalWanderSystem(this.scene, this.physicsWorld);
     this.interactiveProps = new InteractiveProps(this.scene, this.physicsWorld, this.audioManager);
     this.minimap = new Minimap('radar-canvas', this);
     this.hud = new HUD();
@@ -96,17 +99,27 @@ class Game {
     // 2. Comprehensive High-Performance, Exotic & City Vehicle Fleet
     this.vehicles = [];
 
-    // 2a. Flagship Bruno Simon Toy Roadster (Center of Central Plaza)
-    this.brunoCar = new BrunoToyCar(this.scene, this.physicsWorld, this.audioManager, new THREE.Vector3(0, 0, 76), 0xef4444);
+    // 2a. Premier Bugatti Veyron 16.4 Supercar (Flagship Starter Car directly in front of Player)
+    this.starterSupercar = new SportsCar(this.scene, this.physicsWorld, this.audioManager, new THREE.Vector3(0, 0.04, 76), 'BUGATTI_VEYRON');
+    this.vehicles.push(this.starterSupercar);
+
+    // Also place the classic Bruno Toy Car at the off-road fun park
+    this.brunoCar = new BrunoToyCar(this.scene, this.physicsWorld, this.audioManager, new THREE.Vector3(45, 0.04, 95), 0xef4444);
     this.vehicles.push(this.brunoCar);
 
-    // 2b. Dangerous Exotic Sports Cars (Bugatti Veyron, Aston Martin DBS, Mercedes-AMG GT)
+    // 2b. Realistic Exotic Supercars & 4x4 Beasts (Bugatti, Aston Martin, AMG GT, Lamborghini Aventador, Porsche 911 GT3 RS, Mahindra Thar)
     const sportsCarConfigs = [
-      { pos: new THREE.Vector3(6.5, 0, 80), model: 'BUGATTI_VEYRON' },       // Bugatti Veyron in Central Plaza!
-      { pos: new THREE.Vector3(-6.5, 0, 80), model: 'ASTON_MARTIN_DBS' },    // Aston Martin DBS in Central Plaza!
-      { pos: new THREE.Vector3(0, 0, 64), model: 'MERCEDES_AMG_GT' },        // Mercedes-AMG GT in Central Plaza!
-      { pos: new THREE.Vector3(-70, 0, 110), model: 'BUGATTI_VEYRON' },      // Bugatti outside Founder's Stark Tower
-      { pos: new THREE.Vector3(220, 0, 300), model: 'ASTON_MARTIN_DBS' }     // Aston Martin outside Orion Mall / WTC
+      { pos: new THREE.Vector3(7.5, 0, 80), model: 'BUGATTI_VEYRON' },          // Bugatti Veyron in Central Plaza!
+      { pos: new THREE.Vector3(-7.5, 0, 80), model: 'ASTON_MARTIN_DBS' },       // Aston Martin DBS in Central Plaza!
+      { pos: new THREE.Vector3(0, 0, 64), model: 'MERCEDES_AMG_GT' },           // Mercedes-AMG GT in Central Plaza!
+      { pos: new THREE.Vector3(-60, 0, -68), model: 'LAMBORGHINI_AVENTADOR' },   // Lamborghini Aventador SVJ at UB City!
+      { pos: new THREE.Vector3(12.0, 0, 65), model: 'PORSCHE_911_GT3_RS' },      // Porsche 911 GT3 RS in Central Plaza!
+      { pos: new THREE.Vector3(-15.0, 0, 95), model: 'MAHINDRA_THAR_4X4' },      // Mahindra Thar 4x4 in Central Plaza!
+      { pos: new THREE.Vector3(430, 0, -440), model: 'MAHINDRA_THAR_4X4' },     // Mahindra Thar 4x4 at Nandi Hills Base!
+      { pos: new THREE.Vector3(-70, 0, 110), model: 'BUGATTI_VEYRON' },         // Bugatti outside Founder's Stark Tower
+      { pos: new THREE.Vector3(220, 0, 300), model: 'ASTON_MARTIN_DBS' },        // Aston Martin outside Orion Mall / WTC
+      { pos: new THREE.Vector3(240, 0, -370), model: 'LAMBORGHINI_AVENTADOR' },  // Lamborghini Aventador at Airport VIP Terminal!
+      { pos: new THREE.Vector3(-205, 0, -15), model: 'PORSCHE_911_GT3_RS' }     // Porsche 911 GT3 RS at Vidhana Soudha!
     ];
     sportsCarConfigs.forEach(cfg => {
       const sports = new SportsCar(this.scene, this.physicsWorld, this.audioManager, cfg.pos, cfg.model);
@@ -197,8 +210,8 @@ class Game {
     this.nearbyVehicle = null;
     this.interactionCooldown = false;
 
-    // Immediately seat the player in the Bruno Simon Toy Roadster
-    this.enterVehicle(this.brunoCar);
+    // Immediately seat the player in the flagship Bugatti Veyron at Central Plaza
+    this.enterVehicle(this.starterSupercar);
   }
 
   initEvents() {
@@ -274,7 +287,7 @@ class Game {
 
     // Direct Click on Car, Plane, or Helicopter to Enter
     window.addEventListener('click', (e) => {
-      if (e.target.closest('.messenger-header, .messenger-actions, .bottom-hint, #radar-container, #gps-nav-widget, #full-map-overlay, #welcome-landing-modal, .welcome-modal-overlay, .welcome-card, #camera-modal, .camera-card')) {
+      if (this.isAnyModalOpen() || e.target.closest('.messenger-header, .messenger-actions, .bottom-hint, #radar-container, #gps-nav-widget, #full-map-overlay, #welcome-landing-modal, .welcome-modal-overlay, .welcome-card, #camera-modal, .camera-card, #controls-modal, .controls-card')) {
         return;
       }
 
@@ -381,12 +394,26 @@ class Game {
 
     this.toggleCameraModal = toggleCameraModal;
 
-    if (openBtn) openBtn.addEventListener('click', () => toggleCameraModal(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleCameraModal(false));
-    if (doneBtn) doneBtn.addEventListener('click', () => {
+    const handleCloseCamera = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       toggleCameraModal(false);
-      this.hud.showToast('Camera settings applied');
-    });
+    };
+
+    if (openBtn) openBtn.addEventListener('click', () => toggleCameraModal(true));
+    if (closeBtn) {
+      closeBtn.addEventListener('click', handleCloseCamera);
+      closeBtn.addEventListener('pointerdown', handleCloseCamera);
+      closeBtn.addEventListener('touchend', handleCloseCamera);
+    }
+    if (doneBtn) {
+      doneBtn.addEventListener('click', () => {
+        handleCloseCamera();
+        this.hud.showToast('Camera settings applied');
+      });
+    }
 
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
@@ -457,78 +484,129 @@ class Game {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) toggleCameraModal(false);
       });
+      modal.addEventListener('touchend', (e) => {
+        if (e.target === modal) toggleCameraModal(false);
+      });
     }
 
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyV' && !e.target.closest('input, textarea')) {
         toggleCameraModal();
+      } else if (e.code === 'Escape' && isOpen) {
+        toggleCameraModal(false);
       }
     });
   }
 
+  isAnyModalOpen() {
+    return (
+      (this.fullMapOverlay && this.fullMapOverlay.isOpen) ||
+      (this.hud && this.hud.isControlsOpen) ||
+      document.getElementById('welcome-landing-modal') !== null ||
+      !document.getElementById('camera-modal')?.classList.contains('camera-modal-hidden')
+    );
+  }
+
   spawnPlayerAt(worldX, worldZ) {
-    // 1. Calculate true surface elevation (supports ground terrain and elevated highway flyovers)
+    // 1. Calculate true surface elevation (supports ground terrain, summits, and elevated highway flyovers)
     const surfaceY = (this.physicsWorld && typeof this.physicsWorld.getSurfaceHeight === 'function')
-      ? this.physicsWorld.getSurfaceHeight(worldX, worldZ)
+      ? this.physicsWorld.getSurfaceHeight(worldX, worldZ, null, true)
       : 0;
 
-    const safeLandingY = Math.max(0, surfaceY) + 1.2;
+    let finalX = worldX;
+    let finalZ = worldZ;
+
+    // Safety check against obstacles to never spawn inside a building or wall
+    if (this.physicsWorld && this.physicsWorld.obstacles) {
+      for (const b of this.physicsWorld.obstacles) {
+        if (b.isRamp) continue;
+        const pad = 2.5;
+        if (finalX >= b.x - b.hx - pad && finalX <= b.x + b.hx + pad &&
+            finalZ >= b.z - b.hz - pad && finalZ <= b.z + b.hz + pad) {
+          const distLeft = Math.abs(finalX - (b.x - b.hx));
+          const distRight = Math.abs(finalX - (b.x + b.hx));
+          const distBack = Math.abs(finalZ - (b.z - b.hz));
+          const distFront = Math.abs(finalZ - (b.z + b.hz));
+          const minDist = Math.min(distLeft, distRight, distBack, distFront);
+          if (minDist === distFront) finalZ = b.z + b.hz + pad + 1.2;
+          else if (minDist === distBack) finalZ = b.z - b.hz - pad - 1.2;
+          else if (minDist === distRight) finalX = b.x + b.hx + pad + 1.2;
+          else finalX = b.x - b.hx - pad - 1.2;
+        }
+      }
+    }
+
+    finalX = Math.max(-460, Math.min(460, finalX));
+    finalZ = Math.max(-460, Math.min(460, finalZ));
+    const safeLandingY = Math.max(0.04, surfaceY);
+
+    let activeYaw = 0;
 
     if (this.player.isDriving && this.activeVehicle) {
       // Teleport the vehicle and player together
       const veh = this.activeVehicle;
-      veh.position.set(worldX, safeLandingY, worldZ);
+      veh.position.set(finalX, safeLandingY, finalZ);
       veh.speed = 0;
+      veh.currentSpeed = 0;
+      veh.speedKmh = 0;
       if (veh.velocity) veh.velocity.set(0, 0, 0);
       if (veh.angularVelocity !== undefined) veh.angularVelocity = 0;
       if (veh.steerAngle !== undefined) veh.steerAngle = 0;
       if (veh.pitch !== undefined) veh.pitch = 0;
       if (veh.roll !== undefined) veh.roll = 0;
       if (veh.verticalVelocity !== undefined) veh.verticalVelocity = 0;
+      if (veh.altitude !== undefined) veh.altitude = safeLandingY;
 
       if (veh.body) {
-        veh.body.position.set(worldX, safeLandingY, worldZ);
+        veh.body.position.set(finalX, safeLandingY, finalZ);
         veh.body.velocity.set(0, 0, 0);
         veh.body.angularVelocity.set(0, 0, 0);
       }
 
       if (veh.mesh) {
-        veh.mesh.position.set(worldX, safeLandingY, worldZ);
+        veh.mesh.position.set(finalX, safeLandingY, finalZ);
       }
 
-      this.player.position.set(worldX, safeLandingY, worldZ);
-      if (this.player.mesh) {
-        this.player.mesh.position.set(worldX, safeLandingY, worldZ);
+      this.player.position.set(finalX, safeLandingY, finalZ);
+      if (this.player.group) {
+        this.player.group.position.set(finalX, safeLandingY, finalZ);
       }
 
+      activeYaw = veh.yaw || 0;
       const vehName = veh.carName || (veh.isBrunoToyCar ? 'Bruno Toy Roadster' : (veh.isSportsCar ? 'Supercar' : 'Vehicle'));
-      this.hud.showToast(`⚡ Landed ${vehName} at (${Math.round(worldX)}, ${Math.round(worldZ)})!`);
+      this.hud.showToast(`⚡ Landed ${vehName} at (${Math.round(finalX)}, ${Math.round(finalZ)})!`);
     } else {
       // Teleport character on foot
-      this.player.position.set(worldX, safeLandingY, worldZ);
+      this.player.position.set(finalX, safeLandingY, finalZ);
       this.player.velocity.set(0, 0, 0);
       this.player.verticalVelocity = 0;
-      if (this.player.mesh) {
-        this.player.mesh.position.set(worldX, safeLandingY, worldZ);
+      if (this.player.group) {
+        this.player.group.position.set(finalX, safeLandingY, finalZ);
       }
-      this.hud.showToast(`⚡ Landed character at (${Math.round(worldX)}, ${Math.round(worldZ)})!`);
+      activeYaw = this.player.rotation || 0;
+      this.hud.showToast(`⚡ Landed character at (${Math.round(finalX)}, ${Math.round(finalZ)})!`);
     }
 
-    // 2. Instantly reset camera tracking to destination coordinates
+    // 2. Instantly reset camera tracking to destination coordinates without lag or blank screen
     const targetPos = this.player.isDriving && this.activeVehicle
       ? this.activeVehicle.position
       : this.player.position;
 
     if (this.cameraController) {
       if (typeof this.cameraController.resetToTarget === 'function') {
-        this.cameraController.resetToTarget(targetPos);
+        this.cameraController.resetToTarget(targetPos, activeYaw);
       } else {
         this.cameraController.camera.position.set(targetPos.x, targetPos.y + 12, targetPos.z + 16);
         this.cameraController.camera.lookAt(targetPos);
       }
     }
 
-    // 3. Audio feedback
+    // 3. Update environment sun light position immediately to prevent shadow pop
+    if (this.environment) {
+      this.environment.update(0.016, targetPos);
+    }
+
+    // 4. Audio feedback
     if (this.audioManager && typeof this.audioManager.playDoor === 'function') {
       this.audioManager.playDoor();
     }
@@ -816,8 +894,12 @@ class Game {
     if (this.skidSystem) this.skidSystem.update(dt);
 
     // Traffic and crowd must update every frame for smooth movement
+    const activePlayerPos = (this.player.isDriving && this.activeVehicle) ? this.activeVehicle.position : this.player.position;
     this.trafficSystem.update(dt, this.activeVehicle, this.player);
-    this.crowdSystem.update(dt);
+    this.crowdSystem.update(dt, activePlayerPos);
+    if (this.player.isDriving && this.activeVehicle) {
+      this.crowdSystem.checkVehicleCollisions(this.activeVehicle, this.bloodVfx, this.hud, this.audioManager);
+    }
     this.metroSystem.update(dt);
 
     // Throttle distant/decorative systems to every other frame
@@ -826,16 +908,24 @@ class Game {
       if (this.skyCreatures) this.skyCreatures.update(dt, currentTime * 0.001);
       if (this.animalSystem) this.animalSystem.update(dt, currentTime * 0.001);
     }
+    // Animal collision physics — check every 3rd frame (perf-friendly)
+    if (this._sysFrame % 3 === 0 && this.player.isDriving && this.activeVehicle) {
+      if (this.animalSystem) this.animalSystem.checkVehicleCollisions(this.activeVehicle);
+    }
     this.handleVehicleInteractions();
     this.handleObservationElevators();
     this.updateWaypointAnimation(dt, currentTime);
 
+    const activeInput = this.isAnyModalOpen() ? (this.idleInput || (this.idleInput = { isDown: () => false, getForward: () => 0, getTurn: () => 0, isSprinting: () => false, isJumping: () => false })) : this.input;
     const cameraYaw = this.cameraController.yaw;
-    this.player.update(dt, this.input, cameraYaw, this.vehicles);
+    this.player.update(dt, activeInput, cameraYaw, this.vehicles);
 
     this.vehicles.forEach(veh => {
       const isCurrent = (veh === this.activeVehicle);
-      veh.update(dt, this.input, isCurrent);
+      // Skip heavy collision & suspension loops for stationary parked cars
+      if (isCurrent || veh.isTrafficCar || Math.abs(veh.currentSpeed || 0) > 0.05 || veh.isAirborne) {
+        veh.update(dt, activeInput, isCurrent);
+      }
     });
 
     this.bloodVfx.update(dt);
@@ -845,15 +935,16 @@ class Game {
     let activeYaw = this.player.rotation;
 
     if (this.isRidingMetro && this.metroSystem) {
-      // Metro riding – use metro position
-      const metroPos = new THREE.Vector3(
+      // Metro riding – reuse scratch vector to eliminate per-frame GC allocations
+      if (!this._metroPos) this._metroPos = new THREE.Vector3();
+      this._metroPos.set(
         this.metroSystem.trackX,
         this.metroSystem.trainY + 2.5,
         this.metroSystem.currentZ
       );
-      activePos = metroPos;
+      activePos = this._metroPos;
       activeYaw = 0;
-      this.cameraController.update(dt, metroPos, 0, Math.round(this.metroSystem.currentSpeed * 3.6), true);
+      this.cameraController.update(dt, activePos, 0, Math.round(this.metroSystem.currentSpeed * 3.6), true);
       this.hud.updateSpeed(Math.round(this.metroSystem.currentSpeed * 3.6));
     } else {
       if (this.player.isDriving && this.activeVehicle) {
@@ -892,6 +983,10 @@ class Game {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  new Game();
-});
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.game = new Game();
+  });
+} else {
+  window.game = new Game();
+}

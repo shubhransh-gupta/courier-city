@@ -147,15 +147,6 @@ export class Motorbike {
     headlampLens.position.set(0, 0.68, 0.215);
     this.frontFork.add(headlampLens);
 
-    // SpotLight for Night Driving
-    this.spotLight = new THREE.SpotLight(0xfffa65, 0, 50, Math.PI / 6, 0.35);
-    this.spotLight.position.set(0, 0.68, 0.22);
-    this.spotLightTarget = new THREE.Object3D();
-    this.spotLightTarget.position.set(0, 0, 25);
-    this.frontFork.add(this.spotLightTarget);
-    this.spotLight.target = this.spotLightTarget;
-    this.frontFork.add(this.spotLight);
-
     // Front Fork Tubes
     [-0.09, 0.09].forEach(fx => {
       const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.75, 6), chromeMat);
@@ -210,9 +201,6 @@ export class Motorbike {
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    if (this.spotLight) {
-      this.spotLight.intensity = on ? 2.0 : 0;
-    }
   }
 
   update(dt, input) {
@@ -225,7 +213,8 @@ export class Motorbike {
       const boost = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
 
       const throttle = forward - reverse;
-      const turnInput = steerLeft - steerRight;
+      // D / ArrowRight = +1 (Right), A / ArrowLeft = -1 (Left)
+      const turnInput = steerRight - steerLeft;
 
       const currentMax = boost ? this.boostMaxSpeed : this.maxSpeed;
 
@@ -253,9 +242,9 @@ export class Motorbike {
         this.currentSpeed *= Math.max(0, 1 - 4 * dt);
       }
 
-      // Steering & Handlebars
-      const targetSteer = -turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 14);
+      // Steering & Handlebars: responsive Bullet motorbike cornering (Right = +steer, Left = -steer)
+      const targetSteer = turnInput * this.maxSteerAngle;
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 22);
       if (this.frontFork) {
         this.frontFork.rotation.y = this.steerAngle;
       }
@@ -273,9 +262,9 @@ export class Motorbike {
       const proposedX = this.position.x + fwdX * this.currentSpeed * dt;
       const proposedZ = this.position.z + fwdZ * this.currentSpeed * dt;
 
-      // Surface height check
+      // Surface height check: road level is at 0.04m
       const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(proposedX, proposedZ, this.position.y) : 0;
-      this.position.y = surfaceHeight;
+      this.position.y = Math.max(0.04, surfaceHeight);
       this.pitch *= Math.max(0, 1 - 6 * dt);
 
       // Collision avoidance with obstacles

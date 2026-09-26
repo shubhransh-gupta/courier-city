@@ -179,7 +179,7 @@ export class Airplane {
         // 3. Bank & Yaw Steering
         if (turn !== 0) {
           const turnRate = 1.6;
-          this.yaw -= turn * turnRate * dt;
+          this.yaw += turn * turnRate * dt;
           const targetRoll = -turn * 0.55;
           this.roll += (targetRoll - this.roll) * Math.min(1, dt * 6.0);
         } else {
@@ -197,7 +197,7 @@ export class Airplane {
         }
       } else {
         // Ground taxi steering
-        this.yaw -= turn * 2.2 * dt;
+        this.yaw += turn * 2.2 * dt;
         this.pitch = 0;
         this.roll = 0;
         this.altitude = 0.4;
