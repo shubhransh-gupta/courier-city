@@ -164,10 +164,83 @@ export class Player {
 
   update(dt, input, cameraYaw, vehicles = []) {
     if (this.isDriving) {
-      this.group.visible = false;
-      this.shadowMesh.visible = false;
       if (this.currentVehicle) {
         this.position.copy(this.currentVehicle.position);
+
+        const veh = this.currentVehicle;
+        const isBike = !!veh.isMotorbike;
+        const isAuto = !!veh.isAutoRickshaw;
+        const isToyRoadster = !!veh.isBrunoToyCar || !!veh.isConvertible;
+
+        if (isBike || isAuto || isToyRoadster) {
+          // Show player driving/riding the open vehicle!
+          this.group.visible = true;
+          this.shadowMesh.visible = false;
+
+          const yaw = veh.yaw;
+          const sinY = Math.sin(yaw);
+          const cosY = Math.cos(yaw);
+
+          if (isBike) {
+            // Rider sitting in saddle holding handlebars
+            const seatOffsetX = 0;
+            const seatOffsetY = 0.55;
+            const seatOffsetZ = -0.15;
+
+            const wx = veh.position.x + (seatOffsetX * cosY + seatOffsetZ * sinY);
+            const wy = veh.position.y + seatOffsetY;
+            const wz = veh.position.z + (-seatOffsetX * sinY + seatOffsetZ * cosY);
+
+            this.group.position.set(wx, wy, wz);
+            this.group.rotation.set(0.18, yaw, (veh.leanAngle || 0));
+
+            // Biker posture (straddling footpegs and gripping handlebars)
+            this.leftLeg.rotation.set(0.75, 0.25, 0);
+            this.rightLeg.rotation.set(0.75, -0.25, 0);
+            this.leftArm.rotation.set(-1.05, 0.2, 0);
+            this.rightArm.rotation.set(-1.05, -0.2, 0);
+          } else if (isAuto) {
+            // Auto driver seated behind windscreen and handlebar console
+            const seatOffsetX = 0;
+            const seatOffsetY = 0.42;
+            const seatOffsetZ = 0.35;
+
+            const wx = veh.position.x + (seatOffsetX * cosY + seatOffsetZ * sinY);
+            const wy = veh.position.y + seatOffsetY;
+            const wz = veh.position.z + (-seatOffsetX * sinY + seatOffsetZ * cosY);
+
+            this.group.position.set(wx, wy, wz);
+            this.group.rotation.set(0.08, yaw, veh.roll || 0);
+
+            // Auto driver posture
+            this.leftLeg.rotation.set(1.25, 0.1, 0);
+            this.rightLeg.rotation.set(1.25, -0.1, 0);
+            this.leftArm.rotation.set(-0.85, 0.15, 0);
+            this.rightArm.rotation.set(-0.85, -0.15, 0);
+          } else {
+            // Open-top roadster convertible driver seat
+            const seatOffsetX = -0.32;
+            const seatOffsetY = 0.28;
+            const seatOffsetZ = -0.15;
+
+            const wx = veh.position.x + (seatOffsetX * cosY + seatOffsetZ * sinY);
+            const wy = veh.position.y + seatOffsetY;
+            const wz = veh.position.z + (-seatOffsetX * sinY + seatOffsetZ * cosY);
+
+            this.group.position.set(wx, wy, wz);
+            this.group.rotation.set(0.05, yaw, veh.roll || 0);
+
+            // Roadster seated driver
+            this.leftLeg.rotation.set(1.3, 0.08, 0);
+            this.rightLeg.rotation.set(1.3, -0.08, 0);
+            this.leftArm.rotation.set(-0.8, 0.2, 0);
+            this.rightArm.rotation.set(-0.8, -0.1, 0);
+          }
+        } else {
+          // Closed cabin vehicle (BMTC bus, enclosed sports car, airplane, helicopter)
+          this.group.visible = false;
+          this.shadowMesh.visible = false;
+        }
       }
       return;
     }
@@ -475,6 +548,16 @@ export class Player {
     this.velocity.set(0, 0, 0);
     this.isGrounded = true;
     this.currentVehicle = null;
+
+    // Reset rotation and limb kinematics to standing upright
+    this.group.rotation.set(0, this.rotation, 0);
+    this.leftLeg.rotation.set(0, 0, 0);
+    this.rightLeg.rotation.set(0, 0, 0);
+    this.leftArm.rotation.set(0, 0, 0);
+    this.rightArm.rotation.set(0, 0, 0);
+    this.group.visible = true;
+    this.shadowMesh.visible = true;
+
     this.audioManager.playDoor();
   }
 }

@@ -12,14 +12,14 @@ export class MetroSystem {
     this.physicsWorld = physicsWorld;
     this.audioManager = audioManager;
 
-    // Viaduct corridor coordinates (along x = 24, y = 12.5m)
-    this.trackX = 24;
+    // Viaduct corridor coordinates (along x = 32 on the eastern boulevard verge, y = 12.5m)
+    this.trackX = 32;
     this.deckY = 12.5;
     this.trainY = 13.9;
 
-    // Station Z coordinates
-    this.stationSilkBoardZ = 20;
-    this.stationHsrZ = 180;
+    // Station Z coordinates (aligned with bus feeder terminals, safely clear of crossroads)
+    this.stationSilkBoardZ = 50;
+    this.stationHsrZ = 150;
 
     // Track span
     this.trackMinZ = -60;
@@ -61,14 +61,14 @@ export class MetroSystem {
       greenLine: new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.4 }),
       trainWindow: new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2, metalness: 0.8 }),
       headlightOn: new THREE.MeshBasicMaterial({ color: 0xffffff }),
-      taillightOn: new THREE.MeshBasicMaterial({ color: 0xef4444 })
+      tailLightOn: new THREE.MeshBasicMaterial({ color: 0xef4444 })
     };
   }
 
   buildViaductAndStations() {
     this.viaductGroup = new THREE.Group();
 
-    // 1. Viaduct Concrete Deck along X = 24 from z = -60 to 260
+    // 1. Viaduct Concrete Deck along X = 32 from z = -60 to 260
     const trackLength = this.trackMaxZ - this.trackMinZ;
     const centerZ = (this.trackMaxZ + this.trackMinZ) / 2;
 
@@ -94,8 +94,19 @@ export class MetroSystem {
       this.viaductGroup.add(rail);
     });
 
-    // Elevated Heavy Portal Bents & Pillars every 35m
-    for (let pz = this.trackMinZ; pz <= this.trackMaxZ; pz += 35) {
+    // Road corridor crossings at z = 0 and z = 200 (where 38m 6-lane highways run)
+    const roadCrossings = [0, 200];
+    const roadHalfWidthWithMargin = 22; // 38m road + curb buffer
+
+    // Elevated Heavy Portal Bents & Pillars placed strictly outside road surface
+    for (let pz = this.trackMinZ; pz <= this.trackMaxZ; pz += 30) {
+      // Check if this pillar position falls within any roadway
+      const isInsideRoadway = roadCrossings.some(rz => Math.abs(pz - rz) < roadHalfWidthWithMargin);
+      if (isInsideRoadway) {
+        // Skip placing pillar on the road!
+        continue;
+      }
+
       const pillar = new THREE.Mesh(
         new THREE.CylinderGeometry(1.3, 1.6, this.deckY, 12),
         this.materials.pillarMat
@@ -114,6 +125,29 @@ export class MetroSystem {
         this.physicsWorld.addStaticBox(this.trackX, pHy, pz, 1.4, pHy, 1.4, false, true);
       }
     }
+
+    // Straddle Bents at the sideways of road crossings (one at z = rz - 23, one at z = rz + 23)
+    roadCrossings.forEach(rz => {
+      [-23.5, 23.5].forEach(offset => {
+        const pz = rz + offset;
+        const pillar = new THREE.Mesh(
+          new THREE.CylinderGeometry(1.4, 1.7, this.deckY, 12),
+          this.materials.pillarMat
+        );
+        pillar.position.set(this.trackX, this.deckY / 2, pz);
+        pillar.castShadow = true;
+        this.viaductGroup.add(pillar);
+
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(8.6, 1.4, 3.0), this.materials.concrete);
+        cap.position.set(this.trackX, this.deckY - 0.7, pz);
+        this.viaductGroup.add(cap);
+
+        if (this.physicsWorld) {
+          const pHy = Math.max(0.5, (this.deckY - 1.5) / 2);
+          this.physicsWorld.addStaticBox(this.trackX, pHy, pz, 1.5, pHy, 1.5, false, true);
+        }
+      });
+    });
 
     // Overhead Catenary Poles (Traction power)
     for (let cz = this.trackMinZ + 15; cz <= this.trackMaxZ; cz += 45) {

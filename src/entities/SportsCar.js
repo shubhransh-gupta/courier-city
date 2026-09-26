@@ -13,7 +13,11 @@ export class SportsCar {
     this.physicsWorld = physicsWorld;
     this.audioManager = audioManager;
     this.modelType = modelType;
-    this.color = (modelType === 'BUGATTI_VEYRON') ? 0x0284c7 : ((modelType === 'ASTON_MARTIN_DBS') ? 0x065f46 : 0xeab308);
+    this.color = (modelType === 'BUGATTI_VEYRON') ? 0x0284c7 :
+                 (modelType === 'ASTON_MARTIN_DBS') ? 0x065f46 :
+                 (modelType === 'LAMBORGHINI_AVENTADOR') ? 0xf97316 :
+                 (modelType === 'PORSCHE_911_GT3_RS') ? 0x0284c7 :
+                 (modelType === 'MAHINDRA_THAR_4X4') ? 0x1f2937 : 0xeab308;
     this.isSportsCar = true;
 
     // Movement state
@@ -50,6 +54,33 @@ export class SportsCar {
       this.turnRate = 3.4;
       this.friction = 5.8;
       this.radius = 1.35;
+    } else if (modelType === 'LAMBORGHINI_AVENTADOR') {
+      this.carName = 'Lamborghini Aventador SVJ';
+      this.maxSpeed = 52;       // ~187 km/h V12 screaming beast
+      this.boostMaxSpeed = 66;  // ~238 km/h
+      this.acceleration = 38;
+      this.braking = 48;
+      this.turnRate = 3.6;
+      this.friction = 6.4;
+      this.radius = 1.35;
+    } else if (modelType === 'PORSCHE_911_GT3_RS') {
+      this.carName = 'Porsche 911 GT3 RS (992)';
+      this.maxSpeed = 46;       // ~165 km/h
+      this.boostMaxSpeed = 58;  // ~209 km/h
+      this.acceleration = 35;
+      this.braking = 50;        // Carbon ceramic brakes
+      this.turnRate = 4.0;       // Track agility
+      this.friction = 6.6;
+      this.radius = 1.32;
+    } else if (modelType === 'MAHINDRA_THAR_4X4') {
+      this.carName = 'Mahindra Thar 4x4 Off-Roader';
+      this.maxSpeed = 34;       // ~122 km/h
+      this.boostMaxSpeed = 44;
+      this.acceleration = 28;
+      this.braking = 36;
+      this.turnRate = 3.0;
+      this.friction = 5.4;
+      this.radius = 1.4;
     } else { // MERCEDES_AMG_GT
       this.carName = 'Mercedes-AMG GT Black Series';
       this.maxSpeed = 40;       // ~144 km/h
@@ -212,7 +243,7 @@ export class SportsCar {
       tailBar.position.set(0, 0.68, -2.36);
       this.mesh.add(tailBar);
 
-    } else { // MERCEDES_AMG_GT
+    } else if (this.modelType === 'MERCEDES_AMG_GT') {
       // Solarbeam Yellow with Matte Carbon Aerodynamics (Black Series)
       const amgYellow = new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.7, roughness: 0.25 });
 
@@ -275,6 +306,190 @@ export class SportsCar {
         amgLight.position.set(hx, 0.56, 2.27);
         this.mesh.add(amgLight);
       });
+
+    } else if (this.modelType === 'LAMBORGHINI_AVENTADOR') {
+      // Arancio Argos Metallic Pearl Orange with Carbon fiber aero
+      const lamboOrange = new THREE.MeshStandardMaterial({ color: 0xf97316, metalness: 0.75, roughness: 0.22 });
+
+      // Ultra-low stealth fighter angular wedge body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.26, 0.44, 4.75), lamboOrange);
+      body.position.y = 0.38;
+      body.castShadow = true;
+      this.mesh.add(body);
+
+      // Low sloping faceted stealth hood
+      const hood = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.18, 2.2), lamboOrange);
+      hood.position.set(0, 0.52, 1.25);
+      hood.rotation.x = -0.14;
+      this.mesh.add(hood);
+
+      // Aggressive front aerodynamic fang splitters
+      [-0.85, 0.85].forEach(fx => {
+        const fang = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.16, 0.6), carbonMat);
+        fang.position.set(fx, 0.22, 2.38);
+        this.mesh.add(fang);
+      });
+
+      // Side carbon air intake pods (massive side scoops for V12 cooling)
+      [-1.16, 1.16].forEach(sx => {
+        const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.45, 1.1), carbonMat);
+        scoop.position.set(sx, 0.45, -0.6);
+        this.mesh.add(scoop);
+      });
+
+      // Low Angular Cockpit Greenhouse
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.48, 1.8), darkInteriorMat);
+      cabin.position.set(0, 0.82, -0.2);
+      this.mesh.add(cabin);
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.52, 0.05), glassMat);
+      windshield.position.set(0, 0.82, 0.72);
+      windshield.rotation.x = 0.68;
+      this.mesh.add(windshield);
+
+      // High-Mount ALA 2.0 Carbon SVJ Rear Wing
+      const svjWing = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.06, 0.42), carbonMat);
+      svjWing.position.set(0, 1.18, -2.12);
+      svjWing.rotation.x = 0.1;
+      const svjCenterPylon = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.3), carbonMat);
+      svjCenterPylon.position.set(0, 0.95, -2.12);
+      this.mesh.add(svjWing, svjCenterPylon);
+
+      // Central High-Exit Hexagonal Inconel Exhaust
+      const hexExhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.18, 6), chromeMat);
+      hexExhaust.rotation.x = Math.PI / 2;
+      hexExhaust.position.set(0, 0.62, -2.4);
+      this.mesh.add(hexExhaust);
+
+      // Y-shaped Headlights
+      [-0.78, 0.78].forEach(hx => {
+        const yLight = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.08, 0.08), headlampGlowMat);
+        yLight.position.set(hx, 0.48, 2.36);
+        yLight.rotation.y = (hx > 0 ? 0.35 : -0.35);
+        this.mesh.add(yLight);
+      });
+
+    } else if (this.modelType === 'PORSCHE_911_GT3_RS') {
+      // Shark Blue with Carbon Weissach Package
+      const porscheBlue = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.7, roughness: 0.25 });
+
+      // Classic Curvaceous 911 Silhouette
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.12, 0.5, 4.5), porscheBlue);
+      body.position.y = 0.44;
+      body.castShadow = true;
+      this.mesh.add(body);
+
+      // Distinctive wide flared rear haunches
+      [-1.12, 1.12].forEach(rx => {
+        const haunch = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.42, 1.4), porscheBlue);
+        haunch.position.set(rx, 0.52, -1.2);
+        this.mesh.add(haunch);
+      });
+
+      // Front Hood Nostril Air Louvers (Heat extractors)
+      [-0.32, 0.32].forEach(nx => {
+        const nostril = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.55), carbonMat);
+        nostril.position.set(nx, 0.72, 1.1);
+        nostril.rotation.x = -0.1;
+        this.mesh.add(nostril);
+      });
+
+      // Fastback Rounded Greenhouse
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.55, 2.1), darkInteriorMat);
+      cabin.position.set(0, 0.96, -0.2);
+      this.mesh.add(cabin);
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.54, 0.05), glassMat);
+      windshield.position.set(0, 0.96, 0.85);
+      windshield.rotation.x = 0.58;
+      this.mesh.add(windshield);
+
+      // Colossal Top-Hung Swan-Neck GT3 RS Rear Wing
+      const porscheWing = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.06, 0.44), carbonMat);
+      porscheWing.position.set(0, 1.45, -2.05);
+      porscheWing.rotation.x = 0.08;
+      [-0.62, 0.62].forEach(sx => {
+        const swanNeck = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 0.25), carbonMat);
+        swanNeck.position.set(sx, 1.25, -1.95);
+        swanNeck.rotation.x = -0.2;
+        this.mesh.add(swanNeck);
+      });
+      this.mesh.add(porscheWing);
+
+      // Iconic Round Porsche Headlights
+      [-0.72, 0.72].forEach(hx => {
+        const roundLight = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 16), headlampGlowMat);
+        roundLight.rotation.x = Math.PI / 2 - 0.2;
+        roundLight.position.set(hx, 0.64, 2.15);
+        this.mesh.add(roundLight);
+      });
+
+      // Dual Center Exhaust Pipes
+      [-0.1, 0.1].forEach(cx => {
+        const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.15, 8), chromeMat);
+        tip.rotation.x = Math.PI / 2;
+        tip.position.set(cx, 0.32, -2.28);
+        this.mesh.add(tip);
+      });
+
+    } else if (this.modelType === 'MAHINDRA_THAR_4X4') {
+      // Rugged Deep Charcoal/Black Off-Roader
+      const tharBlack = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.85 });
+      const bumperMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 });
+
+      // High-Clearance Boxy 4x4 Body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.72, 3.8), tharBlack);
+      body.position.y = 0.62;
+      body.castShadow = true;
+      this.mesh.add(body);
+
+      // Elevated Hardtop Roof & Cab
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.68, 2.2), tharBlack);
+      cab.position.set(0, 1.28, -0.35);
+      this.mesh.add(cab);
+
+      // Upright Flat Windshield
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.6, 0.06), glassMat);
+      windshield.position.set(0, 1.28, 0.76);
+      windshield.rotation.x = 0.22;
+      this.mesh.add(windshield);
+
+      // Iconic 7-Slot Vertical Slatted Thar Grille
+      const grilleBase = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.44, 0.08), bumperMat);
+      grilleBase.position.set(0, 0.64, 1.95);
+      this.mesh.add(grilleBase);
+
+      for (let s = -3; s <= 3; s++) {
+        const slot = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.32, 0.09), carbonMat);
+        slot.position.set(s * 0.16, 0.64, 1.96);
+        this.mesh.add(slot);
+      }
+
+      // Classic Round Rugged Headlights with Chrome Bezels
+      [-0.72, 0.72].forEach(hx => {
+        const roundLamp = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 16), headlampGlowMat);
+        roundLamp.rotation.x = Math.PI / 2;
+        roundLamp.position.set(hx, 0.64, 1.95);
+        this.mesh.add(roundLamp);
+      });
+
+      // Heavy-Duty Steel Off-Road Front Bumper with Tow Hooks
+      const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(2.25, 0.24, 0.35), bumperMat);
+      frontBumper.position.set(0, 0.38, 2.05);
+      this.mesh.add(frontBumper);
+
+      // Off-road snorkel on passenger A-pillar
+      const snorkel = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.1, 8), bumperMat);
+      snorkel.position.set(0.98, 1.25, 0.65);
+      const snorkelHead = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.16), bumperMat);
+      snorkelHead.position.set(0.98, 1.82, 0.7);
+      this.mesh.add(snorkel, snorkelHead);
+
+      // Rear Full-Size Tailgate Spare Wheel (5th Wheel)
+      const spareRim = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.26, 16), bumperMat);
+      spareRim.rotation.x = Math.PI / 2;
+      spareRim.position.set(0, 0.85, -2.05);
+      this.mesh.add(spareRim);
     }
 
     // High Performance Wheels with Red Brembo Brake Calipers
@@ -291,8 +506,9 @@ export class SportsCar {
       wheelGroup.position.set(wx, wy, wz);
 
       const isRear = wz < 0;
-      const radius = isRear ? 0.40 : 0.38;
-      const width = isRear ? 0.36 : 0.30;
+      const isThar = this.modelType === 'MAHINDRA_THAR_4X4';
+      const radius = isThar ? 0.45 : (isRear ? 0.40 : 0.38);
+      const width = isThar ? 0.38 : (isRear ? 0.36 : 0.30);
 
       const tire = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, width, 16), tireMat);
       tire.rotation.z = Math.PI / 2;
@@ -313,30 +529,12 @@ export class SportsCar {
       this.wheelMeshes.push(wheelGroup);
     });
 
-    // Dual Forward Spotlights for Night Driving
-    this.leftSpot = new THREE.SpotLight(0xffffff, 0, 75, Math.PI / 5, 0.25);
-    this.leftSpot.position.set(-0.75, 0.55, 2.3);
-    this.leftSpotTarget = new THREE.Object3D();
-    this.leftSpotTarget.position.set(-0.75, 0.1, 35);
-    this.mesh.add(this.leftSpot, this.leftSpotTarget);
-    this.leftSpot.target = this.leftSpotTarget;
-
-    this.rightSpot = new THREE.SpotLight(0xffffff, 0, 75, Math.PI / 5, 0.25);
-    this.rightSpot.position.set(0.75, 0.55, 2.3);
-    this.rightSpotTarget = new THREE.Object3D();
-    this.rightSpotTarget.position.set(0.75, 0.1, 35);
-    this.mesh.add(this.rightSpot, this.rightSpotTarget);
-    this.rightSpot.target = this.rightSpotTarget;
-
     this.mesh.userData = { vehicle: this };
     this.scene.add(this.mesh);
   }
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    const intensity = on ? 4.5 : 0;
-    this.leftSpot.intensity = intensity;
-    this.rightSpot.intensity = intensity;
   }
 
   update(dt, input, isPlayerControlling) {
@@ -349,7 +547,8 @@ export class SportsCar {
       const boost = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
 
       const throttle = forward - reverse;
-      const turnInput = steerLeft - steerRight;
+      // D / ArrowRight = +1 (Turn Right), A / ArrowLeft = -1 (Turn Left)
+      const turnInput = steerRight - steerLeft;
 
       const currentMax = boost ? this.boostMaxSpeed : this.maxSpeed;
 
@@ -378,9 +577,9 @@ export class SportsCar {
         this.currentSpeed *= Math.max(0, 1 - 2.5 * dt);
       }
 
-      // Steering
-      const targetSteer = -turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 14);
+      // Steering: razor-sharp supercar handling (Right = +steer, Left = -steer)
+      const targetSteer = turnInput * this.maxSteerAngle;
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 22);
 
       const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), (throttle !== 0) ? 3.0 : 0);
       if (effectiveSpeed > 0.1) {
@@ -395,9 +594,9 @@ export class SportsCar {
       const proposedX = this.position.x + fwdX * this.currentSpeed * dt;
       const proposedZ = this.position.z + fwdZ * this.currentSpeed * dt;
 
-      // Surface height check
+      // Surface height check: road level is at 0.04m to sit tires firmly on asphalt
       const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(proposedX, proposedZ, this.position.y) : 0;
-      this.position.y = surfaceHeight;
+      this.position.y = Math.max(0.04, surfaceHeight);
       this.pitch *= Math.max(0, 1 - 6 * dt);
 
       // Collision avoidance with obstacles

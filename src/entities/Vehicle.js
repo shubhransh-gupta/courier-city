@@ -169,21 +169,6 @@ export class Vehicle {
     rightHeadlight.rotation.y = 0.15;
     this.mesh.add(leftHeadlight, rightHeadlight);
 
-    // Headlight Spotlights
-    this.leftSpot = new THREE.SpotLight(0xfffa65, 0, 40, Math.PI / 5, 0.4, 1);
-    this.leftSpot.position.set(-0.72, 0.58, 2.2);
-    this.leftSpotTarget = new THREE.Object3D();
-    this.leftSpotTarget.position.set(-0.72, 0.1, 18);
-    this.mesh.add(this.leftSpot, this.leftSpotTarget);
-    this.leftSpot.target = this.leftSpotTarget;
-
-    this.rightSpot = new THREE.SpotLight(0xfffa65, 0, 40, Math.PI / 5, 0.4, 1);
-    this.rightSpot.position.set(0.72, 0.58, 2.2);
-    this.rightSpotTarget = new THREE.Object3D();
-    this.rightSpotTarget.position.set(0.72, 0.1, 18);
-    this.mesh.add(this.rightSpot, this.rightSpotTarget);
-    this.rightSpot.target = this.rightSpotTarget;
-
     // Taillight bar
     const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.06), tailLightMat);
     tailBar.position.set(0, 0.62, -2.21);
@@ -240,9 +225,6 @@ export class Vehicle {
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    const intensity = on ? 4.5 : 0;
-    this.leftSpot.intensity = intensity;
-    this.rightSpot.intensity = intensity;
   }
 
   update(dt, input, isPlayerControlling) {
@@ -279,10 +261,9 @@ export class Vehicle {
         this.currentSpeed *= Math.max(0, 1 - 3 * dt);
       }
 
-      // Steering
-      // Steering direction aligned with input: positive turnInput (right) → positive steer
+      // Steering: sharp, responsive arcade steering
       const targetSteer = turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 10);
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 18);
 
       // Always allow steering if the car has any throttle/brake input or motion!
       const isTryingToMove = (input.isDown('KeyW') || input.isDown('ArrowUp') || input.isDown('KeyS') || input.isDown('ArrowDown'));
@@ -341,14 +322,15 @@ export class Vehicle {
         this.verticalVelocity -= this.gravity * dt;
         this.position.y += this.verticalVelocity * dt;
 
-        if (this.position.y <= surfaceHeight) {
-          this.position.y = surfaceHeight;
+        const roadFloor = Math.max(0.04, surfaceHeight);
+        if (this.position.y <= roadFloor) {
+          this.position.y = roadFloor;
           this.verticalVelocity = 0;
           this.isAirborne = false;
           this.pitch = 0;
         }
       } else {
-        this.position.y = surfaceHeight;
+        this.position.y = Math.max(0.04, surfaceHeight);
         this.pitch *= Math.max(0, 1 - 6 * dt);
       }
 

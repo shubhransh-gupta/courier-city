@@ -313,6 +313,62 @@ export class AnimalWanderSystem {
       if (u.tail) {
         u.tail.rotation.z = Math.sin(totalTime * 3.5) * 0.25;
       }
+
+      // If animal was scattered by a vehicle, simulate flying + recovery
+      if (u.isScattered) {
+        u.scatterTimer = (u.scatterTimer || 0) + dt;
+        animal.position.x += u.scatterVX * dt;
+        animal.position.z += u.scatterVZ * dt;
+        animal.position.y = Math.max(0, u.scatterVY > 0 ? u.scatterVY * u.scatterTimer - 4.9 * u.scatterTimer * u.scatterTimer : 0);
+        animal.rotation.z += u.scatterSpin * dt;
+        u.scatterVX *= 0.92;
+        u.scatterVZ *= 0.92;
+        if (u.scatterTimer > 2.5) {
+          u.isScattered = false;
+          u.scatterTimer = 0;
+          u.walking = true;
+          animal.rotation.z = 0;
+          animal.position.y = 0;
+        }
+      }
+    });
+  }
+
+  // Called from main.js animate loop when player is driving
+  checkVehicleCollisions(vehicle) {
+    if (!vehicle || Math.abs(vehicle.currentSpeed || 0) < 4.0) return;
+
+    const vx = vehicle.position.x;
+    const vz = vehicle.position.z;
+    const spd = vehicle.currentSpeed || 8;
+    const fwdX = Math.sin(vehicle.yaw || 0);
+    const fwdZ = Math.cos(vehicle.yaw || 0);
+    const hitRadius = (vehicle.radius || 1.8) + 1.0;
+    const hitRadiusSq = hitRadius * hitRadius;
+
+    this.animals.forEach(animal => {
+      const u = animal.userData;
+      if (u.isScattered) return; // already scattered
+
+      const dx = animal.position.x - vx;
+      const dz = animal.position.z - vz;
+      if (dx * dx + dz * dz < hitRadiusSq) {
+        const dist = Math.max(0.1, Math.sqrt(dx * dx + dz * dz));
+        const impulseMag = Math.min(spd * 1.8, 18.0);
+        u.isScattered = true;
+        u.scatterTimer = 0;
+        u.scatterVX = (dx / dist) * impulseMag * 0.6 + fwdX * impulseMag * 0.4;
+        u.scatterVZ = (dz / dist) * impulseMag * 0.6 + fwdZ * impulseMag * 0.4;
+        u.scatterVY = impulseMag * 0.35;
+        u.scatterSpin = (Math.random() - 0.5) * 8.0;
+        u.walking = false;
+        // Reset position to base after 8s
+        setTimeout(() => {
+          animal.position.copy(u.basePos);
+          animal.rotation.set(0, animal.rotation.y, 0);
+          u.walking = Math.random() > 0.3;
+        }, 8000);
+      }
     });
   }
 }

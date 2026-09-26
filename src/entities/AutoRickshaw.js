@@ -247,15 +247,6 @@ export class AutoRickshaw {
       this.mesh.add(ind);
     });
 
-    // SpotLight for Night Driving
-    this.spotLight = new THREE.SpotLight(0xfffa65, 0, 50, Math.PI / 5, 0.35);
-    this.spotLight.position.set(0, 0.74, 1.5);
-    this.spotLightTarget = new THREE.Object3D();
-    this.spotLightTarget.position.set(0, 0.1, 25);
-    this.mesh.add(this.spotLightTarget);
-    this.spotLight.target = this.spotLightTarget;
-    this.mesh.add(this.spotLight);
-
     // Taillights
     [-0.64, 0.64].forEach(tx => {
       const tail = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.06), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
@@ -309,9 +300,6 @@ export class AutoRickshaw {
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    if (this.spotLight) {
-      this.spotLight.intensity = on ? 3.0 : 0;
-    }
   }
 
   update(dt, input, isPlayerControlling) {
@@ -324,7 +312,8 @@ export class AutoRickshaw {
       const boost = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
 
       const throttle = forward - reverse;
-      const turnInput = steerLeft - steerRight;
+      // D / ArrowRight = +1 (Right), A / ArrowLeft = -1 (Left)
+      const turnInput = steerRight - steerLeft;
 
       const currentMax = boost ? this.boostMaxSpeed : this.maxSpeed;
 
@@ -352,9 +341,9 @@ export class AutoRickshaw {
         this.currentSpeed *= Math.max(0, 1 - 4.5 * dt);
       }
 
-      // Steering & Fork Pivot
-      const targetSteer = -turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 12);
+      // Steering & Fork Pivot: agile Bengaluru 3-wheeler turning (Right = +steer, Left = -steer)
+      const targetSteer = turnInput * this.maxSteerAngle;
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 20);
       if (this.frontFork) {
         this.frontFork.rotation.y = this.steerAngle;
       }
@@ -372,9 +361,9 @@ export class AutoRickshaw {
       const proposedX = this.position.x + fwdX * this.currentSpeed * dt;
       const proposedZ = this.position.z + fwdZ * this.currentSpeed * dt;
 
-      // Surface height check
+      // Surface height check: road level is at 0.04m
       const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(proposedX, proposedZ, this.position.y) : 0;
-      this.position.y = surfaceHeight;
+      this.position.y = Math.max(0.04, surfaceHeight);
       this.pitch *= Math.max(0, 1 - 6 * dt);
 
       // Collision avoidance with obstacles

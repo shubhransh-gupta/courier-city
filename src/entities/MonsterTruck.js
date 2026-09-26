@@ -203,30 +203,12 @@ export class MonsterTruck {
       this.wheelMeshes.push(wheelGroup);
     });
 
-    // Heavy Spotlights
-    this.leftSpot = new THREE.SpotLight(0xffffff, 0, 80, Math.PI / 4, 0.3);
-    this.leftSpot.position.set(-0.8, 1.5, 2.3);
-    this.leftSpotTarget = new THREE.Object3D();
-    this.leftSpotTarget.position.set(-0.8, 0.1, 35);
-    this.mesh.add(this.leftSpot, this.leftSpotTarget);
-    this.leftSpot.target = this.leftSpotTarget;
-
-    this.rightSpot = new THREE.SpotLight(0xffffff, 0, 80, Math.PI / 4, 0.3);
-    this.rightSpot.position.set(0.8, 1.5, 2.3);
-    this.rightSpotTarget = new THREE.Object3D();
-    this.rightSpotTarget.position.set(0.8, 0.1, 35);
-    this.mesh.add(this.rightSpot, this.rightSpotTarget);
-    this.rightSpot.target = this.rightSpotTarget;
-
     this.mesh.userData = { vehicle: this };
     this.scene.add(this.mesh);
   }
 
   setHeadlights(on) {
     this.headlightsOn = on;
-    const intensity = on ? 5.0 : 0;
-    this.leftSpot.intensity = intensity;
-    this.rightSpot.intensity = intensity;
   }
 
   update(dt, input, isPlayerControlling) {
@@ -239,7 +221,8 @@ export class MonsterTruck {
       const boost = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
 
       const throttle = forward - reverse;
-      const turnInput = steerLeft - steerRight;
+      // D / ArrowRight = +1 (Right), A / ArrowLeft = -1 (Left)
+      const turnInput = steerRight - steerLeft;
 
       const currentMax = boost ? this.boostMaxSpeed : this.maxSpeed;
 
@@ -267,9 +250,9 @@ export class MonsterTruck {
         this.currentSpeed *= Math.max(0, 1 - 3 * dt);
       }
 
-      // Steering
-      const targetSteer = -turnInput * this.maxSteerAngle;
-      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 10);
+      // Steering: high-torque 4x4 steering (Right = +steer, Left = -steer)
+      const targetSteer = turnInput * this.maxSteerAngle;
+      this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 18);
 
       const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), (throttle !== 0) ? 3.0 : 0);
       if (effectiveSpeed > 0.1) {
@@ -284,9 +267,9 @@ export class MonsterTruck {
       const proposedX = this.position.x + fwdX * this.currentSpeed * dt;
       const proposedZ = this.position.z + fwdZ * this.currentSpeed * dt;
 
-      // Surface height check
+      // Surface height check: road level is at 0.04m
       const surfaceHeight = this.physicsWorld.getSurfaceHeight ? this.physicsWorld.getSurfaceHeight(proposedX, proposedZ, this.position.y) : 0;
-      this.position.y = surfaceHeight;
+      this.position.y = Math.max(0.04, surfaceHeight);
       this.pitch *= Math.max(0, 1 - 6 * dt);
 
       // Collision avoidance

@@ -27,7 +27,77 @@ export class CityBuilder {
     this.observationElevators = [];
 
     this.initMaterials();
+
+    // ── Global building height limiter ───────────────────────────────────
+    // All landmark / building geometry is added into this group.
+    // Scaling it on Y = 0.38 makes even 90m structures appear ≤ 34m,
+    // keeping them in the camera's comfortable view range without needing
+    // to rewrite every individual height value in 5000+ lines of code.
+    this.buildingGroup = new THREE.Group();
+    this.buildingGroup.scale.y = 0.38;
+    this.scene.add(this.buildingGroup);
+    // ─────────────────────────────────────────────────────────────────────
+
     this.buildWorld();
+  }
+
+  // Helper called by all landmark/building methods to add scaled objects
+  _sb(obj) { this.buildingGroup.add(obj); }
+
+  buildWorld() {
+    // Ground, roads, river – added directly to scene (NOT height-scaled)
+    this.createLandscapeAndRiver();
+    this.createHimalayanMountains();
+    this.createRoadNetwork();
+    this.createAirportRunwayAndHelipad();
+
+    // ── Monkey-patch scene.add → this.buildingGroup.add for all landmarks ──
+    // This means every mesh created inside landmark methods automatically goes
+    // into the height-scaled group. Ground/roads above were already added.
+    const _origAdd = this.scene.add.bind(this.scene);
+    this.scene.add = (...args) => this.buildingGroup.add(...args);
+
+    this.createYetiAndPolarBears();
+    this.createCityZoo();
+    this.createBankAndSchoolDistricts();
+    this.createGasStationAndHospital();
+
+    // Dispersed iconic global & Indian landmarks across 1200m
+    this.buildIndiaGate();
+    this.buildTajMahal();
+    this.buildRedFort();
+    this.buildRashtrapatiBhavan();
+    this.buildEiffelTower();
+    this.buildStatueOfLiberty();
+
+    this.createNightclubDistrict();
+    this.buildIndianNationalFlag();
+    this.buildBdaParks();
+    this.buildBdaComplexes();
+    this.buildRoadRoundaboutsChorahas();
+    this.buildBangaloreColleges();
+    this.buildBnmInstitute();
+    this.buildKumaraswamyLayout();
+    this.buildFoundersBuildingStarkTower();
+    this.buildHinduTemples();
+    this.buildIndianAirForceHQ();
+    this.buildIndianArmyHQ();
+    this.buildVidhanaSoudha();
+    this.buildUBCity();
+    this.buildOrionMall();
+    this.buildLalbaghGardens();
+    this.buildNandiHills();
+    this.buildTownHall();
+    this.createBangaloreDistricts();
+    this.createCityVegetation();
+    this.buildTipuSultanSummerPalace();
+    this.buildMysorePalace();
+    this.buildVvPuramFoodStreet();
+    this.buildRussellMarketAndCommercialStreet();
+    this.createJumpRamps();
+
+    // Restore original scene.add
+    this.scene.add = _origAdd;
   }
 
   initMaterials() {
@@ -86,52 +156,6 @@ export class CityBuilder {
       lampPost: new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.8 }),
       lampGlow: new THREE.MeshBasicMaterial({ color: 0xfef08a })
     };
-  }
-
-  buildWorld() {
-    this.createLandscapeAndRiver();
-    this.createHimalayanMountains();
-    this.createYetiAndPolarBears();
-    this.createCityZoo();
-    this.createBankAndSchoolDistricts();
-    this.createGasStationAndHospital();
-    this.createRoadNetwork();
-    this.createAirportRunwayAndHelipad();
-
-    // Dispersed iconic global & Indian landmarks across 1200m
-    this.buildIndiaGate();          // Central Ceremonial Axis (0, -140)
-    this.buildTajMahal();           // East Riverfront (320, -180)
-    this.buildRedFort();           // North-West Citadel (-320, -260)
-    this.buildRashtrapatiBhavan();  // South-West Palace (-340, 240)
-    this.buildEiffelTower();        // South-East Champ de Mars (180, 260)
-    this.buildStatueOfLiberty();    // Far-East Liberty Island (440, 80)
-
-    this.createNightclubDistrict(); // Neon Nightclub & Rooftop Lounge (-80, -60)
-    this.buildIndianNationalFlag(); // Monumental 55m Tiranga in Central Plaza (0, -20)
-    this.buildBdaParks();           // BDA Public Parks in HSR, Koramangala & Indiranagar
-    this.buildBdaComplexes();       // BDA Commercial Shopping Complexes (HSR & Koramangala)
-    this.buildRoadRoundaboutsChorahas(); // Grand roundabouts/chorahas with Kamal (Lotus) monuments
-    this.buildBangaloreColleges();  // BMS College of Engineering & IISc Heritage Campus
-    this.buildBnmInstitute();       // BNM Institute of Technology (BNMIT) in South Bangalore (-140, 160)
-    this.buildKumaraswamyLayout();  // Kumaraswamy Layout Civic District & Viewpoint (-200, 180)
-    this.buildFoundersBuildingStarkTower(); // Unique Stark Tower Design in BTM Layout (-70, 130)
-    this.buildHinduTemples();       // Sri Someshwara Rajagopuram, Bull Temple & ISKCON
-    this.buildIndianAirForceHQ();   // IAF HQ Training Command with fighter jet monument (180, -240)
-    this.buildIndianArmyHQ();       // Indian Army Cantonment HQ with battle tank monument (-180, 220)
-    this.buildVidhanaSoudha();      // Majestic Karnataka State Legislature (-240, -40)
-    this.buildUBCity();             // UB City Tower & Luxury Amphitheatre (-60, -100)
-    this.buildOrionMall();          // Orion Mall & World Trade Center Bangalore (240, 320)
-    this.buildLalbaghGardens();     // Lalbagh Glass House & Kempegowda Tower (-140, 280)
-    this.buildNandiHills();         // Nandi Hills Ghats & Sunrise Viewpoint (440, -460)
-    this.buildTownHall();           // Bangalore Town Hall (40, 200)
-    this.createBangaloreDistricts(); // Koramangala, HSR, BTM & Auto-rickshaw stands
-    this.createCityVegetation();    // 350+ multi-species trees, parks & street props
-    this.buildTipuSultanSummerPalace();
-    this.buildMysorePalace();
-    this.buildVvPuramFoodStreet();
-    this.buildRussellMarketAndCommercialStreet();
-
-    this.createJumpRamps();
   }
 
   createLandscapeAndRiver() {
@@ -605,16 +629,16 @@ export class CityBuilder {
   }
 
   createRoadNetwork() {
-    // Upgraded from 2-lane (16m) to spacious 4-lane grand boulevard (28m wide)
-    const highwayW = 28;
+    // Upgraded to spacious 6-lane grand expressway & boulevard network (38m wide)
+    const highwayW = 38;
     const len = 1100;
 
-    // North-South Central Spine (4 lanes)
+    // North-South Central Spine (6 lanes: 3 in each direction)
     this.addHighway(0, 0, highwayW, len, 0);
-    // East-West Grand Arterial (4 lanes)
+    // East-West Grand Arterial (6 lanes: 3 in each direction)
     this.addHighway(0, 0, len, highwayW, 0);
 
-    // Regional connecting 4-lane arterial routes
+    // Regional connecting 6-lane arterial routes
     this.addHighway(-200, 0, highwayW, len, 0);
     this.addHighway(200, 0, highwayW, len, 0);
     this.addHighway(0, -200, len, highwayW, 0);
@@ -626,7 +650,7 @@ export class CityBuilder {
     group.position.set(x, 0.04, z);
     group.rotation.y = rotY;
 
-    // Broad 4-lane asphalt roadbed
+    // Broad 6-lane asphalt roadbed (38m wide)
     const road = new THREE.Mesh(new THREE.PlaneGeometry(width, length), this.materials.road);
     road.rotation.x = -Math.PI / 2;
     road.receiveShadow = true;
@@ -641,20 +665,20 @@ export class CityBuilder {
     const centerLine1 = new THREE.Mesh(centerLineGeo, this.materials.roadMarking);
     centerLine1.rotation.x = -Math.PI / 2;
     centerLine1.position.y = 0.007;
-    if (isHorizontal) centerLine1.position.z = -0.25;
-    else centerLine1.position.x = -0.25;
+    if (isHorizontal) centerLine1.position.z = -0.35;
+    else centerLine1.position.x = -0.35;
 
     const centerLine2 = new THREE.Mesh(centerLineGeo, this.materials.roadMarking);
     centerLine2.rotation.x = -Math.PI / 2;
     centerLine2.position.y = 0.007;
-    if (isHorizontal) centerLine2.position.z = 0.25;
-    else centerLine2.position.x = 0.25;
+    if (isHorizontal) centerLine2.position.z = 0.35;
+    else centerLine2.position.x = 0.35;
     group.add(centerLine1, centerLine2);
 
-    // Dashed white lane dividers separating the 2 lanes in each direction
-    // Width is 28m -> lane offsets at ±6.5m from center
+    // Dashed white lane dividers separating the 3 lanes in each direction (6 lanes total)
+    // Width is 38m -> lanes per direction separated at ±6.0m and ±12.0m from center
     const dashGeo = isHorizontal ? new THREE.PlaneGeometry(4.5, 0.35) : new THREE.PlaneGeometry(0.35, 4.5);
-    const laneOffsets = [-6.5, 6.5];
+    const laneOffsets = [-12.0, -6.0, 6.0, 12.0];
 
     laneOffsets.forEach(offset => {
       for (let i = -count / 2; i <= count / 2; i++) {
@@ -672,8 +696,8 @@ export class CityBuilder {
       }
     });
 
-    // Solid white outer road boundary lines (at ±12.8m)
-    const edgeOffsets = [-12.8, 12.8];
+    // Solid white outer road boundary lines (at ±17.5m)
+    const edgeOffsets = [-17.5, 17.5];
     const edgeLineGeo = isHorizontal ? new THREE.PlaneGeometry(roadLen, 0.3) : new THREE.PlaneGeometry(0.3, roadLen);
     edgeOffsets.forEach(edgeOff => {
       const edgeLine = new THREE.Mesh(edgeLineGeo, this.materials.roadWhite);
@@ -1329,10 +1353,10 @@ export class CityBuilder {
   // (BDA Parks, BDA Complexes, Colleges, Hindu Temples, Flag, IAF & Army HQ)
   // ========================================================
 
-  // A. MONUMENTAL 55M INDIAN NATIONAL FLAG (Central Plaza: 0, -20)
+  // A. MONUMENTAL 55M INDIAN NATIONAL FLAG (Central Plaza West Promenade: -36, 0)
   buildIndianNationalFlag() {
     const group = new THREE.Group();
-    group.position.set(0, 0, -20);
+    group.position.set(-36, 0, 0);
 
     // 1. Grand tiered octagonal polished granite base
     const plinthGeo = new THREE.CylinderGeometry(8.5, 9.5, 1.2, 8);
@@ -1451,12 +1475,12 @@ export class CityBuilder {
     group.add(flameLight);
 
     // Ground High-Powered Floodlight illuminating the Tiranga
-    const flagFlood = new THREE.PointLight(0xffffff, 3.0, 75);
+    const flagFlood = new THREE.PointLight(0xffffff, 3.0, 28);
     flagFlood.position.set(0, 4.0, 0);
     group.add(flagFlood);
 
     this.scene.add(group);
-    this.physicsWorld.addStaticBox(0, 1.0, -20, 8.5, 1.0, 8.5);
+    this.physicsWorld.addStaticBox(-36, 1.0, 0, 8.5, 1.0, 8.5);
   }
 
   // B. BDA PUBLIC PARKS (Bangalore Development Authority Parks)
@@ -2372,12 +2396,12 @@ export class CityBuilder {
       cabin.position.set(wx, 13.6, 32);
       armyGroup.add(cabin);
 
-      // Searchlight on sentry tower
-      const searchlight = new THREE.SpotLight(0xfef08a, 3.0, 50, Math.PI / 5, 0.4);
-      searchlight.position.set(wx, 14, 32);
-      searchlight.target.position.set(wx, 0, 10);
-      armyGroup.add(searchlight);
-      armyGroup.add(searchlight.target);
+      // Searchlight lantern lens on sentry tower (emissive mesh, zero dynamic light uniform overhead)
+      const lanternMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+      const searchlightLens = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.4, 12), lanternMat);
+      searchlightLens.position.set(wx, 14, 32);
+      searchlightLens.rotation.x = Math.PI / 4;
+      armyGroup.add(searchlightLens);
     });
 
     // 2. Army Garrison Command & Barracks Building (50m wide x 15m tall x 22m deep)
@@ -3302,8 +3326,24 @@ export class CityBuilder {
         const tx = zone.cx + Math.cos(angle) * dist;
         const tz = zone.cz + Math.sin(angle) * dist;
 
-        // Skip planting on central road lanes (x near 0, z near 0, etc.)
-        if (Math.abs(tx) < 14 || Math.abs(tz) < 14) continue;
+        // Strict clearance: Never plant trees on 6-lane roads or inside 48m roundabouts
+        const roadXs = [0, -200, 200];
+        const roadZs = [0, -200, 200];
+        const halfRoadBuffer = 21.5; // 38m road (19m half-width) + curb buffer
+        const onAnyRoad = roadXs.some(rx => Math.abs(tx - rx) < halfRoadBuffer) ||
+                          roadZs.some(rz => Math.abs(tz - rz) < halfRoadBuffer);
+        if (onAnyRoad) continue;
+
+        // Skip inside roundabouts (50m radius around chorahas)
+        const insideRoundabout = roadXs.some(rx =>
+          roadZs.some(rz => {
+            const dx = tx - rx;
+            const dz = tz - rz;
+            return (dx * dx + dz * dz) < 2500;
+          })
+        );
+        if (insideRoundabout) continue;
+
         // Skip airport runway
         if (tx > 140 && tx < 450 && tz < -260) continue;
 
@@ -3358,7 +3398,6 @@ export class CityBuilder {
 
     const crown2 = new THREE.Mesh(new THREE.SphereGeometry(1.8, 7, 7), this.materials.oakLeaf);
     crown2.position.set(0.6, 6.2, 0.3);
-    crown2.castShadow = true;
     group.add(crown2);
 
     this.scene.add(group);
@@ -3385,7 +3424,6 @@ export class CityBuilder {
 
     const crownTop = new THREE.Mesh(new THREE.DodecahedronGeometry(1.6, 1), this.materials.mapleLeafTop);
     crownTop.position.set(0.3, 6.0, -0.2);
-    crownTop.castShadow = true;
     group.add(crownTop);
 
     this.scene.add(group);
@@ -3414,7 +3452,6 @@ export class CityBuilder {
 
     const c2 = new THREE.Mesh(new THREE.SphereGeometry(1.6, 7, 7), this.materials.sakuraLeaf2);
     c2.position.set(-0.4, 5.5, 0.4);
-    c2.castShadow = true;
     group.add(c2);
 
     this.scene.add(group);
@@ -3441,12 +3478,10 @@ export class CityBuilder {
 
     const tier2 = new THREE.Mesh(new THREE.ConeGeometry(1.8, 2.8, 7), this.materials.pineLeaf);
     tier2.position.y = 6.2;
-    tier2.castShadow = true;
     group.add(tier2);
 
     const tier3 = new THREE.Mesh(new THREE.ConeGeometry(1.2, 2.2, 7), this.materials.pineLeaf);
     tier3.position.y = 7.8;
-    tier3.castShadow = true;
     group.add(tier3);
 
     this.scene.add(group);
@@ -3505,12 +3540,12 @@ export class CityBuilder {
     const postMat = this.materials.lampPost;
     const lampGlowMat = this.materials.lampGlow;
 
-    // Modern Street Lamps along Major Intersections
+    // Modern Street Lamps along Major Intersections (placed on the sidewalk curb at ±20.8m)
     const lampCoords = [
-      [-12, -90], [12, -90], [-12, -40], [12, -40],
-      [-12, 40], [12, 40], [-12, 90], [12, 90],
-      [-90, -12], [-90, 12], [-40, -12], [-40, 12],
-      [40, -12], [40, 12], [90, -12], [90, 12]
+      [-20.8, -90], [20.8, -90], [-20.8, -40], [20.8, -40],
+      [-20.8, 40], [20.8, 40], [-20.8, 90], [20.8, 90],
+      [-90, -20.8], [-90, 20.8], [-40, -20.8], [-40, 20.8],
+      [40, -20.8], [40, 20.8], [90, -20.8], [90, 20.8]
     ];
 
     lampCoords.forEach(([lx, lz]) => {
@@ -3532,11 +3567,11 @@ export class CityBuilder {
       this.scene.add(lamp);
     });
 
-    // Park Benches in Central Boulevard Plaza
+    // Park Benches in Central Boulevard Plaza (placed on outer pedestrian promenade at ±21.5m)
     const benchWood = this.materials.benchWood;
     const benchIron = this.materials.benchIron;
     for (let bz = -70; bz <= 70; bz += 28) {
-      [-15, 15].forEach((bx) => {
+      [-21.5, 21.5].forEach((bx) => {
         const bench = new THREE.Group();
         bench.position.set(bx, 0, bz);
         bench.rotation.y = bx > 0 ? -Math.PI / 2 : Math.PI / 2;
@@ -3800,16 +3835,16 @@ export class CityBuilder {
       }
     });
 
-    // 2. Highway Entrance Gantry on West Arterial Road (x = -200, z = -40 => relative x = 40)
+    // 2. Highway Entrance Gantry on West Sidewalk of Arterial Road (world x = -221, z = -26 => relative x = 19)
     const gantryPillarMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
     const gPillarL = new THREE.Mesh(new THREE.BoxGeometry(1.2, 8.5, 1.2), gantryPillarMat);
-    gPillarL.position.set(40, 4.25, 14 - 15);
+    gPillarL.position.set(19, 4.25, 14 - 14); // world x = -221, z = -40
     const gPillarR = new THREE.Mesh(new THREE.BoxGeometry(1.2, 8.5, 1.2), gantryPillarMat);
-    gPillarR.position.set(40, 4.25, 14 + 15);
+    gPillarR.position.set(19, 4.25, 14 + 14); // world x = -221, z = -12
     soudhaGroup.add(gPillarL, gPillarR);
 
-    const gCrossbeam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.2, 31), gantryPillarMat);
-    gCrossbeam.position.set(40, 8.5, 14);
+    const gCrossbeam = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.2, 29.2), gantryPillarMat);
+    gCrossbeam.position.set(19, 8.5, 14);
     soudhaGroup.add(gCrossbeam);
 
     // Illuminated Highway Directional Signboard
@@ -3834,7 +3869,7 @@ export class CityBuilder {
       new THREE.PlaneGeometry(18, 3.2),
       new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gantryCanvas), side: THREE.DoubleSide })
     );
-    gantrySignMesh.position.set(40, 8.5, 14);
+    gantrySignMesh.position.set(19, 8.5, 14);
     gantrySignMesh.rotation.y = Math.PI / 2;
     soudhaGroup.add(gantrySignMesh);
 
@@ -3949,8 +3984,8 @@ export class CityBuilder {
 
     this.scene.add(soudhaGroup);
     this.physicsWorld.addStaticBox(-240, 12, -44, 45, 12, 18);
-    this.physicsWorld.addStaticBox(-200, 4.25, -26, 1.2, 4.25, 1.2);
-    this.physicsWorld.addStaticBox(-200, 4.25, -54, 1.2, 4.25, 1.2);
+    this.physicsWorld.addStaticBox(-221, 4.25, -40, 1.2, 4.25, 1.2);
+    this.physicsWorld.addStaticBox(-221, 4.25, -12, 1.2, 4.25, 1.2);
   }
 
   // ========================================================
@@ -4048,7 +4083,7 @@ export class CityBuilder {
   // ========================================================
   buildOrionMall() {
     const mallGroup = new THREE.Group();
-    mallGroup.position.set(240, 0, 320);
+    mallGroup.position.set(275, 0, 320);
 
     const mallGlass = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.15, metalness: 0.85 });
     const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
@@ -4107,8 +4142,8 @@ export class CityBuilder {
     mallGroup.add(boardwalk);
 
     this.scene.add(mallGroup);
-    this.physicsWorld.addStaticBox(240, 9, 320, 31, 9, 19);
-    this.physicsWorld.addStaticBox(240 - 36, 46, 320, 12, 46, 12);
+    this.physicsWorld.addStaticBox(275, 9, 320, 31, 9, 19);
+    this.physicsWorld.addStaticBox(275 - 36, 46, 320, 12, 46, 12);
   }
 
   // ========================================================
@@ -4304,11 +4339,11 @@ export class CityBuilder {
   }
 
   // ========================================================
-  // 21. SIR K.P. PUTTANNA CHETTY TOWN HALL (40, 200)
+  // 21. SIR K.P. PUTTANNA CHETTY TOWN HALL (60, 248)
   // ========================================================
   buildTownHall() {
     const thGroup = new THREE.Group();
-    thGroup.position.set(40, 0, 200);
+    thGroup.position.set(60, 0, 248);
 
     const stoneMat = new THREE.MeshStandardMaterial({ color: 0xf5ebe0, roughness: 0.65 });
     const redTile = new THREE.MeshStandardMaterial({ color: 0xa83232, roughness: 0.7 });
@@ -4359,7 +4394,7 @@ export class CityBuilder {
     thGroup.add(thMesh);
 
     this.scene.add(thGroup);
-    this.physicsWorld.addStaticBox(40, 7, 200, 22, 7, 14);
+    this.physicsWorld.addStaticBox(60, 7, 248, 22, 7, 14);
   }
 
   // ========================================================
@@ -4487,26 +4522,26 @@ export class CityBuilder {
     const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.85 });
 
     const statueConfigs = [
-      // Kempegowda Statue — founder of Bangalore
-      { name: 'Kempegowda', pos: [0, 0, -20], height: 8, baseMat: stoneMat, figureMat: bronzeMat, sword: true },
+      // Kempegowda Statue — founder of Bangalore (Central Plaza Promenade lawn)
+      { name: 'Kempegowda', pos: [-36, 0, 24], height: 8, baseMat: stoneMat, figureMat: bronzeMat, sword: true },
       // Tipu Sultan — Tiger of Mysore
       { name: 'Tipu Sultan', pos: [-160, 0, -120], height: 7, baseMat: stoneMat, figureMat: bronzeMat, sword: true },
-      // Mahatma Gandhi — Father of the Nation
-      { name: 'Mahatma Gandhi', pos: [40, 0, 200], height: 6.5, baseMat: marbleMat, figureMat: bronzeMat, staff: true },
+      // Mahatma Gandhi — Father of the Nation (Town Hall Forecourt)
+      { name: 'Mahatma Gandhi', pos: [60, 0, 235], height: 6.5, baseMat: marbleMat, figureMat: bronzeMat, staff: true },
       // Sir M. Visvesvaraya — Engineer Statesman
       { name: 'Sir M. Visvesvaraya', pos: [-240, 0, -40], height: 7, baseMat: stoneMat, figureMat: bronzeMat },
       // Swami Vivekananda — Spiritual Leader
       { name: 'Swami Vivekananda', pos: [100, 0, -80], height: 7.5, baseMat: marbleMat, figureMat: bronzeMat },
       // Dr. B.R. Ambedkar — Architect of Constitution
       { name: 'Dr. B.R. Ambedkar', pos: [-80, 0, -160], height: 7, baseMat: stoneMat, figureMat: bronzeMat },
-      // Subhas Chandra Bose — Freedom Fighter
-      { name: 'Subhas Chandra Bose', pos: [180, 0, 100], height: 7, baseMat: stoneMat, figureMat: bronzeMat, sword: true },
+      // Subhas Chandra Bose — Freedom Fighter (BDA Park Garden)
+      { name: 'Subhas Chandra Bose', pos: [160, 0, 100], height: 7, baseMat: stoneMat, figureMat: bronzeMat, sword: true },
       // Queen Victoria (colonial era statue preserved in Cubbon Park)
       { name: 'Queen Victoria', pos: [-140, 0, 280], height: 6, baseMat: marbleMat, figureMat: marbleMat },
       // Mark Cubbon — Commissioner of Mysore
       { name: 'Mark Cubbon', pos: [-100, 0, 250], height: 5.5, baseMat: stoneMat, figureMat: bronzeMat },
-      // Basaveshwara — 12th century philosopher
-      { name: 'Basaveshwara', pos: [60, 0, -200], height: 8, baseMat: stoneMat, figureMat: bronzeMat },
+      // Basaveshwara — 12th century philosopher (Vidhana Soudha North Gardens)
+      { name: 'Basaveshwara', pos: [60, 0, -245], height: 8, baseMat: stoneMat, figureMat: bronzeMat },
       // Nandi Bull — Sacred Bull of Shiva (near Nandi Hills approach)
       { name: 'Nandi Bull', pos: [400, 0, -420], height: 5, baseMat: stoneMat, figureMat: goldMat, isBull: true },
     ];
@@ -4687,28 +4722,43 @@ export class CityBuilder {
       const group = new THREE.Group();
       group.position.set(pt.x, 0, pt.z);
 
-      // 1. Broad Circular Road Asphalt Apron for the Roundabout (Radius 22m)
-      const roadGeo = new THREE.CircleGeometry(28, 36);
+      // 1. Broad Circular Road Asphalt Apron for the Roundabout (Radius 48m, giving 36m wide circular roadway!)
+      const roadGeo = new THREE.CircleGeometry(48, 48);
       const roadMesh = new THREE.Mesh(roadGeo, roadCircMat);
       roadMesh.rotation.x = -Math.PI / 2;
       roadMesh.position.y = 0.045;
       roadMesh.receiveShadow = true;
       group.add(roadMesh);
 
-      // Outer White Dashed Guidance Ring
-      const ringDashGeo = new THREE.RingGeometry(26.5, 27.2, 36);
-      const ringDash = new THREE.Mesh(ringDashGeo, this.materials.roadWhite);
-      ringDash.rotation.x = -Math.PI / 2;
-      ringDash.position.y = 0.05;
-      group.add(ringDash);
+      // Multi-lane Roundabout Circular Guidance Rings
+      // Inner Lane Ring (Radius ~23m)
+      const ringInnerGeo = new THREE.RingGeometry(22.6, 23.3, 48);
+      const ringInner = new THREE.Mesh(ringInnerGeo, this.materials.roadWhite);
+      ringInner.rotation.x = -Math.PI / 2;
+      ringInner.position.y = 0.05;
+      group.add(ringInner);
 
-      // 2. Raised Central Island Curb & Lawn (Radius 9m)
-      const islandCurb = new THREE.Mesh(new THREE.CylinderGeometry(9.0, 9.4, 0.5, 32), curbMat);
+      // Middle Lane Ring (Radius ~34m)
+      const ringMidGeo = new THREE.RingGeometry(33.6, 34.3, 48);
+      const ringMid = new THREE.Mesh(ringMidGeo, this.materials.roadWhite);
+      ringMid.rotation.x = -Math.PI / 2;
+      ringMid.position.y = 0.05;
+      group.add(ringMid);
+
+      // Outer Shoulder Boundary Ring (Radius ~47m)
+      const ringOuterGeo = new THREE.RingGeometry(46.8, 47.5, 48);
+      const ringOuter = new THREE.Mesh(ringOuterGeo, this.materials.roadWhite);
+      ringOuter.rotation.x = -Math.PI / 2;
+      ringOuter.position.y = 0.05;
+      group.add(ringOuter);
+
+      // 2. Raised Central Island Curb & Lawn (Radius 11.5m)
+      const islandCurb = new THREE.Mesh(new THREE.CylinderGeometry(11.5, 12.0, 0.5, 36), curbMat);
       islandCurb.position.y = 0.25;
       islandCurb.receiveShadow = true;
       group.add(islandCurb);
 
-      const islandLawn = new THREE.Mesh(new THREE.CircleGeometry(8.9, 32), lawnMat);
+      const islandLawn = new THREE.Mesh(new THREE.CircleGeometry(11.4, 36), lawnMat);
       islandLawn.rotation.x = -Math.PI / 2;
       islandLawn.position.y = 0.51;
       group.add(islandLawn);
@@ -5036,12 +5086,12 @@ export class CityBuilder {
     group.add(mast);
 
     // Blinking red aviation warning light on spire
-    const spireLight = new THREE.PointLight(0xff0000, 3.0, 40);
+    const spireLight = new THREE.PointLight(0xff0000, 3.0, 22);
     spireLight.position.set(2, 118, -2);
     group.add(spireLight);
 
     // Glowing Arc Reactor Core Beacon at top
-    const reactorLight = new THREE.PointLight(0x06b6d4, 4.5, 45);
+    const reactorLight = new THREE.PointLight(0x06b6d4, 4.5, 22);
     reactorLight.position.set(0, 91, 14);
     group.add(reactorLight);
 
@@ -5094,7 +5144,7 @@ export class CityBuilder {
 
 
   buildTipuSultanSummerPalace() {
-    const px = -160;
+    const px = -140;
     const pz = -80;
     const group = new THREE.Group();
     group.position.set(px, 0, pz);
@@ -5315,7 +5365,7 @@ export class CityBuilder {
 
   buildVvPuramFoodStreet() {
     const fx = -40;
-    const fz = 220;
+    const fz = 255;
     const group = new THREE.Group();
     group.position.set(fx, 0, fz);
 

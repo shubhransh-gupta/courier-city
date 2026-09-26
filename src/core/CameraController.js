@@ -46,7 +46,7 @@ export class CameraController {
 
   initInputListeners() {
     window.addEventListener('mousedown', (e) => {
-      if (e.target.tagName === 'CANVAS') {
+      if (e.target === this.domElement) {
         this.isDragging = true;
         this.lastMouseX = e.clientX;
         this.lastMouseY = e.clientY;
@@ -80,15 +80,15 @@ export class CameraController {
       this.targetDistance = Math.max(6.0, Math.min(50.0, this.targetDistance + e.deltaY * 0.015));
     }, { passive: true });
 
-    // Keyboard controls
+    // Keyboard controls (KeyI, KeyK, KeyJ, KeyL for camera orbit, Arrow keys reserved for vehicle driving!)
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowUp' || e.code === 'KeyI') {
+      if (e.code === 'KeyI') {
         this.keys.up = true;
-      } else if (e.code === 'ArrowDown' || e.code === 'KeyK') {
+      } else if (e.code === 'KeyK') {
         this.keys.down = true;
-      } else if (e.code === 'ArrowLeft' || e.code === 'KeyJ') {
+      } else if (e.code === 'KeyJ') {
         this.keys.left = true;
-      } else if (e.code === 'ArrowRight' || e.code === 'KeyL') {
+      } else if (e.code === 'KeyL') {
         this.keys.right = true;
       } else if (e.code === 'KeyV') {
         this.toggleViewMode();
@@ -96,13 +96,13 @@ export class CameraController {
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowUp' || e.code === 'KeyI') {
+      if (e.code === 'KeyI') {
         this.keys.up = false;
-      } else if (e.code === 'ArrowDown' || e.code === 'KeyK') {
+      } else if (e.code === 'KeyK') {
         this.keys.down = false;
-      } else if (e.code === 'ArrowLeft' || e.code === 'KeyJ') {
+      } else if (e.code === 'KeyJ') {
         this.keys.left = false;
-      } else if (e.code === 'ArrowRight' || e.code === 'KeyL') {
+      } else if (e.code === 'KeyL') {
         this.keys.right = false;
       }
     });
@@ -202,8 +202,15 @@ export class CameraController {
     };
   }
 
-  resetToTarget(targetPos) {
+  setPhysicsWorld(physicsWorld) {
+    this.physicsWorld = physicsWorld;
+  }
+
+  resetToTarget(targetPos, entityYaw = null) {
     if (!targetPos) return;
+    if (entityYaw !== null && this.viewMode === 'chase') {
+      this.yaw = entityYaw - Math.PI;
+    }
     const safePitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
     const cosPitch = Math.cos(safePitch);
     const sinPitch = Math.sin(safePitch);
@@ -292,6 +299,66 @@ export class CameraController {
       Math.max(minCamY, desiredCamY),
       targetPos.z + offsetZ
     );
+
+    // 6. Building & Wall Occlusion Avoidance:
+    // If a building lies between the camera and the car, pull the camera closer
+    // and elevate slightly so the player never loses sight of their vehicle.
+    if (this.physicsWorld && this.physicsWorld.obstacles) {
+      const rayStart = new THREE.Vector3(targetPos.x, targetPos.y + 1.2, targetPos.z);
+      const rayDir = new THREE.Vector3().subVectors(desiredCamPos, rayStart);
+      const totalDist = rayDir.length();
+      if (totalDist > 0.1) {
+        rayDir.normalize();
+        let closestHit = totalDist;
+
+        for (let i = 0; i < this.physicsWorld.obstacles.length; i++) {
+          const obs = this.physicsWorld.obstacles[i];
+          if (obs.isRamp) continue; // Don't occlude for ground ramps
+
+          let tmin = 0;
+          let tmax = closestHit;
+          let hit = true;
+
+          const axes = [
+            { start: rayStart.x, dir: rayDir.x, min: obs.minX, max: obs.maxX },
+            { start: rayStart.y, dir: rayDir.y, min: obs.minY, max: obs.maxY },
+            { start: rayStart.z, dir: rayDir.z, min: obs.minZ, max: obs.maxZ }
+          ];
+
+          for (let a = 0; a < 3; a++) {
+            const ax = axes[a];
+            if (Math.abs(ax.dir) < 0.000001) {
+              if (ax.start < ax.min || ax.start > ax.max) {
+                hit = false;
+                break;
+              }
+            } else {
+              const invD = 1.0 / ax.dir;
+              let t1 = (ax.min - ax.start) * invD;
+              let t2 = (ax.max - ax.start) * invD;
+              if (t1 > t2) { const tmp = t1; t1 = t2; t2 = tmp; }
+              tmin = Math.max(tmin, t1);
+              tmax = Math.min(tmax, t2);
+              if (tmin > tmax) {
+                hit = false;
+                break;
+              }
+            }
+          }
+
+          if (hit && tmin > 0.8 && tmin < closestHit) {
+            closestHit = tmin;
+          }
+        }
+
+        if (closestHit < totalDist) {
+          const safeDist = Math.max(4.0, closestHit - 0.7);
+          desiredCamPos.copy(rayStart).addScaledVector(rayDir, safeDist);
+          // Elevate camera slightly to look over building facade into alleyway
+          desiredCamPos.y = Math.max(desiredCamPos.y, targetPos.y + 3.2);
+        }
+      }
+    }
 
     // Frame-rate independent exponential smoothing
     const smoothRate = this.smoothingSpeed || 11.0;

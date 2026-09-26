@@ -115,11 +115,19 @@ export class CrowdSystem {
     });
   }
 
-  update(dt) {
+  update(dt, playerPos) {
     const time = performance.now() * 0.001;
 
-    this.pedestrians.forEach(p => {
-      p.animPhase += dt * (p.state === 'dancing' ? 8.0 : 4.5);
+    for (let i = 0; i < this.pedestrians.length; i++) {
+      const p = this.pedestrians[i];
+
+      // Distance check: only animate limbs if near the player (<80m)
+      const isFar = playerPos && (
+        Math.abs(p.mesh.position.x - playerPos.x) > 80 ||
+        Math.abs(p.mesh.position.z - playerPos.z) > 80
+      );
+
+      if (p.isKnocked) continue;
 
       if (p.state === 'walking') {
         p.mesh.position.z += p.dir * p.speed * dt;
@@ -129,6 +137,9 @@ export class CrowdSystem {
           p.dir *= -1;
         }
 
+        if (isFar) continue;
+
+        p.animPhase += dt * 4.5;
         const swing = Math.sin(p.animPhase) * 0.55;
         p.leftLeg.rotation.x = swing;
         p.rightLeg.rotation.x = -swing;
@@ -136,6 +147,8 @@ export class CrowdSystem {
         p.rightArm.rotation.x = swing * 0.7;
         p.mesh.position.y = p.baseY + Math.abs(Math.sin(p.animPhase * 2)) * 0.04;
       } else if (p.state === 'dancing') {
+        if (isFar) continue;
+        p.animPhase += dt * 8.0;
         // Club dance animations!
         const danceSwing = Math.sin(p.animPhase) * 0.4;
         const armWave = Math.cos(p.animPhase) * 0.8;
@@ -146,12 +159,62 @@ export class CrowdSystem {
         p.leftLeg.rotation.x = danceSwing * 0.5;
         p.rightLeg.rotation.x = -danceSwing * 0.5;
       } else {
+        if (isFar) continue;
         // Idle breathing / chatting
         const breathe = Math.sin(time * 1.5 + p.animPhase) * 0.02;
         p.mesh.position.y = p.baseY + breathe;
         p.leftArm.rotation.x = Math.sin(time + p.animPhase) * 0.1;
         p.rightArm.rotation.x = -Math.sin(time + p.animPhase) * 0.1;
       }
-    });
+    }
+  }
+
+  checkVehicleCollisions(vehicle, bloodVfx, hud, audioManager) {
+    if (!vehicle || Math.abs(vehicle.currentSpeed || 0) < 3.0) return;
+
+    const vehX = vehicle.position.x;
+    const vehZ = vehicle.position.z;
+    const hitRadius = (vehicle.radius || 1.4) + 0.6;
+    const hitRadiusSq = hitRadius * hitRadius;
+
+    for (let i = 0; i < this.pedestrians.length; i++) {
+      const p = this.pedestrians[i];
+      if (p.isKnocked) continue;
+
+      const dx = p.mesh.position.x - vehX;
+      const dz = p.mesh.position.z - vehZ;
+      if (dx * dx + dz * dz < hitRadiusSq) {
+        p.isKnocked = true;
+
+        // Trigger beautiful floral tribute and petals!
+        if (bloodVfx) {
+          const hitDir = new THREE.Vector3(
+            Math.sin(vehicle.yaw || 0),
+            0.5,
+            Math.cos(vehicle.yaw || 0)
+          );
+          bloodVfx.spawnHit(p.mesh.position, hitDir);
+        }
+
+        // Knocked down animation: lies peacefully
+        p.mesh.rotation.z = Math.PI / 2;
+        p.mesh.position.y = (p.baseY || 0) + 0.12;
+
+        if (hud) {
+          hud.showToast('🌸 Flower tribute placed on the road &middot; Drive safely in Bengaluru!');
+        }
+
+        if (audioManager && typeof audioManager.playCrash === 'function') {
+          audioManager.playCrash();
+        }
+
+        // Recover after 12 seconds
+        setTimeout(() => {
+          p.isKnocked = false;
+          p.mesh.rotation.z = 0;
+          p.mesh.position.y = p.baseY || 0;
+        }, 12000);
+      }
+    }
   }
 }

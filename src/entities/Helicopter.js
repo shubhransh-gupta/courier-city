@@ -129,14 +129,6 @@ export class Helicopter {
 
     this.mesh.add(leftSkid, rightSkid);
 
-    // 6. Searchlight Pointing Downwards
-    this.searchlight = new THREE.SpotLight(0xfffa65, 0, 80, Math.PI / 6, 0.5, 1.2);
-    this.searchlight.position.set(0, 0.6, 1.5);
-    this.searchlightTarget = new THREE.Object3D();
-    this.searchlightTarget.position.set(0, -20, 10);
-    this.mesh.add(this.searchlight, this.searchlightTarget);
-    this.searchlight.target = this.searchlightTarget;
-
     // Projected ground shadow
     const shadowGeo = new THREE.PlaneGeometry(8, 8);
     const shadowMat = new THREE.MeshBasicMaterial({
@@ -183,7 +175,7 @@ export class Helicopter {
         const targetRoll = -turn * 0.28;
         this.roll += (targetRoll - this.roll) * Math.min(1, dt * 4);
 
-        this.yaw -= turn * 1.8 * dt;
+        this.yaw += turn * 1.8 * dt;
 
         const maxSpd = boost ? this.maxSpeed * 1.3 : this.maxSpeed;
         if (Math.abs(fwd) > 0.01) {
@@ -206,9 +198,6 @@ export class Helicopter {
 
       this.position.y = this.altitude;
       this.speedKmh = Math.round(Math.abs(this.speed) * 3.6);
-
-      // Searchlight on at night or in flight
-      this.searchlight.intensity = this.isAirborne ? 4.0 : 0;
       this.audioManager.updateEngine(this.isAirborne ? 0.85 : 0.2);
     }
 
