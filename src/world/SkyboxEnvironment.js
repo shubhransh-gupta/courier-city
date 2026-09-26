@@ -14,28 +14,29 @@ export class SkyboxEnvironment {
   }
 
   initLights() {
-    // Bruno Simon warm studio lighting:
-    // 1. Warm hemisphere light filling shadows with rich terracotta/sand bounce
-    this.hemiLight = new THREE.HemisphereLight(0xfffaf0, 0xd4c7b5, 1.15);
+    // Bruno Simon warm studio lighting from folio-2025:
+    // 1. Warm hemisphere light filling shadows with rich terracotta/purple bounce
+    this.hemiLight = new THREE.HemisphereLight(0xfff4e6, 0x7e546e, 1.25);
     this.scene.add(this.hemiLight);
 
-    // 2. Crisp, warm directional sunlight casting soft PCF shadows
-    this.sunLight = new THREE.DirectionalLight(0xfff6e6, 1.85);
-    this.sunLight.position.set(45, 65, 38);
+    // 2. Crisp, warm golden directional sunlight casting soft PCF shadows
+    this.sunLight = new THREE.DirectionalLight(0xfff9ee, 2.2);
+    this.sunLight.position.set(38, 62, 34);
     this.sunLight.castShadow = true;
     this.sunLight.shadow.mapSize.width = 1024;
     this.sunLight.shadow.mapSize.height = 1024;
     this.sunLight.shadow.camera.near = 1;
     this.sunLight.shadow.camera.far = 160;
 
-    // Follow-sun shadow bounding box (tight 75m box for razor-sharp shadows at scale)
-    const shadowDist = 38;
+    // Follow-sun shadow bounding box (tight 36m box for razor-sharp shadows at scale)
+    const shadowDist = 36;
     this.sunLight.shadow.camera.left = -shadowDist;
     this.sunLight.shadow.camera.right = shadowDist;
     this.sunLight.shadow.camera.top = shadowDist;
     this.sunLight.shadow.camera.bottom = -shadowDist;
-    this.sunLight.shadow.bias = -0.0004;
-    this.sunLight.shadow.radius = 2.0;
+    this.sunLight.shadow.bias = -0.0006;
+    this.sunLight.shadow.normalBias = 0.05;
+    this.sunLight.shadow.radius = 2.8;
 
     this.scene.add(this.sunLight);
     this.scene.add(this.sunLight.target);
@@ -44,14 +45,14 @@ export class SkyboxEnvironment {
   initAtmosphere() {
     // Bruno Simon signature diorama palette:
     // Warm matte studio sand/cream that seamlessly dissolves the horizon
-    this.daySkyColor = new THREE.Color(0xe5dacf);
-    this.nightSkyColor = new THREE.Color(0x1a1c23);
+    this.daySkyColor = new THREE.Color(0xe5d9ca);
+    this.nightSkyColor = new THREE.Color(0x181a24);
 
     this.scene.background = this.daySkyColor.clone();
 
     // Linear fog matching the studio floor color exactly
     // Creates the clean infinite studio look while keeping nearby city blocks crisp
-    this.scene.fog = new THREE.Fog(0xe5dacf, 130, 360);
+    this.scene.fog = new THREE.Fog(0xe5d9ca, 85, 260);
   }
 
   initClouds() {
@@ -120,20 +121,11 @@ export class SkyboxEnvironment {
   update(dt, targetPos) {
     if (!targetPos) return;
 
-    // Follow-sun: Position the directional light and shadow frustum over the player
-    // Threshold updates to avoid thrashing shadow buffers on fractional sub-pixel movements
-    if (!this.lastShadowPos) {
-      this.lastShadowPos = new THREE.Vector3();
-      this.sunLight.position.set(targetPos.x + 45, targetPos.y + 65, targetPos.z + 38);
-      this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
-      this.sunLight.target.updateMatrixWorld();
-      this.lastShadowPos.copy(targetPos);
-    } else if (targetPos.distanceToSquared(this.lastShadowPos) > 64.0) {
-      this.sunLight.position.set(targetPos.x + 45, targetPos.y + 65, targetPos.z + 38);
-      this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
-      this.sunLight.target.updateMatrixWorld();
-      this.lastShadowPos.copy(targetPos);
-    }
+    // Follow-sun: Position the directional light and shadow frustum directly over the player
+    // This guarantees shadow density right where the player is anywhere across Bangalore!
+    this.sunLight.position.set(targetPos.x + 38, targetPos.y + 62, targetPos.z + 34);
+    this.sunLight.target.position.set(targetPos.x, targetPos.y, targetPos.z);
+    this.sunLight.target.updateMatrixWorld();
 
     this.clouds.forEach(cloud => {
       cloud.position.x += dt * 1.4;

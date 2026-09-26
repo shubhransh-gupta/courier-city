@@ -26,6 +26,7 @@ import { FullMapOverlay } from './ui/FullMapOverlay.js';
 import { SkidMarkSystem } from './world/SkidMarkSystem.js';
 import { InteractiveProps } from './world/InteractiveProps.js';
 import { BrunoToyCar } from './entities/BrunoToyCar.js';
+import { DioramaPostProcessing } from './core/DioramaPostProcessing.js';
 
 class Game {
   constructor() {
@@ -90,6 +91,7 @@ class Game {
     this.minimap = new Minimap('radar-canvas', this);
     this.hud = new HUD();
     this.fullMapOverlay = new FullMapOverlay(this);
+    this.postProcessing = new DioramaPostProcessing(this.renderer, this.scene, this.camera);
   }
 
   initEntities() {
@@ -219,6 +221,9 @@ class Game {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      if (this.postProcessing) {
+        this.postProcessing.setSize(window.innerWidth, window.innerHeight);
+      }
     });
 
     // Welcome Landing Screen Dismissal (Handles both pointer, touch and click immediately)
@@ -979,7 +984,11 @@ class Game {
     this.hud.updateViewMode(this.cameraController.viewMode);
 
     this.input.clearDelta();
-    this.renderer.render(this.scene, this.camera);
+    if (this.postProcessing) {
+      this.postProcessing.render();
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
   }
 }
 

@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { brunoMaterials } from '../core/BrunoMaterialSystem.js';
 
 export class InteractiveProps {
   constructor(scene, physicsWorld, audioManager) {
@@ -13,6 +15,7 @@ export class InteractiveProps {
     this.createDestructibleBrickWall(new THREE.Vector3(-18, 0.4, 75));
     this.createBouncyCones();
     this.createFloorTypography();
+    this.loadBrunoProps();
   }
 
   initMaterials() {
@@ -356,5 +359,116 @@ export class InteractiveProps {
         item.body.angularVelocity.set(0, 0, 0);
       }
     }
+  }
+
+  loadBrunoProps() {
+    const base = import.meta.env.BASE_URL || './';
+    const cleanBase = base.endsWith('/') ? base : base + '/';
+    const loader = new GLTFLoader();
+
+    // 1. Handcrafted Park Benches from folio-2025
+    loader.load(`${cleanBase}models/benches.glb`, (gltf) => {
+      const benchBase = gltf.scene;
+      brunoMaterials.applyToModel(benchBase);
+      const benchPositions = [
+        { pos: new THREE.Vector3(-12, 0, 72), rotY: Math.PI / 2 },
+        { pos: new THREE.Vector3(12, 0, 72), rotY: -Math.PI / 2 },
+        { pos: new THREE.Vector3(-12, 0, 84), rotY: Math.PI / 2 },
+        { pos: new THREE.Vector3(12, 0, 84), rotY: -Math.PI / 2 },
+        { pos: new THREE.Vector3(0, 0, 68), rotY: Math.PI }
+      ];
+      benchPositions.forEach(cfg => {
+        const bench = benchBase.clone(true);
+        bench.position.copy(cfg.pos);
+        bench.rotation.y = cfg.rotY;
+        bench.scale.set(1.4, 1.4, 1.4);
+        this.scene.add(bench);
+      });
+    });
+
+    // 2. Glowing Japanese Stone Lanterns from folio-2025
+    loader.load(`${cleanBase}models/lanterns.glb`, (gltf) => {
+      const lanternBase = gltf.scene;
+      brunoMaterials.applyToModel(lanternBase);
+      const lanternPositions = [
+        new THREE.Vector3(-16, 0, 68),
+        new THREE.Vector3(16, 0, 68),
+        new THREE.Vector3(-16, 0, 92),
+        new THREE.Vector3(16, 0, 92),
+        new THREE.Vector3(0, 0, 108)
+      ];
+      lanternPositions.forEach(pos => {
+        const lantern = lanternBase.clone(true);
+        lantern.position.copy(pos);
+        lantern.scale.set(1.5, 1.5, 1.5);
+        this.scene.add(lantern);
+
+        // Add warm point light inside lantern
+        const pLight = new THREE.PointLight(0xff9e42, 1.6, 14);
+        pLight.position.set(pos.x, pos.y + 1.2, pos.z);
+        this.scene.add(pLight);
+      });
+    });
+
+    // 3. Vintage Street Pole Lamps from folio-2025
+    loader.load(`${cleanBase}models/poleLights.glb`, (gltf) => {
+      const lampBase = gltf.scene;
+      brunoMaterials.applyToModel(lampBase);
+      const lampPositions = [
+        { pos: new THREE.Vector3(-8, 0, 52), rotY: Math.PI / 2 },
+        { pos: new THREE.Vector3(8, 0, 52), rotY: -Math.PI / 2 },
+        { pos: new THREE.Vector3(-8, 0, 114), rotY: Math.PI / 2 },
+        { pos: new THREE.Vector3(8, 0, 114), rotY: -Math.PI / 2 },
+        { pos: new THREE.Vector3(-25, 0, 80), rotY: 0 },
+        { pos: new THREE.Vector3(25, 0, 80), rotY: Math.PI }
+      ];
+      lampPositions.forEach(cfg => {
+        const lamp = lampBase.clone(true);
+        lamp.position.copy(cfg.pos);
+        lamp.rotation.y = cfg.rotY;
+        lamp.scale.set(1.4, 1.4, 1.4);
+        this.scene.add(lamp);
+
+        const pLight = new THREE.PointLight(0xffa834, 1.8, 16);
+        pLight.position.set(cfg.pos.x, cfg.pos.y + 4.2, cfg.pos.z);
+        this.scene.add(pLight);
+      });
+    });
+
+    // 4. Wooden Diorama Fences from folio-2025
+    loader.load(`${cleanBase}models/fences.glb`, (gltf) => {
+      const fenceBase = gltf.scene;
+      brunoMaterials.applyToModel(fenceBase);
+      for (let z = 90; z <= 104; z += 3.5) {
+        [-7, 7].forEach(x => {
+          const fence = fenceBase.clone(true);
+          fence.position.set(x, 0, z);
+          fence.rotation.y = Math.PI / 2;
+          fence.scale.set(1.2, 1.2, 1.2);
+          this.scene.add(fence);
+        });
+      }
+    });
+
+    // 5. Stylized Low-Poly Oak Trees from folio-2025
+    loader.load(`${cleanBase}models/oakTrees.glb`, (gltf) => {
+      const treeBase = gltf.scene;
+      brunoMaterials.applyToModel(treeBase);
+      const treePositions = [
+        { pos: new THREE.Vector3(-22, 0, 85), s: 1.6 },
+        { pos: new THREE.Vector3(22, 0, 85), s: 1.8 },
+        { pos: new THREE.Vector3(-22, 0, 65), s: 1.5 },
+        { pos: new THREE.Vector3(22, 0, 65), s: 1.7 },
+        { pos: new THREE.Vector3(-30, 0, 95), s: 1.9 },
+        { pos: new THREE.Vector3(30, 0, 95), s: 1.6 }
+      ];
+      treePositions.forEach(cfg => {
+        const tree = treeBase.clone(true);
+        tree.position.copy(cfg.pos);
+        tree.scale.set(cfg.s, cfg.s, cfg.s);
+        tree.rotation.y = Math.random() * Math.PI * 2;
+        this.scene.add(tree);
+      });
+    });
   }
 }

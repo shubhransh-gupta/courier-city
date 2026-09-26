@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { brunoMaterials } from '../core/BrunoMaterialSystem.js';
 
 /**
  * BrunoToyCar: Flagship stylized diorama toy car inspired by Bruno Simon's portfolio.
@@ -82,43 +84,24 @@ export class BrunoToyCar {
     this.mesh.position.copy(this.position);
 
     // Bruno Simon stylized tactile materials (soft matte satin clay & shiny chrome)
-    const bodyPaintMat = new THREE.MeshStandardMaterial({
-      color: this.color,
-      roughness: 0.38,
-      metalness: 0.15
-    });
-
-    const roofCreamMat = new THREE.MeshStandardMaterial({
+    const bodyPaintMat = brunoMaterials.get('redGradient');
+    const roofCreamMat = brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
       color: 0xfbf8f3,
       roughness: 0.42,
       metalness: 0.08
-    });
+    }));
 
-    const chromeMat = new THREE.MeshStandardMaterial({
-      color: 0xf1f5f9,
-      metalness: 0.95,
-      roughness: 0.12
-    });
+    const chromeMat = brunoMaterials.get('bodyMetal');
+    const darkTrimMat = brunoMaterials.get('darkGray');
+    const glassMat = brunoMaterials.get('carGlass');
+    const headlampGlowMat = brunoMaterials.get('emissiveOrange');
+    const tailLampMat = brunoMaterials.get('stopLights');
+    const tireMat = brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.92 }));
+    const rimMat = brunoMaterials.get('bodyMetal');
+    const caliperMat = brunoMaterials.get('redGradient');
 
-    const darkTrimMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.65,
-      metalness: 0.2
-    });
-
-    const glassMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
-      roughness: 0.08,
-      metalness: 0.85,
-      transparent: true,
-      opacity: 0.85
-    });
-
-    const headlampGlowMat = new THREE.MeshBasicMaterial({ color: 0xfffae0 });
-    const tailLampMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
-    const tireMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.92 });
-    const rimMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.18 });
-    const caliperMat = new THREE.MeshStandardMaterial({ color: 0xd9534f, roughness: 0.3 });
+    this.bodyMesh = new THREE.Group();
+    this.proceduralBody = new THREE.Group();
 
     // 1. Lower Chassis with beveled edges (Smooth rounded rectangular extrusion)
     const chassisShape = this.createRoundedRectShape(2.1, 4.2, 0.35);
@@ -133,12 +116,10 @@ export class BrunoToyCar {
     chassisGeo.rotateX(Math.PI / 2); // Orient horizontal along X-Z plane
     chassisGeo.translate(0, 0.48, 0);
 
-    this.bodyMesh = new THREE.Group();
-
     const lowerBody = new THREE.Mesh(chassisGeo, bodyPaintMat);
     lowerBody.castShadow = true;
     lowerBody.receiveShadow = true;
-    this.bodyMesh.add(lowerBody);
+    this.proceduralBody.add(lowerBody);
 
     // Front sculpt hood slope
     const hoodShape = this.createRoundedRectShape(1.85, 1.5, 0.25);
@@ -153,7 +134,7 @@ export class BrunoToyCar {
     hoodGeo.translate(0, 0.65, 1.05);
     const hood = new THREE.Mesh(hoodGeo, bodyPaintMat);
     hood.castShadow = true;
-    this.bodyMesh.add(hood);
+    this.proceduralBody.add(hood);
 
     // 2. Beveled Toy Cabin (Cream roof with rounded curved corners)
     const cabShape = this.createRoundedRectShape(1.65, 2.0, 0.32);
@@ -168,38 +149,38 @@ export class BrunoToyCar {
     cabGeo.translate(0, 1.15, -0.2);
     const cab = new THREE.Mesh(cabGeo, roofCreamMat);
     cab.castShadow = true;
-    this.bodyMesh.add(cab);
+    this.proceduralBody.add(cab);
 
     // Front Windshield (curved dark glossy glass)
     const windshieldGeo = new THREE.BoxGeometry(1.5, 0.52, 0.08);
     const windshield = new THREE.Mesh(windshieldGeo, glassMat);
     windshield.position.set(0, 1.08, 0.82);
     windshield.rotation.x = 0.42;
-    this.bodyMesh.add(windshield);
+    this.proceduralBody.add(windshield);
 
     // Rear Window
     const rearWin = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.46, 0.08), glassMat);
     rearWin.position.set(0, 1.08, -1.22);
     rearWin.rotation.x = -0.38;
-    this.bodyMesh.add(rearWin);
+    this.proceduralBody.add(rearWin);
 
     // Side Windows
     [-0.83, 0.83].forEach(wx => {
       const sideWin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 1.45), glassMat);
       sideWin.position.set(wx, 1.08, -0.2);
-      this.bodyMesh.add(sideWin);
+      this.proceduralBody.add(sideWin);
     });
 
     // 3. Classic Toy Front Grille & Beveled Chrome Bumper
     const grille = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.32, 0.08), darkTrimMat);
     grille.position.set(0, 0.46, 2.18);
-    this.bodyMesh.add(grille);
+    this.proceduralBody.add(grille);
 
     // Slatted grille chrome accents
     for (let g = -0.5; g <= 0.5; g += 0.25) {
       const slat = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.24, 0.04), chromeMat);
       slat.position.set(g, 0.46, 2.22);
-      this.bodyMesh.add(slat);
+      this.proceduralBody.add(slat);
     }
 
     // Chrome Front Bumper with rounded ends
@@ -207,41 +188,41 @@ export class BrunoToyCar {
     frontBumper.rotation.z = Math.PI / 2;
     frontBumper.position.set(0, 0.32, 2.24);
     frontBumper.castShadow = true;
-    this.bodyMesh.add(frontBumper);
+    this.proceduralBody.add(frontBumper);
 
     // Chrome Rear Bumper
     const rearBumper = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.2, 12), chromeMat);
     rearBumper.rotation.z = Math.PI / 2;
     rearBumper.position.set(0, 0.32, -2.22);
     rearBumper.castShadow = true;
-    this.bodyMesh.add(rearBumper);
+    this.proceduralBody.add(rearBumper);
 
     // Chrome Roll-Bar Hoop behind Cabin
     const rollBarGeo = new THREE.TorusGeometry(0.68, 0.07, 10, 18, Math.PI);
     const rollBar = new THREE.Mesh(rollBarGeo, chromeMat);
     rollBar.position.set(0, 1.35, -1.25);
     rollBar.castShadow = true;
-    this.bodyMesh.add(rollBar);
+    this.proceduralBody.add(rollBar);
 
     // 4. Iconic Circular Toy Headlights (Warm glowing lenses)
     [-0.68, 0.68].forEach(hx => {
       // Headlight chrome bezel ring
       const bezel = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.05, 8, 16), chromeMat);
       bezel.position.set(hx, 0.56, 2.18);
-      this.bodyMesh.add(bezel);
+      this.proceduralBody.add(bezel);
 
       // Glowing lens
       const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.06, 16), headlampGlowMat);
       lens.rotation.x = Math.PI / 2;
       lens.position.set(hx, 0.56, 2.2);
-      this.bodyMesh.add(lens);
+      this.proceduralBody.add(lens);
     });
 
     // Dual Red Tail Lights
     [-0.72, 0.72].forEach(tx => {
       const tail = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.16, 0.06), tailLampMat);
       tail.position.set(tx, 0.56, -2.18);
-      this.bodyMesh.add(tail);
+      this.proceduralBody.add(tail);
     });
 
     // Dual Chrome Exhaust Pipes
@@ -249,7 +230,7 @@ export class BrunoToyCar {
       const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.35, 12), chromeMat);
       exhaust.rotation.x = Math.PI / 2;
       exhaust.position.set(ex, 0.28, -2.28);
-      this.bodyMesh.add(exhaust);
+      this.proceduralBody.add(exhaust);
     });
 
     // 5. Bruno Simon Signature Toy Antenna with Wobbly Bobble Sphere on Top!
@@ -274,7 +255,13 @@ export class BrunoToyCar {
     this.antennaBobble.castShadow = true;
     this.antennaMast.add(this.antennaBobble);
 
-    this.bodyMesh.add(this.antennaGroup);
+    this.proceduralBody.add(this.antennaGroup);
+
+    // Add procedural body to bodyMesh
+    this.bodyMesh.add(this.proceduralBody);
+
+    // Load Bruno Simon's Official 3D GLTF Roadster
+    this.loadOfficialModel();
 
     // Add main body to vehicle mesh
     this.mesh.add(this.bodyMesh);
@@ -355,6 +342,59 @@ export class BrunoToyCar {
     wheelGroup.add(caliper);
 
     return wheelGroup;
+  }
+
+  loadOfficialModel() {
+    const base = import.meta.env.BASE_URL || './';
+    const cleanBase = base.endsWith('/') ? base : base + '/';
+    const loader = new GLTFLoader();
+    loader.load(`${cleanBase}models/vehicle/oldSchool.glb`, (gltf) => {
+      this.attachOfficialModel(gltf.scene);
+    }, undefined, () => {
+      loader.load(`${cleanBase}models/vehicle/defaultAntenna.glb`, (gltf2) => {
+        this.attachOfficialModel(gltf2.scene);
+      });
+    });
+  }
+
+  attachOfficialModel(model) {
+    if (!model) return;
+    brunoMaterials.applyToModel(model);
+
+    // Compute bounding box and normalize size
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 3.6 / maxDim;
+    model.scale.set(scale, scale, scale);
+
+    // Center horizontally and align tires with ground
+    model.position.x = -center.x * scale;
+    model.position.y = -box.min.y * scale + 0.05;
+    model.position.z = -center.z * scale;
+
+    // Detect animated nodes
+    model.traverse((child) => {
+      if (child.name && child.name.match(/stopLight|backLight/i)) {
+        this.loadedStopLights = child;
+      }
+      if (child.name && child.name.match(/headlight/i)) {
+        this.loadedHeadlights = child;
+      }
+      if (child.name && child.name.match(/antenna/i)) {
+        this.loadedAntenna = child;
+      }
+    });
+
+    if (this.proceduralBody) {
+      this.proceduralBody.visible = false;
+    }
+    this.bodyMesh.add(model);
+    this.officialModel = model;
   }
 
   update(dt, input, isPlayerControlling) {
@@ -560,6 +600,18 @@ export class BrunoToyCar {
     // Apply bouncy suspension roll and pitch to the body mesh
     if (this.bodyMesh) {
       this.bodyMesh.rotation.set(this.pitch + this.chassisPitch, 0, this.chassisRoll);
+    }
+
+    // Sync official GLTF model components if loaded
+    if (this.loadedAntenna) {
+      this.loadedAntenna.rotation.set(this.antennaSwayZ, 0, this.antennaSwayX);
+    }
+    if (this.loadedHeadlights) {
+      this.loadedHeadlights.visible = this.headlightsOn;
+    }
+    if (this.loadedStopLights) {
+      const isBraking = isPlayerControlling && (input.getForward() < 0 || input.isDown('Space'));
+      this.loadedStopLights.visible = isBraking;
     }
 
     // Wheel spin & steering kinematics
