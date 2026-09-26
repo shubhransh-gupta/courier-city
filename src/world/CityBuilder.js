@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { TextureGenerator } from './TextureGenerator.js';
+import { brunoMaterials } from '../core/BrunoMaterialSystem.js';
 
 export class CityBuilder {
   constructor(scene, physicsWorld) {
@@ -31,10 +32,15 @@ export class CityBuilder {
 
   initMaterials() {
     this.materials = {
-      // Bruno Simon signature diorama studio floor (warm matte cream/sand)
-      grass: new THREE.MeshStandardMaterial({ color: 0xe5dacf, roughness: 0.92, metalness: 0.0 }),
-      parkGreen: new THREE.MeshStandardMaterial({ color: 0x78a072, roughness: 0.9, metalness: 0.0 }),
-      sand: new THREE.MeshStandardMaterial({ color: 0xe3d3be, roughness: 0.95, metalness: 0.0 }),
+      // Bruno Simon signature diorama studio floor (warm matte cream/sand with paving slabs)
+      grass: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
+        color: 0xe5d9ca,
+        map: brunoMaterials.slabsTexture,
+        roughness: 0.92,
+        metalness: 0.0
+      })),
+      parkGreen: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x78a072, roughness: 0.9, metalness: 0.0 })),
+      sand: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xe3d3be, roughness: 0.95, metalness: 0.0 })),
       water: new THREE.MeshStandardMaterial({
         color: 0x5294a6,
         roughness: 0.35,
@@ -42,22 +48,22 @@ export class CityBuilder {
         transparent: true,
         opacity: 0.92
       }),
-      road: new THREE.MeshStandardMaterial({ color: 0x38353a, roughness: 0.88, metalness: 0.05 }),
+      road: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x38353a, roughness: 0.88, metalness: 0.05 })),
       roadMarking: new THREE.MeshBasicMaterial({ color: 0xf5efe6 }),
       roadWhite: new THREE.MeshBasicMaterial({ color: 0xfbf9f5 }),
-      sidewalk: new THREE.MeshStandardMaterial({ color: 0xd8cebf, roughness: 0.85, metalness: 0.02 }),
-      tajMarble: new THREE.MeshStandardMaterial({
+      sidewalk: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xd8cebf, roughness: 0.85, metalness: 0.02 })),
+      tajMarble: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
         color: 0xf7f5f0,
         roughness: 0.35,
         metalness: 0.04
-      }),
+      })),
       goldTrim: new THREE.MeshStandardMaterial({ color: 0xe5ad52, roughness: 0.45, metalness: 0.4 }),
-      redSandstone: new THREE.MeshStandardMaterial({ color: 0xd46853, roughness: 0.85, metalness: 0.02 }),
-      buffSandstone: new THREE.MeshStandardMaterial({ color: 0xdfba8c, roughness: 0.85, metalness: 0.02 }),
-      eiffelIron: new THREE.MeshStandardMaterial({ color: 0x58575c, roughness: 0.7, metalness: 0.3 }),
+      redSandstone: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xd46853, roughness: 0.85, metalness: 0.02 })),
+      buffSandstone: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xdfba8c, roughness: 0.85, metalness: 0.02 })),
+      eiffelIron: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x58575c, roughness: 0.7, metalness: 0.3 })),
       copperDome: new THREE.MeshStandardMaterial({ color: 0x6ca391, roughness: 0.6, metalness: 0.15 }),
       statueCopper: new THREE.MeshStandardMaterial({ color: 0x6ca391, roughness: 0.55, metalness: 0.15 }),
-      rock: new THREE.MeshStandardMaterial({ color: 0x9c9389, roughness: 0.92, metalness: 0.02 }),
+      rock: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x9c9389, roughness: 0.92, metalness: 0.02 })),
       snow: new THREE.MeshStandardMaterial({ color: 0xfaf8f5, roughness: 0.5, metalness: 0.02 }),
       bridgeMetal: new THREE.MeshStandardMaterial({ color: 0xd9534f, roughness: 0.6, metalness: 0.2 }),
       // Vegetation & Street Furniture materials (shared to eliminate draw calls and memory stalls)
