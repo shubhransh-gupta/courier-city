@@ -108,131 +108,132 @@
 
     <!-- Minimal toast message -->
     <div id="toast-message">Explore the city, visit the Zoo, or fly at the Airport!</div>
+  </div>
 
-    <!-- Camera View Customizer Modal -->
-    <div id="camera-modal" class="camera-modal-hidden">
-      <div class="camera-card">
-        <div class="camera-header">
-          <div class="camera-title-group">
-            <span class="camera-badge">📷 VIEW CUSTOMIZER</span>
-            <h3>Camera Angle & Perspective</h3>
-          </div>
-          <button id="close-camera-btn" class="camera-close-btn">&times;</button>
+  <!-- Camera View Customizer Modal -->
+  <div id="camera-modal" class="camera-modal-hidden">
+    <div class="camera-card">
+      <div class="camera-header">
+        <div class="camera-title-group">
+          <span class="camera-badge">📷 VIEW CUSTOMIZER</span>
+          <h3>Camera Angle & Perspective</h3>
         </div>
+        <button id="close-camera-btn" class="camera-close-btn" type="button" aria-label="Close Camera Customizer">&times;</button>
+      </div>
 
-        <div class="camera-presets-section">
-          <div class="section-label">Select View Preset</div>
-          <div class="camera-presets-grid">
-            <button class="cam-preset-btn active" data-preset="diorama">🏎️ Diorama Follow</button>
-            <button class="cam-preset-btn" data-preset="isometric">📐 3/4 Isometric</button>
-            <button class="cam-preset-btn" data-preset="closeChase">🚗 Close Action</button>
-            <button class="cam-preset-btn" data-preset="topDown">🦅 Top-Down</button>
-            <button class="cam-preset-btn" data-preset="cockpit">🎥 Hood / Low</button>
-            <button class="cam-preset-btn" data-preset="free">🕹️ Free Orbit</button>
-          </div>
-        </div>
-
-        <div class="camera-sliders-group">
-          <div class="cam-slider-row">
-            <div class="cam-slider-label">
-              <span>📏 Distance / Zoom</span>
-              <span id="cam-dist-val" class="cam-val-badge">16m</span>
-            </div>
-            <input type="range" id="cam-dist-slider" min="6" max="50" step="1" value="16">
-          </div>
-
-          <div class="cam-slider-row">
-            <div class="cam-slider-label">
-              <span>📐 Pitch / Angle</span>
-              <span id="cam-pitch-val" class="cam-val-badge">47°</span>
-            </div>
-            <input type="range" id="cam-pitch-slider" min="15" max="85" step="1" value="47">
-          </div>
-
-          <div class="cam-slider-row">
-            <div class="cam-slider-label">
-              <span>⬆️ Height Offset</span>
-              <span id="cam-height-val" class="cam-val-badge">2.0m</span>
-            </div>
-            <input type="range" id="cam-height-slider" min="0.5" max="8" step="0.5" value="2.0">
-          </div>
-
-          <div class="cam-slider-row">
-            <div class="cam-slider-label">
-              <span>👁️ Lens FOV</span>
-              <span id="cam-fov-val" class="cam-val-badge">38°</span>
-            </div>
-            <input type="range" id="cam-fov-slider" min="25" max="75" step="1" value="38">
-          </div>
-
-          <div class="cam-slider-row">
-            <div class="cam-slider-label">
-              <span>⚡ Damping Smoothness</span>
-              <span id="cam-smooth-val" class="cam-val-badge">Smooth (11)</span>
-            </div>
-            <input type="range" id="cam-smooth-slider" min="4" max="25" step="1" value="11">
-          </div>
-        </div>
-
-        <div class="camera-footer">
-          <button id="cam-reset-btn" class="cam-reset-btn">🔄 Reset to Bruno Simon Default</button>
-          <button id="cam-done-btn" class="cam-done-btn">✓ Save & Apply</button>
+      <div class="camera-presets-section">
+        <div class="section-label">Select View Preset</div>
+        <div class="camera-presets-grid">
+          <button class="cam-preset-btn active" data-preset="diorama" type="button">🏎️ Diorama Follow</button>
+          <button class="cam-preset-btn" data-preset="isometric" type="button">📐 3/4 Isometric</button>
+          <button class="cam-preset-btn" data-preset="closeChase" type="button">🚗 Close Action</button>
+          <button class="cam-preset-btn" data-preset="topDown" type="button">🦅 Top-Down</button>
+          <button class="cam-preset-btn" data-preset="cockpit" type="button">🎥 Hood / Low</button>
+          <button class="cam-preset-btn" data-preset="free" type="button">🕹️ Free Orbit</button>
         </div>
       </div>
+
+      <div class="camera-sliders-group">
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>📏 Distance / Zoom</span>
+            <span id="cam-dist-val" class="cam-val-badge">16m</span>
+          </div>
+          <input type="range" id="cam-dist-slider" min="6" max="50" step="1" value="16">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>📐 Pitch / Angle</span>
+            <span id="cam-pitch-val" class="cam-val-badge">47°</span>
+          </div>
+          <input type="range" id="cam-pitch-slider" min="15" max="85" step="1" value="47">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>⬆️ Height Offset</span>
+            <span id="cam-height-val" class="cam-val-badge">2.0m</span>
+          </div>
+          <input type="range" id="cam-height-slider" min="0.5" max="8" step="0.5" value="2.0">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>👁️ Lens FOV</span>
+            <span id="cam-fov-val" class="cam-val-badge">38°</span>
+          </div>
+          <input type="range" id="cam-fov-slider" min="25" max="75" step="1" value="38">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>⚡ Damping Smoothness</span>
+            <span id="cam-smooth-val" class="cam-val-badge">Smooth (11)</span>
+          </div>
+          <input type="range" id="cam-smooth-slider" min="4" max="25" step="1" value="11">
+        </div>
+      </div>
+
+      <div class="camera-footer">
+        <button id="cam-reset-btn" class="cam-reset-btn" type="button">🔄 Reset to Bruno Simon Default</button>
+        <button id="cam-done-btn" class="cam-done-btn" type="button">✓ Save & Apply</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Dropdown / Collapsible Controls Modal -->
-    <div id="controls-modal" class="controls-modal-hidden">
-      <div class="controls-card">
-        <div class="controls-header">
-          <div class="controls-title-group">
-            <span class="controls-badge">GUIDE</span>
-            <h3>Game Controls & Keys</h3>
-          </div>
-          <button id="close-controls-btn" class="controls-close-btn">&times;</button>
+  <!-- Dropdown / Collapsible Controls Modal -->
+  <div id="controls-modal" class="controls-modal-hidden">
+    <div class="controls-card">
+      <div class="controls-header">
+        <div class="controls-title-group">
+          <span class="controls-badge">GUIDE</span>
+          <h3>Game Controls & Keys</h3>
+        </div>
+        <button id="close-controls-btn" class="controls-close-btn" type="button" aria-label="Close Controls Guide">&times;</button>
+      </div>
+
+      <div class="controls-grid">
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🏃 On Foot</div>
+          <div class="ctrl-row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Walk / Run</span></div>
+          <div class="ctrl-row"><kbd>Shift</kbd> <span>Sprint Boost</span></div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Jump</span></div>
+          <div class="ctrl-row"><kbd>F</kbd> <span>Enter Vehicle / Aircraft</span></div>
+          <div class="ctrl-row"><kbd>E</kbd> <span>Elevator to Summit (Eiffel/Liberty/Taj)</span></div>
         </div>
 
-        <div class="controls-grid">
-          <div class="ctrl-group">
-            <div class="ctrl-cat">🏃 On Foot</div>
-            <div class="ctrl-row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Walk / Run</span></div>
-            <div class="ctrl-row"><kbd>Shift</kbd> <span>Sprint Boost</span></div>
-            <div class="ctrl-row"><kbd>Space</kbd> <span>Jump</span></div>
-            <div class="ctrl-row"><kbd>F</kbd> <span>Enter Vehicle / Aircraft</span></div>
-            <div class="ctrl-row"><kbd>E</kbd> <span>Elevator to Summit (Eiffel/Liberty/Taj)</span></div>
-          </div>
-
-          <div class="ctrl-group">
-            <div class="ctrl-cat">🚗 Driving Cars</div>
-            <div class="ctrl-row"><kbd>W</kbd> <span>Accelerate</span></div>
-            <div class="ctrl-row"><kbd>S</kbd> <span>Brake / Reverse</span></div>
-            <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Steer</span></div>
-            <div class="ctrl-row"><kbd>Space</kbd> <span>Handbrake Drift</span></div>
-            <div class="ctrl-row"><kbd>C</kbd> <span>Spawn Sports Car</span></div>
-            <div class="ctrl-row"><kbd>L</kbd> <span>Toggle Headlights</span></div>
-          </div>
-
-          <div class="ctrl-group">
-            <div class="ctrl-cat">✈️ Airplane & Helicopter</div>
-            <div class="ctrl-row"><kbd>Space</kbd> <span>Climb / Lift Off Up</span></div>
-            <div class="ctrl-row"><kbd>Shift</kbd> <span>Descend / Land</span></div>
-            <div class="ctrl-row"><kbd>W</kbd> <span>Throttle Forward</span></div>
-            <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Bank & Steer</span></div>
-          </div>
-
-          <div class="ctrl-group">
-            <div class="ctrl-cat">🎥 Camera & Map</div>
-            <div class="ctrl-row"><kbd>V</kbd> <span>Toggle View (Chase / Free / Top)</span></div>
-            <div class="ctrl-row"><kbd>M</kbd> <span>Open Fullscreen Map & GPS</span></div>
-            <div class="ctrl-row"><span>Drag Mouse</span> <span>Orbit / Pitch View</span></div>
-            <div class="ctrl-row"><span>Mouse Wheel</span> <span>Zoom Camera</span></div>
-          </div>
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🚗 Driving Cars</div>
+          <div class="ctrl-row"><kbd>W</kbd> <span>Accelerate</span></div>
+          <div class="ctrl-row"><kbd>S</kbd> <span>Brake / Reverse</span></div>
+          <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Steer</span></div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Handbrake Drift</span></div>
+          <div class="ctrl-row"><kbd>C</kbd> <span>Spawn Sports Car</span></div>
+          <div class="ctrl-row"><kbd>L</kbd> <span>Toggle Headlights</span></div>
         </div>
 
-        <div class="controls-footer">
-          <span class="ctrl-tip">Tip: Press <kbd>H</kbd> anytime to open or close this controls guide.</span>
-          <button id="dismiss-controls-btn" class="ctrl-btn-primary">Got it</button>
+        <div class="ctrl-group">
+          <div class="ctrl-cat">✈️ Airplane & Helicopter</div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Climb / Lift Off Up</span></div>
+          <div class="ctrl-row"><kbd>Shift</kbd> <span>Descend / Land</span></div>
+          <div class="ctrl-row"><kbd>W</kbd> <span>Throttle Forward</span></div>
+          <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Bank & Steer</span></div>
         </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🎥 Camera & Map</div>
+          <div class="ctrl-row"><kbd>V</kbd> <span>Toggle Camera Customizer</span></div>
+          <div class="ctrl-row"><kbd>M</kbd> <span>Open Fullscreen Map & GPS</span></div>
+          <div class="ctrl-row"><kbd>H</kbd> <span>Toggle Controls Guide</span></div>
+          <div class="ctrl-row"><span>Drag Mouse</span> <span>Orbit / Pitch View</span></div>
+          <div class="ctrl-row"><span>Mouse Wheel</span> <span>Zoom Camera</span></div>
+        </div>
+      </div>
+
+      <div class="controls-footer">
+        <span class="ctrl-tip">Tip: Press <kbd>H</kbd> anytime to open or close this controls guide.</span>
+        <button id="dismiss-controls-btn" class="ctrl-btn-primary" type="button">Got it</button>
       </div>
     </div>
   </div>

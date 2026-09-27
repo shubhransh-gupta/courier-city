@@ -40,6 +40,7 @@ export class HUD {
     const toggleBtn = document.getElementById('toggle-controls-btn');
     const closeBtn = document.getElementById('close-controls-btn');
     const dismissBtn = document.getElementById('dismiss-controls-btn');
+    const controlsCard = this.controlsModal ? this.controlsModal.querySelector('.controls-card') : null;
 
     const handleClose = (e) => {
       if (e) {
@@ -49,7 +50,14 @@ export class HUD {
       this.toggleControls(false);
     };
 
-    if (toggleBtn) toggleBtn.addEventListener('click', () => this.toggleControls());
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleControls();
+      });
+    }
+
     if (closeBtn) {
       closeBtn.addEventListener('click', handleClose);
       closeBtn.addEventListener('pointerdown', handleClose);
@@ -61,18 +69,25 @@ export class HUD {
       dismissBtn.addEventListener('touchend', handleClose);
     }
 
-    // Close on backdrop click (outside card)
+    // Stop propagation inside controls card
+    if (controlsCard) {
+      controlsCard.addEventListener('click', (e) => e.stopPropagation());
+      controlsCard.addEventListener('pointerdown', (e) => e.stopPropagation());
+      controlsCard.addEventListener('mousedown', (e) => e.stopPropagation());
+    }
+
+    // Close on backdrop click/tap (outside card)
     if (this.controlsModal) {
-      this.controlsModal.addEventListener('click', (e) => {
+      const handleBackdrop = (e) => {
         if (e.target === this.controlsModal) {
+          e.preventDefault();
+          e.stopPropagation();
           this.toggleControls(false);
         }
-      });
-      this.controlsModal.addEventListener('touchend', (e) => {
-        if (e.target === this.controlsModal) {
-          this.toggleControls(false);
-        }
-      });
+      };
+      this.controlsModal.addEventListener('click', handleBackdrop);
+      this.controlsModal.addEventListener('pointerdown', handleBackdrop);
+      this.controlsModal.addEventListener('touchend', handleBackdrop);
     }
 
     window.addEventListener('keydown', (e) => {
@@ -89,8 +104,10 @@ export class HUD {
     this.isControlsOpen = (force !== null) ? force : !this.isControlsOpen;
     if (this.isControlsOpen) {
       this.controlsModal.classList.remove('controls-modal-hidden');
+      if (this.onModalToggle) this.onModalToggle(true);
     } else {
       this.controlsModal.classList.add('controls-modal-hidden');
+      if (this.onModalToggle) this.onModalToggle(false);
     }
   }
 

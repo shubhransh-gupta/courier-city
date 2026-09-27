@@ -355,6 +355,7 @@ class Game {
     const smoothSlider = document.getElementById('cam-smooth-slider');
     const smoothVal = document.getElementById('cam-smooth-val');
     const presetBtns = document.querySelectorAll('.cam-preset-btn');
+    const cameraCard = modal ? modal.querySelector('.camera-card') : null;
 
     let isOpen = false;
 
@@ -390,6 +391,13 @@ class Game {
       if (!modal) return;
       isOpen = (force !== null) ? force : !isOpen;
       if (isOpen) {
+        // Auto-close other open modals to avoid overlap
+        if (this.hud && this.hud.isControlsOpen) {
+          this.hud.toggleControls(false);
+        }
+        if (this.fullMapOverlay && this.fullMapOverlay.isOpen) {
+          this.fullMapOverlay.toggle(false);
+        }
         modal.classList.remove('camera-modal-hidden');
         syncUIFromCamera();
       } else {
@@ -399,6 +407,18 @@ class Game {
 
     this.toggleCameraModal = toggleCameraModal;
 
+    // Connect HUD controls modal listener to auto-close camera modal
+    if (this.hud) {
+      this.hud.onModalToggle = (isControlsOpen) => {
+        if (isControlsOpen) {
+          toggleCameraModal(false);
+          if (this.fullMapOverlay && this.fullMapOverlay.isOpen) {
+            this.fullMapOverlay.toggle(false);
+          }
+        }
+      };
+    }
+
     const handleCloseCamera = (e) => {
       if (e) {
         e.preventDefault();
@@ -407,98 +427,109 @@ class Game {
       toggleCameraModal(false);
     };
 
-    if (openBtn) openBtn.addEventListener('click', () => toggleCameraModal(true));
+    // Toggle button in header (clicking opens or closes)
+    if (openBtn) {
+      openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleCameraModal();
+      });
+    }
+
+    // Close button 'X'
     if (closeBtn) {
       closeBtn.addEventListener('click', handleCloseCamera);
       closeBtn.addEventListener('pointerdown', handleCloseCamera);
       closeBtn.addEventListener('touchend', handleCloseCamera);
     }
+
+    // Done button 'Save & Apply'
     if (doneBtn) {
-      doneBtn.addEventListener('click', () => {
+      doneBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         handleCloseCamera();
         this.hud.showToast('Camera settings applied');
       });
+      doneBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
     }
 
+    // Reset button
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
+      resetBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.cameraController.applyPreset('diorama');
         syncUIFromCamera();
         this.hud.showToast('Camera reset to Bruno Simon default');
       });
+      resetBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
     }
 
+    // Preset selector buttons
     presetBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const presetKey = btn.dataset.preset;
         this.cameraController.applyPreset(presetKey);
         syncUIFromCamera();
         this.hud.showToast(`Preset: ${btn.textContent.trim()}`);
       });
+      btn.addEventListener('pointerdown', (e) => e.stopPropagation());
     });
 
-    // Slider listeners
-    if (distSlider) {
-      distSlider.addEventListener('input', (e) => {
+    // Stop propagation inside card so backdrop dismiss doesn't trigger when clicking modal content
+    if (cameraCard) {
+      cameraCard.addEventListener('click', (e) => e.stopPropagation());
+      cameraCard.addEventListener('pointerdown', (e) => e.stopPropagation());
+      cameraCard.addEventListener('mousedown', (e) => e.stopPropagation());
+    }
+
+    // Slider listeners with propagation isolation
+    const sliders = [
+      { el: distSlider, val: distVal, unit: 'm', update: (v) => this.cameraController.setCustomView({ distance: v }) },
+      { el: pitchSlider, val: pitchVal, unit: '°', update: (v) => this.cameraController.setCustomView({ pitch: (v * Math.PI) / 180 }) },
+      { el: heightSlider, val: heightVal, unit: 'm', update: (v) => this.cameraController.setCustomView({ eyeHeight: v }) },
+      { el: fovSlider, val: fovVal, unit: '°', update: (v) => this.cameraController.setCustomView({ fov: v }) },
+      { el: smoothSlider, val: smoothVal, unit: '', update: (v) => {
+        this.cameraController.setCustomView({ smoothing: v });
+        if (smoothVal) smoothVal.textContent = v > 16 ? `Ultra (${v})` : (v > 9 ? `Smooth (${v})` : `Snappy (${v})`);
+      }}
+    ];
+
+    sliders.forEach(s => {
+      if (!s.el) return;
+      s.el.addEventListener('pointerdown', (e) => e.stopPropagation());
+      s.el.addEventListener('mousedown', (e) => e.stopPropagation());
+      s.el.addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
-        this.cameraController.setCustomView({ distance: val });
-        if (distVal) distVal.textContent = `${val}m`;
+        s.update(val);
+        if (s.val && s.unit) s.val.textContent = `${val}${s.unit}`;
         presetBtns.forEach(b => b.classList.remove('active'));
       });
-    }
+    });
 
-    if (pitchSlider) {
-      pitchSlider.addEventListener('input', (e) => {
-        const degrees = parseFloat(e.target.value);
-        const radians = (degrees * Math.PI) / 180;
-        this.cameraController.setCustomView({ pitch: radians });
-        if (pitchVal) pitchVal.textContent = `${degrees}°`;
-        presetBtns.forEach(b => b.classList.remove('active'));
-      });
-    }
-
-    if (heightSlider) {
-      heightSlider.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        this.cameraController.setCustomView({ eyeHeight: val });
-        if (heightVal) heightVal.textContent = `${val}m`;
-        presetBtns.forEach(b => b.classList.remove('active'));
-      });
-    }
-
-    if (fovSlider) {
-      fovSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        this.cameraController.setCustomView({ fov: val });
-        if (fovVal) fovVal.textContent = `${val}°`;
-        presetBtns.forEach(b => b.classList.remove('active'));
-      });
-    }
-
-    if (smoothSlider) {
-      smoothSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        this.cameraController.setCustomView({ smoothing: val });
-        if (smoothVal) {
-          smoothVal.textContent = val > 16 ? `Ultra (${val})` : (val > 9 ? `Smooth (${val})` : `Snappy (${val})`);
-        }
-      });
-    }
-
+    // Dismiss on backdrop click (outside card)
     if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) toggleCameraModal(false);
-      });
-      modal.addEventListener('touchend', (e) => {
-        if (e.target === modal) toggleCameraModal(false);
-      });
+      const handleBackdrop = (e) => {
+        if (e.target === modal) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleCameraModal(false);
+        }
+      };
+      modal.addEventListener('click', handleBackdrop);
+      modal.addEventListener('pointerdown', handleBackdrop);
+      modal.addEventListener('touchend', handleBackdrop);
     }
 
+    // Global Key shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyV' && !e.target.closest('input, textarea')) {
         toggleCameraModal();
-      } else if (e.code === 'Escape' && isOpen) {
-        toggleCameraModal(false);
+      } else if (e.code === 'Escape') {
+        if (isOpen) toggleCameraModal(false);
       }
     });
   }

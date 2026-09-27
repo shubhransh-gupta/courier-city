@@ -589,11 +589,15 @@ html, body {
 #controls-modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.88);
-  z-index: 1100;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto !important;
+  cursor: pointer;
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
@@ -609,10 +613,17 @@ html, body {
   border-radius: 20px;
   width: 90%;
   max-width: 680px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  pointer-events: auto !important;
+  cursor: default;
   animation: modalScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.controls-card button,
+.controls-card kbd {
+  pointer-events: auto;
 }
 
 @keyframes modalScaleUp {
@@ -895,11 +906,15 @@ html, body {
 #camera-modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.88);
-  z-index: 1100;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto !important;
+  cursor: pointer;
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
@@ -915,10 +930,17 @@ html, body {
   border-radius: 20px;
   width: 90%;
   max-width: 580px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  pointer-events: auto !important;
+  cursor: default;
   animation: modalScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.camera-card button,
+.camera-card input {
+  pointer-events: auto !important;
 }
 
 .camera-header {
