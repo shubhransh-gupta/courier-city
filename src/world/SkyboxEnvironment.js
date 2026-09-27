@@ -14,13 +14,13 @@ export class SkyboxEnvironment {
   }
 
   initLights() {
-    // Bruno Simon warm studio lighting from folio-2025:
-    // 1. Warm hemisphere light filling shadows with rich terracotta/purple bounce
-    this.hemiLight = new THREE.HemisphereLight(0xfff4e6, 0x7e546e, 1.25);
+    // Natural clear-sky daylight:
+    // 1. Balanced hemisphere ambient light with soft sky-blue top and earth bounce (no weird purple tint)
+    this.hemiLight = new THREE.HemisphereLight(0xcde8ff, 0x556b4f, 0.95);
     this.scene.add(this.hemiLight);
 
-    // 2. Crisp, warm golden directional sunlight casting soft PCF shadows
-    this.sunLight = new THREE.DirectionalLight(0xfff9ee, 2.2);
+    // 2. Crisp, warm golden-white directional sunlight casting clean soft PCF shadows
+    this.sunLight = new THREE.DirectionalLight(0xfff8ee, 1.45);
     this.sunLight.position.set(38, 62, 34);
     this.sunLight.castShadow = true;
     this.sunLight.shadow.mapSize.width = 1024;
@@ -35,24 +35,22 @@ export class SkyboxEnvironment {
     this.sunLight.shadow.camera.top = shadowDist;
     this.sunLight.shadow.camera.bottom = -shadowDist;
     this.sunLight.shadow.bias = -0.0006;
-    this.sunLight.shadow.normalBias = 0.05;
-    this.sunLight.shadow.radius = 2.8;
+    this.sunLight.shadow.normalBias = 0.04;
+    this.sunLight.shadow.radius = 2.4;
 
     this.scene.add(this.sunLight);
     this.scene.add(this.sunLight.target);
   }
 
   initAtmosphere() {
-    // Bruno Simon signature diorama palette:
-    // Warm matte studio sand/cream that seamlessly dissolves the horizon
-    this.daySkyColor = new THREE.Color(0xe5d9ca);
-    this.nightSkyColor = new THREE.Color(0x181a24);
+    // Clear vibrant blue Bengaluru sky and soft atmospheric horizon haze
+    this.daySkyColor = new THREE.Color(0x72b1ea);
+    this.nightSkyColor = new THREE.Color(0x0f172a);
 
     this.scene.background = this.daySkyColor.clone();
 
-    // Linear fog matching the studio floor color exactly
-    // Creates the clean infinite studio look while keeping nearby city blocks crisp
-    this.scene.fog = new THREE.Fog(0xe5d9ca, 85, 260);
+    // Natural atmospheric horizon fog (soft sky haze)
+    this.scene.fog = new THREE.Fog(0x98c4ea, 120, 480);
   }
 
   initClouds() {
@@ -99,20 +97,24 @@ export class SkyboxEnvironment {
 
   toggleDayNight() {
     this.isNight = !this.isNight;
-    const targetSky = this.isNight ? this.nightSkyColor : this.daySkyColor;
-    this.scene.background.copy(targetSky);
-    this.scene.fog.color.copy(targetSky);
-
     if (this.isNight) {
+      this.scene.background.setHex(0x0f172a);
+      this.scene.fog.color.setHex(0x0f172a);
+      this.scene.fog.near = 80;
+      this.scene.fog.far = 320;
       this.sunLight.intensity = 0.35;
-      this.sunLight.color.setHex(0x6b7fa3);
-      this.hemiLight.intensity = 0.5;
-      this.hemiLight.color.setHex(0x282c37);
+      this.sunLight.color.setHex(0x38bdf8);
+      this.hemiLight.intensity = 0.45;
+      this.hemiLight.color.setHex(0x1e293b);
     } else {
-      this.sunLight.intensity = 1.85;
-      this.sunLight.color.setHex(0xfff6e6);
-      this.hemiLight.intensity = 1.15;
-      this.hemiLight.color.setHex(0xfffaf0);
+      this.scene.background.setHex(0x72b1ea);
+      this.scene.fog.color.setHex(0x98c4ea);
+      this.scene.fog.near = 120;
+      this.scene.fog.far = 480;
+      this.sunLight.intensity = 1.45;
+      this.sunLight.color.setHex(0xfff8ee);
+      this.hemiLight.intensity = 0.95;
+      this.hemiLight.color.setHex(0xcde8ff);
     }
 
     return this.isNight;

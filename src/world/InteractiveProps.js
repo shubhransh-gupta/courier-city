@@ -383,6 +383,9 @@ export class InteractiveProps {
         bench.rotation.y = cfg.rotY;
         bench.scale.set(1.4, 1.4, 1.4);
         this.scene.add(bench);
+
+        // Solid collider for bench
+        this.physicsWorld.addStaticBox(cfg.pos.x, 0.6, cfg.pos.z, 1.3, 0.6, 0.7);
       });
     });
 
@@ -407,6 +410,9 @@ export class InteractiveProps {
         const pLight = new THREE.PointLight(0xff9e42, 1.6, 14);
         pLight.position.set(pos.x, pos.y + 1.2, pos.z);
         this.scene.add(pLight);
+
+        // Solid collider for stone lantern
+        this.physicsWorld.addStaticBox(pos.x, 0.8, pos.z, 0.75, 0.8, 0.75);
       });
     });
 
@@ -432,6 +438,9 @@ export class InteractiveProps {
         const pLight = new THREE.PointLight(0xffa834, 1.8, 16);
         pLight.position.set(cfg.pos.x, cfg.pos.y + 4.2, cfg.pos.z);
         this.scene.add(pLight);
+
+        // Solid pole collider
+        this.physicsWorld.addStaticBox(cfg.pos.x, 2.5, cfg.pos.z, 0.45, 2.5, 0.45, false, false, true);
       });
     });
 
@@ -446,6 +455,9 @@ export class InteractiveProps {
           fence.rotation.y = Math.PI / 2;
           fence.scale.set(1.2, 1.2, 1.2);
           this.scene.add(fence);
+
+          // Solid fence collider
+          this.physicsWorld.addStaticBox(x, 0.6, z, 0.35, 0.6, 1.8);
         });
       }
     });
@@ -468,6 +480,9 @@ export class InteractiveProps {
         tree.scale.set(cfg.s, cfg.s, cfg.s);
         tree.rotation.y = Math.random() * Math.PI * 2;
         this.scene.add(tree);
+
+        // Solid tree trunk collider
+        this.physicsWorld.addStaticBox(cfg.pos.x, 2.5, cfg.pos.z, 0.85 * cfg.s, 2.5, 0.85 * cfg.s, false, false, true);
       });
     });
   }

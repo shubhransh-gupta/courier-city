@@ -341,8 +341,8 @@ export class AutoRickshaw {
         this.currentSpeed *= Math.max(0, 1 - 4.5 * dt);
       }
 
-      // Steering & Fork Pivot: agile Bengaluru 3-wheeler turning (Right = +steer, Left = -steer)
-      const targetSteer = turnInput * this.maxSteerAngle;
+      // Steering & Fork Pivot: agile Bengaluru 3-wheeler turning (Left = steer left, Right = steer right)
+      const targetSteer = -turnInput * this.maxSteerAngle;
       this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 20);
       if (this.frontFork) {
         this.frontFork.rotation.y = this.steerAngle;

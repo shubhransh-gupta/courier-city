@@ -261,8 +261,8 @@ export class Vehicle {
         this.currentSpeed *= Math.max(0, 1 - 3 * dt);
       }
 
-      // Steering: sharp, responsive arcade steering
-      const targetSteer = turnInput * this.maxSteerAngle;
+      // Steering: sharp, responsive arcade steering (Left = steer left, Right = steer right)
+      const targetSteer = -turnInput * this.maxSteerAngle;
       this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 18);
 
       // Always allow steering if the car has any throttle/brake input or motion!
@@ -481,57 +481,10 @@ export class Vehicle {
   }
 
   resolveCollisions(x, z) {
-    let finalX = x;
-    let finalZ = z;
-    let collided = false;
-    let isTree = false;
-
-    const obstacles = this.physicsWorld.obstacles || [];
-    const r = this.radius;
-    const vehicleY = this.position.y;
-
-    for (const b of obstacles) {
-      if (b.isRamp) continue; // Don't block ramp entrance!
-
-      // Broadphase spatial check: skip obstacles far from vehicle
-      if (Math.abs(b.x - finalX) > b.hx + r + 1.0 || Math.abs(b.z - finalZ) > b.hz + r + 1.0) {
-        continue;
-      }
-
-      // If obstacle is a flyover pillar and vehicle is elevated on a ramp or flyover deck, skip it!
-      if (b.isPillar && vehicleY > 1.5) {
-        continue;
-      }
-
-      // 3D vertical clearance: If car's base is at or above the obstacle's top surface, skip horizontal collision!
-      const minY = b.y - b.hy;
-      const maxY = b.y + b.hy;
-      if (vehicleY + 0.3 < minY || vehicleY >= maxY - 0.25) {
-        continue;
-      }
-
-      const closestX = Math.max(b.x - b.hx, Math.min(finalX, b.x + b.hx));
-      const closestZ = Math.max(b.z - b.hz, Math.min(finalZ, b.z + b.hz));
-
-      const dx = finalX - closestX;
-      const dz = finalZ - closestZ;
-      const distSq = dx * dx + dz * dz;
-
-      if (distSq < r * r) {
-        collided = true;
-        if (b.isTree) isTree = true;
-        const dist = Math.sqrt(distSq);
-        if (dist > 0.0001) {
-          const overlap = r - dist;
-          finalX += (dx / dist) * overlap;
-          finalZ += (dz / dist) * overlap;
-        } else {
-          finalX += r;
-        }
-      }
+    if (this.physicsWorld && typeof this.physicsWorld.resolveSphereCollision === 'function') {
+      return this.physicsWorld.resolveSphereCollision(x, this.position.y + 0.45, z, this.radius);
     }
-
-    return { x: finalX, z: finalZ, collided, isTree };
+    return { x, z, collided: false, isTree: false };
   }
 
   getExitPosition() {

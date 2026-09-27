@@ -577,8 +577,8 @@ export class SportsCar {
         this.currentSpeed *= Math.max(0, 1 - 2.5 * dt);
       }
 
-      // Steering: razor-sharp supercar handling (Right = +steer, Left = -steer)
-      const targetSteer = turnInput * this.maxSteerAngle;
+      // Steering: razor-sharp supercar handling (Left = steer left, Right = steer right)
+      const targetSteer = -turnInput * this.maxSteerAngle;
       this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 22);
 
       const effectiveSpeed = Math.max(Math.abs(this.currentSpeed), (throttle !== 0) ? 3.0 : 0);

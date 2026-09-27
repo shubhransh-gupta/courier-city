@@ -32,10 +32,10 @@ export class BrunoMaterialSystem {
     this.slabsTexture.wrapT = THREE.RepeatWrapping;
     this.slabsTexture.repeat.set(16, 16);
 
-    // 3. Shading parameters from Bruno Simon's Lighting.js
-    this.shadowColor = new THREE.Color('#78486e');      // Warm purple-amber shadow tint
-    this.bounceColor = new THREE.Color('#e0a575');      // Warm floor bounce reflection
-    this.sunColor = new THREE.Color('#fff9ee');
+    // 3. Shading parameters
+    this.shadowColor = new THREE.Color('#2d3748');      // Deep neutral-cool shadow tone
+    this.bounceColor = new THREE.Color('#557a54');      // Soft natural grass/ground reflection
+    this.sunColor = new THREE.Color('#fff8ee');
 
     this.initGradients();
     this.initBaseMaterials();
@@ -104,10 +104,9 @@ export class BrunoMaterialSystem {
         `
         #include <dithering_fragment>
         
-        // Bruno Simon Warm GI Ground Bounce
-        // Underside faces catch warm reflection from the sandy floor
-        float bounceFactor = smoothstep(-1.0, 0.6, -normal.y);
-        gl_FragColor.rgb += uBounceColor * bounceFactor * 0.22;
+        // Natural soft ground bounce reflection
+        float bounceFactor = smoothstep(-1.0, 0.4, -normal.y);
+        gl_FragColor.rgb += uBounceColor * bounceFactor * 0.08;
         `
       );
     };

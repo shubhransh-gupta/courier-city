@@ -286,5 +286,83 @@ export class PhysicsWorld {
   removeBody(body) {
     this.world.removeBody(body);
   }
+
+  /**
+   * Universal, impenetrable sphere vs static box obstacle collision resolution
+   * Used by SportsCar, BrunoToyCar, Vehicle, AutoRickshaw, Bus, MonsterTruck, Motorbike, and Player
+   */
+  resolveSphereCollision(x, y, z, radius) {
+    let finalX = x;
+    let finalZ = z;
+    let collided = false;
+    let isTree = false;
+
+    const obstacles = this.obstacles || [];
+    const r = radius;
+
+    for (const b of obstacles) {
+      if (b.isRamp) continue; // Allow driving onto ramps
+
+      // Broadphase spatial distance check: skip obstacles far from object
+      if (Math.abs(b.x - finalX) > b.hx + r + 1.5 || Math.abs(b.z - finalZ) > b.hz + r + 1.5) {
+        continue;
+      }
+
+      // If obstacle is a flyover pillar and entity is elevated on flyover deck/ramp, skip it
+      if (b.isPillar && y > 1.5) continue;
+
+      const minY = b.y - b.hy;
+      const maxY = b.y + b.hy;
+      // 3D vertical clearance: skip if entirely above top surface or completely below
+      if (y + 0.3 < minY || y >= maxY - 0.2) continue;
+
+      const isInsideX = (finalX >= b.x - b.hx) && (finalX <= b.x + b.hx);
+      const isInsideZ = (finalZ >= b.z - b.hz) && (finalZ <= b.z + b.hz);
+
+      if (isInsideX && isInsideZ) {
+        // Deep interior penetration: push out along shortest axis to exterior
+        collided = true;
+        if (b.isTree) isTree = true;
+        const leftDist = finalX - (b.x - b.hx);
+        const rightDist = (b.x + b.hx) - finalX;
+        const backDist = finalZ - (b.z - b.hz);
+        const frontDist = (b.z + b.hz) - finalZ;
+        const minDist = Math.min(leftDist, rightDist, backDist, frontDist);
+
+        if (minDist === leftDist) {
+          finalX = b.x - b.hx - r;
+        } else if (minDist === rightDist) {
+          finalX = b.x + b.hx + r;
+        } else if (minDist === backDist) {
+          finalZ = b.z - b.hz - r;
+        } else {
+          finalZ = b.z + b.hz + r;
+        }
+      } else {
+        // Exterior sphere-box overlap
+        const closestX = Math.max(b.x - b.hx, Math.min(finalX, b.x + b.hx));
+        const closestZ = Math.max(b.z - b.hz, Math.min(finalZ, b.z + b.hz));
+
+        const dx = finalX - closestX;
+        const dz = finalZ - closestZ;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq < r * r) {
+          collided = true;
+          if (b.isTree) isTree = true;
+          const dist = Math.sqrt(distSq);
+          if (dist > 0.0001) {
+            const push = r - dist;
+            finalX += (dx / dist) * push;
+            finalZ += (dz / dist) * push;
+          } else {
+            finalX += (finalX >= b.x ? 1 : -1) * r;
+          }
+        }
+      }
+    }
+
+    return { x: finalX, z: finalZ, collided, isTree };
+  }
 }
 
