@@ -46,9 +46,9 @@ export class DioramaPostProcessing {
       uniforms: {
         tDiffuse: { value: null },
         uResolution: { value: new THREE.Vector2(width, height) },
-        uStart: { value: 0.16 },    // Distance from center Y before blur starts
-        uEnd: { value: 0.48 },      // Full blur at screen edges
-        uAmount: { value: 0.0032 }  // Blur strength
+        uStart: { value: 0.32 },    // Keep central 65% of screen pin-sharp
+        uEnd: { value: 0.52 },      // Gentle blur at top and bottom horizon margins
+        uAmount: { value: 0.0024 }  // Subtle photographic lens blur
       },
       vertexShader: `
         varying vec2 vUv;

@@ -432,8 +432,8 @@ export class BrunoToyCar {
         this.currentSpeed *= Math.max(0, 1 - 3.2 * dt);
       }
 
-      // 2. Smooth, sharp, responsive arcade steering
-      const targetSteer = turnInput * this.maxSteerAngle;
+      // 2. Smooth, sharp, responsive arcade steering (Left = steer left, Right = steer right)
+      const targetSteer = -turnInput * this.maxSteerAngle;
       this.steerAngle += (targetSteer - this.steerAngle) * Math.min(1, dt * 20.0);
 
       const isTryingToMove = (input.isDown('KeyW') || input.isDown('ArrowUp') || input.isDown('KeyS') || input.isDown('ArrowDown'));
@@ -667,51 +667,10 @@ export class BrunoToyCar {
   }
 
   resolveCollisions(x, z) {
-    let finalX = x;
-    let finalZ = z;
-    let collided = false;
-    let isTree = false;
-
-    const obstacles = this.physicsWorld.obstacles || [];
-    const r = this.radius;
-    const vehicleY = this.position.y;
-
-    for (const b of obstacles) {
-      if (b.isRamp) continue;
-
-      // Spatial broadphase check
-      if (Math.abs(b.x - finalX) > b.hx + r + 1.0 || Math.abs(b.z - finalZ) > b.hz + r + 1.0) {
-        continue;
-      }
-
-      if (b.isPillar && vehicleY > 1.5) continue;
-
-      const minY = b.y - b.hy;
-      const maxY = b.y + b.hy;
-      if (vehicleY + 0.3 < minY || vehicleY >= maxY - 0.25) continue;
-
-      const closestX = Math.max(b.x - b.hx, Math.min(finalX, b.x + b.hx));
-      const closestZ = Math.max(b.z - b.hz, Math.min(finalZ, b.z + b.hz));
-
-      const dx = finalX - closestX;
-      const dz = finalZ - closestZ;
-      const distSq = dx * dx + dz * dz;
-
-      if (distSq < r * r) {
-        collided = true;
-        if (b.isTree) isTree = true;
-        const dist = Math.sqrt(distSq);
-        if (dist > 0.0001) {
-          const push = r - dist;
-          finalX += (dx / dist) * push;
-          finalZ += (dz / dist) * push;
-        } else {
-          finalX += r;
-        }
-      }
+    if (this.physicsWorld && typeof this.physicsWorld.resolveSphereCollision === 'function') {
+      return this.physicsWorld.resolveSphereCollision(x, this.position.y + 0.45, z, this.radius);
     }
-
-    return { x: finalX, z: finalZ, collided, isTree };
+    return { x, z, collided: false, isTree: false };
   }
 
   getExitPosition() {

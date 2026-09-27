@@ -102,26 +102,41 @@ export class CityBuilder {
 
   initMaterials() {
     this.materials = {
-      // Bruno Simon signature diorama studio floor (warm matte cream/sand with paving slabs)
+      // Natural, realistic open-world Bangalore landscape materials
       grass: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
-        color: 0xe5d9ca,
-        map: brunoMaterials.slabsTexture,
-        roughness: 0.92,
+        color: 0x4d7c4d, // Rich, realistic garden lawn green
+        roughness: 0.94,
         metalness: 0.0
       })),
-      parkGreen: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x78a072, roughness: 0.9, metalness: 0.0 })),
-      sand: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xe3d3be, roughness: 0.95, metalness: 0.0 })),
+      parkGreen: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
+        color: 0x3d7448, // Lush manicured park green (Cubbon Park / Lalbagh)
+        roughness: 0.88,
+        metalness: 0.0
+      })),
+      sand: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
+        color: 0xdeb887, // Natural golden riverbank sand
+        roughness: 0.95,
+        metalness: 0.0
+      })),
       water: new THREE.MeshStandardMaterial({
-        color: 0x5294a6,
-        roughness: 0.35,
-        metalness: 0.1,
+        color: 0x1e88e5, // Vibrant azure river water
+        roughness: 0.25,
+        metalness: 0.15,
         transparent: true,
-        opacity: 0.92
+        opacity: 0.90
       }),
-      road: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0x38353a, roughness: 0.88, metalness: 0.05 })),
-      roadMarking: new THREE.MeshBasicMaterial({ color: 0xf5efe6 }),
-      roadWhite: new THREE.MeshBasicMaterial({ color: 0xfbf9f5 }),
-      sidewalk: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({ color: 0xd8cebf, roughness: 0.85, metalness: 0.02 })),
+      road: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
+        color: 0x27292d, // Clean dark charcoal asphalt road
+        roughness: 0.85,
+        metalness: 0.05
+      })),
+      roadMarking: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+      roadWhite: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+      sidewalk: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
+        color: 0xc8cbcf, // Clean urban curb concrete
+        roughness: 0.85,
+        metalness: 0.02
+      })),
       tajMarble: brunoMaterials.enhanceMaterialWithBrunoShading(new THREE.MeshStandardMaterial({
         color: 0xf7f5f0,
         roughness: 0.35,
