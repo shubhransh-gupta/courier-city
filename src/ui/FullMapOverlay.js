@@ -140,17 +140,24 @@ export class FullMapOverlay {
     }
 
     // Close on backdrop click (outside modal card)
+    const mapModal = this.overlay.querySelector('.map-modal');
+    if (mapModal) {
+      mapModal.addEventListener('click', (e) => e.stopPropagation());
+      mapModal.addEventListener('pointerdown', (e) => e.stopPropagation());
+      mapModal.addEventListener('mousedown', (e) => e.stopPropagation());
+    }
+
     if (this.overlay) {
-      this.overlay.addEventListener('click', (e) => {
+      const handleBackdrop = (e) => {
         if (e.target === this.overlay) {
+          e.preventDefault();
+          e.stopPropagation();
           this.toggle(false);
         }
-      });
-      this.overlay.addEventListener('touchend', (e) => {
-        if (e.target === this.overlay) {
-          this.toggle(false);
-        }
-      });
+      };
+      this.overlay.addEventListener('click', handleBackdrop);
+      this.overlay.addEventListener('pointerdown', handleBackdrop);
+      this.overlay.addEventListener('touchend', handleBackdrop);
     }
 
     // Card buttons
@@ -318,6 +325,10 @@ export class FullMapOverlay {
   toggle(forceState = null) {
     this.isOpen = (forceState !== null) ? forceState : !this.isOpen;
     if (this.isOpen) {
+      if (this.game) {
+        if (this.game.toggleCameraModal) this.game.toggleCameraModal(false);
+        if (this.game.hud && this.game.hud.isControlsOpen) this.game.hud.toggleControls(false);
+      }
       this.overlay.classList.remove('map-overlay-hidden');
       this.hideActionCard();
       this._startRenderLoop();

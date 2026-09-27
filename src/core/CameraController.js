@@ -77,11 +77,17 @@ export class CameraController {
     });
 
     window.addEventListener('wheel', (e) => {
+      if (e.target && e.target.closest && e.target.closest('#camera-modal, #controls-modal, #full-map-overlay, #welcome-landing-modal, .camera-card, .controls-card, .map-modal')) {
+        return;
+      }
       this.targetDistance = Math.max(6.0, Math.min(50.0, this.targetDistance + e.deltaY * 0.015));
     }, { passive: true });
 
     // Keyboard controls (KeyI, KeyK, KeyJ, KeyL for camera orbit, Arrow keys reserved for vehicle driving!)
     window.addEventListener('keydown', (e) => {
+      if (e.target && e.target.closest && e.target.closest('input, textarea, #camera-modal, #controls-modal, #full-map-overlay')) {
+        return;
+      }
       if (e.code === 'KeyI') {
         this.keys.up = true;
       } else if (e.code === 'KeyK') {
@@ -90,8 +96,6 @@ export class CameraController {
         this.keys.left = true;
       } else if (e.code === 'KeyL') {
         this.keys.right = true;
-      } else if (e.code === 'KeyV') {
-        this.toggleViewMode();
       }
     });
 
