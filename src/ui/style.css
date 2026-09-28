@@ -432,8 +432,8 @@ html, body {
 }
 
 @keyframes cardFadeSlideUp {
-  0% { opacity = 0; transform = translate(-50%, 12px); }
-  100% { opacity = 1; transform = translate(-50%, 0); }
+  0% { opacity: 0; transform: translate(-50%, 12px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
 }
 
 .map-action-card.hidden {
@@ -888,10 +888,10 @@ html, body {
   background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #ffffff;
   border: none;
-  border-radius = 9999px;
+  border-radius: 9999px;
   padding: 14px 34px;
-  font-size = 1rem;
-  font-weight = 700;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -970,14 +970,14 @@ html, body {
   font-size: 0.68rem;
   font-weight: 700;
   padding: 3px 8px;
-  border-radius = 6px;
-  letter-spacing = 0.04em;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
 }
 
 .camera-header h3 {
   margin: 0;
-  font-size = 1.15rem;
-  font-weight = 600;
+  font-size: 1.15rem;
+  font-weight: 600;
   color: #0f172a;
 }
 
@@ -989,7 +989,7 @@ html, body {
   color: #64748b;
   cursor: pointer;
   padding: 4px;
-  border-radius = 6px;
+  border-radius: 6px;
 }
 
 .camera-close-btn:hover {
@@ -1004,7 +1004,7 @@ html, body {
 
 .section-label {
   font-size: 0.74rem;
-  font-weight = 700;
+  font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1024,7 +1024,7 @@ html, body {
   font-size: 0.78rem;
   font-weight: 600;
   padding: 10px 12px;
-  border-radius = 10px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
@@ -1068,7 +1068,7 @@ html, body {
 
 .cam-val-badge {
   font-size: 0.74rem;
-  font-weight = 700;
+  font-weight: 700;
   color: #7c3aed;
   background: #f5f3ff;
   padding: 2px 8px;
@@ -1212,14 +1212,13 @@ html, body {
   font-weight: bold;
 }
 
- .touch-btn:hover {
-    background: rgba(0, 0, 0, 0.7);
+.touch-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .touch-btn:active {
-    background: rgba(0, 0, 0, 0.8);
-    transform: scale(0.95);
-}
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(0.95);
 }
 
 .touch-controls.hidden {

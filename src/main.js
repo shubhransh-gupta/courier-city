@@ -102,6 +102,11 @@ class Game {
     this.postProcessing = new DioramaPostProcessing(this.renderer, this.scene, this.camera);
     this.ambientAirTraffic = new AmbientAirTrafficSystem(this.scene, this.physicsWorld, this.audioManager);
   }
+
+  initEntities() {
+    // 1. Character Player
+    this.player = new Player(this.scene, this.physicsWorld, this.audioManager, this.bloodVfx);
+
     // 2. Comprehensive High-Performance, Exotic & City Vehicle Fleet
     this.vehicles = [];
 
