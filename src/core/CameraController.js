@@ -356,10 +356,10 @@ export class CameraController {
         }
 
         if (closestHit < totalDist) {
-          const safeDist = Math.max(4.0, closestHit - 0.7);
+          const safeDist = Math.max(6.0, closestHit - 0.5);
           desiredCamPos.copy(rayStart).addScaledVector(rayDir, safeDist);
           // Elevate camera slightly to look over building facade into alleyway
-          desiredCamPos.y = Math.max(desiredCamPos.y, targetPos.y + 3.2);
+          desiredCamPos.y = Math.max(desiredCamPos.y, targetPos.y + 5.0);
         }
       }
     }

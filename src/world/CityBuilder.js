@@ -3998,7 +3998,12 @@ export class CityBuilder {
     this.createAutoRickshaw(soudhaGroup, 28, 28, 0.6);
 
     this.scene.add(soudhaGroup);
-    this.physicsWorld.addStaticBox(-240, 12, -44, 45, 12, 18);
+    this.physicsWorld.addStaticBox(-240, 13, -44, 44, 11, 17);
+    this.physicsWorld.addStaticBox(-240, 34, -44, 12, 10.5, 12);
+    this.physicsWorld.addStaticBox(-278, 14, -56, 4.5, 14, 4.5);
+    this.physicsWorld.addStaticBox(-202, 14, -56, 4.5, 14, 4.5);
+    this.physicsWorld.addStaticBox(-278, 14, -32, 4.5, 14, 4.5);
+    this.physicsWorld.addStaticBox(-202, 14, -32, 4.5, 14, 4.5);
     this.physicsWorld.addStaticBox(-221, 4.25, -40, 1.2, 4.25, 1.2);
     this.physicsWorld.addStaticBox(-221, 4.25, -12, 1.2, 4.25, 1.2);
   }
