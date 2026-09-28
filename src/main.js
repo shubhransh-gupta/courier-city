@@ -64,6 +64,14 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
+    // Handle webgl context lost/restored
+    this.canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      console.log('WebGL context lost');
+    }, false);
+    this.canvas.addEventListener('webglcontextrestored', () => {
+      console.log('WebGL context restored');
+    }, false);
   }
 
   initScene() {
@@ -88,10 +96,11 @@ class Game {
     this.skyCreatures = new SkyCreatures(this.scene);
     this.animalSystem = new AnimalWanderSystem(this.scene, this.physicsWorld);
     this.interactiveProps = new InteractiveProps(this.scene, this.physicsWorld, this.audioManager);
-    this.minimap = new Minimap('radar-canvas', this);
+    this.minimap = new Minimap("radar-canvas", this);
     this.hud = new HUD();
     this.fullMapOverlay = new FullMapOverlay(this);
     this.postProcessing = new DioramaPostProcessing(this.renderer, this.scene, this.camera);
+    this.ambientAirTraffic = new AmbientAirTrafficSystem(this.scene, this.physicsWorld, this.audioManager);
   }
 
   initEntities() {
@@ -335,6 +344,26 @@ class Game {
         this.spawnCarNearPlayer();
       }
     });
+
+    // Touch controls visibility: show when touch detected, hide after 2s of no touch
+    const touchControls = document.getElementById('touch-controls');
+    if (touchControls) {
+      let touchHideTimeout = null;
+
+      const showTouchControls = () => {
+        touchControls.classList.remove('hidden');
+        // Hide after 2 seconds of no touch
+        if (touchHideTimeout) clearTimeout(touchHideTimeout);
+        touchHideTimeout = setTimeout(() => {
+          touchControls.classList.add('hidden');
+        }, 3000);
+      };
+
+      window.addEventListener('touchstart', showTouchControls, { passive: true });
+
+      // Also show controls briefly on touchmove to keep them visible during interaction
+      window.addEventListener('touchmove', showTouchControls, { passive: true });
+    }
   }
 
   initCameraModal() {
@@ -936,6 +965,7 @@ class Game {
     if (this.player.isDriving && this.activeVehicle) {
       this.crowdSystem.checkVehicleCollisions(this.activeVehicle, this.bloodVfx, this.hud, this.audioManager);
     }
+    this.ambientAirTraffic.update(dt, currentTime * 0.001);
     this.metroSystem.update(dt);
 
     // Throttle distant/decorative systems to every other frame
