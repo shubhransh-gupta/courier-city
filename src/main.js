@@ -27,6 +27,7 @@ import { SkidMarkSystem } from './world/SkidMarkSystem.js';
 import { InteractiveProps } from './world/InteractiveProps.js';
 import { BrunoToyCar } from './entities/BrunoToyCar.js';
 import { DioramaPostProcessing } from './core/DioramaPostProcessing.js';
+import { AmbientAirTrafficSystem } from './world/AmbientAirTrafficSystem.js';
 
 class Game {
   constructor() {
@@ -100,7 +101,11 @@ class Game {
     this.hud = new HUD();
     this.fullMapOverlay = new FullMapOverlay(this);
     this.postProcessing = new DioramaPostProcessing(this.renderer, this.scene, this.camera);
-    this.ambientAirTraffic = new AmbientAirTrafficSystem(this.scene, this.physicsWorld, this.audioManager);
+    try {
+      this.ambientAirTraffic = new AmbientAirTrafficSystem(this.scene, this.physicsWorld, this.audioManager);
+    } catch (err) {
+      console.warn('AmbientAirTrafficSystem initialization error:', err);
+    }
   }
 
   initEntities() {
@@ -237,42 +242,15 @@ class Game {
 
     // Welcome Landing Screen Dismissal (Handles both pointer, touch and click immediately)
     const startBtn = document.getElementById('start-game-btn');
-    const landingModal = document.getElementById('welcome-landing-modal');
-    if (startBtn && landingModal) {
-      const dismissWelcome = (e) => {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        // Hide modal visually
-        landingModal.classList.add('welcome-hidden');
-        landingModal.style.display = 'none';
-        landingModal.style.pointerEvents = 'none';
-        // Attempt to resume audio context safely
-        try {
-          if (this.audioManager && this.audioManager.ctx && this.audioManager.ctx.state === 'suspended') {
-            this.audioManager.ctx.resume();
-          }
-        } catch (err) {
-          console.warn('Audio resume error:', err);
-        }
-        // Show welcome toast if HUD is ready
-        try {
-          if (this.hud && typeof this.hud.showToast === 'function') {
-            this.hud.showToast('Welcome to Courier City! Presented by Shubhransh Gupta');
-          }
-        } catch (err) {
-          console.warn('HUD toast error:', err);
-        }
-        // Remove modal element from DOM to free resources
-        if (landingModal.parentNode) {
-          landingModal.parentNode.removeChild(landingModal);
+    if (startBtn) {
+      const handleDismiss = (e) => {
+        if (typeof window.dismissWelcomeModal === 'function') {
+          window.dismissWelcomeModal(e);
         }
       };
-
-      startBtn.addEventListener('click', dismissWelcome);
-      startBtn.addEventListener('pointerdown', dismissWelcome);
-      startBtn.addEventListener('touchend', dismissWelcome);
+      startBtn.addEventListener('click', handleDismiss);
+      startBtn.addEventListener('touchend', handleDismiss);
+      startBtn.addEventListener('pointerdown', handleDismiss);
     }
 
     // Toggle Map Button & GPS Widget Click
@@ -965,7 +943,9 @@ class Game {
     if (this.player.isDriving && this.activeVehicle) {
       this.crowdSystem.checkVehicleCollisions(this.activeVehicle, this.bloodVfx, this.hud, this.audioManager);
     }
-    this.ambientAirTraffic.update(dt, currentTime * 0.001);
+    if (this.ambientAirTraffic && typeof this.ambientAirTraffic.update === 'function') {
+      this.ambientAirTraffic.update(dt, currentTime * 0.001);
+    }
     this.metroSystem.update(dt);
 
     // Throttle distant/decorative systems to every other frame

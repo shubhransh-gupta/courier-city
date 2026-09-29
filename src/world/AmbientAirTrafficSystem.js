@@ -169,13 +169,7 @@ export class AmbientAirTrafficSystem {
       }
 
       // Update airplane physics
-      const fakeInput = {
-        getForward: () => 1, // Always forward for ambient traffic
-        getTurn: () => 0,
-        isDown: () => false,
-        isSprinting: () => false
-      };
-      airplane.update(dt, fakeInput, true);
+      airplane.update(dt, null, false);
     }
   }
 
@@ -209,13 +203,7 @@ export class AmbientAirTrafficSystem {
       }
 
       // Update helicopter physics
-      const fakeInput = {
-        getForward: () => 1, // Always forward for ambient traffic
-        getTurn: () => 0,
-        isDown: () => false,
-        isSprinting: () => false
-      };
-      helicopter.update(dt, fakeInput, true);
+      helicopter.update(dt, null, false);
     }
   }
 
