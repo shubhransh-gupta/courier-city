@@ -47,13 +47,45 @@
       </div>
 
       <div class="welcome-actions">
-        <button id="start-game-btn" class="welcome-start-btn" type="button">
+        <button id="start-game-btn" class="welcome-start-btn" type="button" onclick="window.dismissWelcomeModal && window.dismissWelcomeModal(event)">
           <span>START EXPLORING CITY</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
     </div>
   </div>
+
+  <script>
+    window.dismissWelcomeModal = function(e) {
+      if (e) {
+        try { e.preventDefault(); } catch (_) {}
+        try { e.stopPropagation(); } catch (_) {}
+      }
+      var modal = document.getElementById('welcome-landing-modal');
+      if (modal) {
+        modal.classList.add('welcome-hidden');
+        modal.style.display = 'none';
+        modal.style.pointerEvents = 'none';
+        setTimeout(function() {
+          if (modal && modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+          }
+        }, 300);
+      }
+      if (window.game) {
+        try {
+          if (window.game.audioManager && window.game.audioManager.ctx && window.game.audioManager.ctx.state === 'suspended') {
+            window.game.audioManager.ctx.resume();
+          }
+        } catch (_) {}
+        try {
+          if (window.game.hud && typeof window.game.hud.showToast === 'function') {
+            window.game.hud.showToast('Welcome to Courier City! Presented by Shubhransh Gupta');
+          }
+        } catch (_) {}
+      }
+    };
+  </script>
 
   <!-- Clean, minimalist Messenger-style HUD -->
   <div id="ui-layer">
