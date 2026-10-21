@@ -1,63 +1,92 @@
 /* ==========================================================================
-   Courier City — Bharat 3D Open World & Interactive India Map Styling
+   Courier City — Modern Urban UI & Interactive India Map Styling
    Presented by Shubhransh Gupta
    ========================================================================== */
 
-/* --- Brand Row & Masthead Customization --- */
+:root {
+  --cc-bg: #090d16;
+  --cc-surface: rgba(15, 23, 42, 0.75);
+  --cc-surface-solid: #0f172a;
+  --cc-border: rgba(255, 255, 255, 0.12);
+  --cc-text: #f8fafc;
+  --cc-text-muted: #94a3b8;
+  --cc-emerald: #10b981;
+  --cc-emerald-glow: rgba(16, 185, 129, 0.25);
+  --cc-amber: #f59e0b;
+  --cc-cyan: #06b6d4;
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+}
+
+/* --- Global Overrides for Cleaner, Smaller Modern Typography --- */
+html, body {
+  font-family: var(--font-main) !important;
+  color: var(--cc-text) !important;
+}
+
+#home {
+  background-color: #0b1120 !important;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.22), transparent 70%),
+    radial-gradient(circle at 10% 80%, rgba(16, 185, 129, 0.12), transparent 50%) !important;
+  color: var(--cc-text) !important;
+}
+
+/* --- Refined Modern Masthead --- */
 .masthead {
-  padding: clamp(16px, 2.5vh, 28px) clamp(16px, 3.5vw, 48px) 0 !important;
+  padding: 18px clamp(16px, 3vw, 40px) 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 8px !important;
+  gap: 6px !important;
   align-items: flex-start !important;
 }
 
 .brand-badge-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(35, 26, 38, 0.08);
-  border: 1px solid rgba(35, 26, 38, 0.2);
-  padding: 5px 12px 4px;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 4px 11px 3px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--ink);
+  letter-spacing: 0.06em;
+  color: #34d399;
   text-transform: uppercase;
 }
 
 .brand-badge-pill .pulse-green-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  background: var(--cc-emerald);
+  box-shadow: 0 0 8px var(--cc-emerald);
   animation: beacon-pulse 2s infinite ease-out;
 }
 
 .masthead h1 {
-  font: 400 clamp(30px, 3.2vw, 44px)/1 "Rozha One", serif !important;
+  font: 800 clamp(22px, 2.2vw, 30px)/1.15 var(--font-main) !important;
   margin: 0 !important;
-  letter-spacing: -0.01em;
-  color: var(--ink);
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+  text-transform: uppercase;
 }
 
 .masthead .intro {
   margin: 0 !important;
-  max-width: 52em !important;
-  font-size: clamp(13px, 1vw, 15px) !important;
+  max-width: 58em !important;
+  font-size: 13px !important;
   line-height: 1.45 !important;
-  color: var(--ink-2);
+  color: var(--cc-text-muted) !important;
 }
 
 /* --- Interactive India Explorer Layout --- */
 .india-explorer-layout {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
-  gap: clamp(16px, 2.5vw, 36px);
-  padding: clamp(12px, 2vh, 24px) clamp(16px, 3.5vw, 48px);
-  align-items: center;
+  gap: clamp(14px, 2vw, 28px);
+  padding: 14px clamp(16px, 3vw, 40px) 10px;
+  align-items: stretch;
   min-height: 0;
   flex: 1;
   position: relative;
@@ -67,18 +96,17 @@
 @media (max-width: 980px) {
   .india-explorer-layout {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
     overflow-y: auto;
   }
 }
 
-/* --- Left: Cartographic India Map Container --- */
+/* --- Left: Cartographic India Map Viewport --- */
 .india-map-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  min-height: 480px;
+  gap: 8px;
+  min-height: 440px;
 }
 
 .map-control-bar {
@@ -86,13 +114,14 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 6px 14px;
-  background: rgba(230, 218, 198, 0.65);
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--cc-surface);
+  backdrop-filter: blur(10px);
   border-radius: 8px;
-  border: 1px solid rgba(93, 81, 89, 0.15);
-  font-size: 12px;
-  color: var(--ink);
+  border: 1px solid var(--cc-border);
+  font-size: 11.5px;
+  color: var(--cc-text);
 }
 
 .map-control-title {
@@ -102,61 +131,73 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: #e2e8f0;
 }
 
 .map-legend-items {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .legend-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
+  color: var(--cc-text-muted);
 }
 
 .dot-beacon {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   display: inline-block;
 }
 
 .dot-beacon.active {
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  background: var(--cc-emerald);
+  box-shadow: 0 0 8px var(--cc-emerald);
 }
 
 .dot-beacon.upcoming {
-  background: #9ca3af;
+  background: #64748b;
 }
 
 .india-map-frame {
   position: relative;
   flex: 1;
-  min-height: 440px;
-  background: rgba(239, 230, 214, 0.5);
-  border: 1.5px solid rgba(93, 81, 89, 0.25);
-  border-radius: 12px;
+  min-height: 420px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(35, 26, 38, 0.05), 0 8px 24px rgba(35, 26, 38, 0.06);
+  box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.4), 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 .india-map-svg {
   width: 100%;
   height: 100%;
   display: block;
-  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: center center;
 }
 
-/* Graticules and Compass */
+/* Official SOI Map Boundaries */
+.india-landmass {
+  fill: #1e293b;
+  stroke: #475569;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  transition: fill 0.3s ease;
+}
+
 .map-graticule {
-  stroke: rgba(93, 81, 89, 0.15);
-  stroke-dasharray: 3 4;
+  stroke: rgba(255, 255, 255, 0.04);
+  stroke-dasharray: 2 4;
   stroke-width: 1;
 }
 
@@ -164,30 +205,8 @@
   position: absolute;
   top: 14px;
   right: 14px;
-  opacity: 0.65;
+  opacity: 0.5;
   pointer-events: none;
-}
-
-/* Map Country Landmass */
-.india-landmass {
-  fill: #e8dcc8;
-  stroke: #5d5159;
-  stroke-width: 1.8;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 3px 6px rgba(35, 26, 38, 0.08));
-}
-
-.india-subdivision {
-  fill: none;
-  stroke: rgba(93, 81, 89, 0.22);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
-}
-
-.ocean-relief {
-  fill: none;
-  stroke: rgba(43, 76, 126, 0.12);
-  stroke-width: 1.2;
 }
 
 /* City Pins on Map */
@@ -199,18 +218,18 @@
 
 .map-city-pin:hover,
 .map-city-pin:focus-visible {
-  transform: scale(1.15);
+  transform: scale(1.18);
 }
 
 .map-city-pin.active-selected .core-circle {
   stroke: #ffffff;
   stroke-width: 2.5;
-  fill: #059669;
+  fill: #10b981;
 }
 
 .pulse-radar-ring {
   fill: none;
-  stroke: #10b981;
+  stroke: var(--cc-emerald);
   stroke-width: 1.5;
   opacity: 0.8;
   animation: radar-expand 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -218,58 +237,44 @@
 }
 
 @keyframes radar-expand {
-  0% {
-    r: 6;
-    opacity: 0.9;
-  }
-  70% {
-    r: 22;
-    opacity: 0.1;
-  }
-  100% {
-    r: 26;
-    opacity: 0;
-  }
+  0% { r: 5; opacity: 0.9; }
+  75% { r: 20; opacity: 0.1; }
+  100% { r: 24; opacity: 0; }
 }
 
 @keyframes beacon-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 0.75;
-  }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.75; }
 }
 
 .pin-label-group text {
-  font-family: Mukta, system-ui, sans-serif;
-  font-size: 11px;
+  font-family: var(--font-main);
+  font-size: 10px;
   font-weight: 700;
-  fill: var(--ink);
+  fill: #ffffff;
   paint-order: stroke;
-  stroke: var(--paper);
-  stroke-width: 3px;
+  stroke: #090d16;
+  stroke-width: 2.5px;
   stroke-linejoin: round;
 }
 
 .pin-label-group .vernacular-subtext {
-  font-family: "Rozha One", "Noto Serif Kannada", "Noto Serif Bengali", serif;
-  font-size: 12px;
-  fill: var(--accent, #c8402a);
+  font-family: "Noto Serif Kannada", "Noto Serif Bengali", "Noto Serif Telugu", serif;
+  font-size: 10.5px;
+  fill: var(--cc-emerald);
 }
 
 /* --- Right: City Details & Fleet Inspector Card --- */
 .city-inspector-card {
-  background: var(--paper-2);
-  border: 1.5px solid rgba(93, 81, 89, 0.22);
-  border-radius: 12px;
-  padding: clamp(16px, 2.5vw, 24px);
-  box-shadow: 0 10px 30px rgba(35, 26, 38, 0.08);
+  background: var(--cc-surface);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--cc-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   position: relative;
   z-index: 6;
 }
@@ -284,13 +289,13 @@
 .live-planet-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: #10b9811f;
-  border: 1px solid #10b98155;
-  color: #065f46;
-  font-size: 11px;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 10px;
   font-weight: 800;
-  padding: 3px 9px 2px;
+  padding: 3px 8px 2px;
   border-radius: 999px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -298,7 +303,7 @@
 
 .inspector-diorama-slot {
   width: 100%;
-  max-width: 200px;
+  max-width: 170px;
   aspect-ratio: 1;
   margin: 0 auto;
   position: relative;
@@ -309,14 +314,14 @@
 }
 
 .inspector-script-name {
-  font: 700 clamp(32px, 3vw, 44px)/1.1 "Rozha One", "Noto Serif Kannada", "Noto Serif Bengali", serif;
-  color: var(--accent, var(--flame));
-  letter-spacing: 0.02em;
+  font: 700 clamp(22px, 2.2vw, 28px)/1.15 "Noto Serif Kannada", "Noto Serif Bengali", "Noto Serif Telugu", serif;
+  color: var(--cc-amber);
+  letter-spacing: 0.01em;
 }
 
 .inspector-latin-name {
-  font: 700 20px/1.2 "Rozha One", serif;
-  color: var(--ink);
+  font: 800 17px/1.2 var(--font-main);
+  color: #ffffff;
   margin-top: 2px;
   display: flex;
   align-items: center;
@@ -324,20 +329,20 @@
 }
 
 .inspector-transit-line {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-2);
-  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cc-text-muted);
+  margin-top: 3px;
 }
 
 /* Landmarks Showcase Section */
 .inspector-section-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--ink-2);
-  margin-bottom: 5px;
+  color: #94a3b8;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -346,90 +351,89 @@
 .inspector-landmark-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .landmark-pill {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 9px;
-  border-radius: 6px;
-  background: rgba(35, 26, 38, 0.06);
-  border: 1px solid rgba(35, 26, 38, 0.12);
-  color: var(--ink);
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
 }
 
 /* Courier City Vehicle Fleet Showcase */
 .fleet-badges-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  gap: 5px;
 }
 
 .fleet-badge-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 9px;
-  background: #ffffff66;
-  border: 1px solid rgba(93, 81, 89, 0.16);
+  gap: 6px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #f1f5f9;
 }
 
 .fleet-badge-item .fleet-icon {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* Action Buttons */
 .inspector-actions {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .btn-enter-city {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--cc-emerald);
+  color: #042f2e;
   border: 0;
-  padding: 12px 18px;
-  border-radius: 8px;
-  font: 700 15px/1 Mukta, sans-serif;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font: 800 13px/1 var(--font-main);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(35, 26, 38, 0.18);
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
 .btn-enter-city:hover {
-  background: #3e2e42;
+  background: #34d399;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(35, 26, 38, 0.25);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
 }
 
 .btn-wander-city {
-  background: transparent;
-  color: var(--ink);
-  border: 1.5px solid rgba(35, 26, 38, 0.35);
-  padding: 12px 14px;
-  border-radius: 8px;
-  font: 700 14px/1 Mukta, sans-serif;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid var(--cc-border);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font: 700 12.5px/1 var(--font-main);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-wander-city:hover {
-  border-color: var(--ink);
-  background: rgba(35, 26, 38, 0.05);
+  background: rgba(255, 255, 255, 0.14);
 }
 
-/* Hide original 7-card horizontal grid during map selection */
+/* Hide original 7-card horizontal grid */
 #home:not(.loading) .cities {
   position: absolute;
   opacity: 0;
@@ -437,32 +441,138 @@
   left: -9999px;
 }
 
-/* When loading a city, hide the map and show the transit checklist */
+/* Hide Gulmohar vertical station dots */
+.route {
+  display: none !important;
+}
+
+/* --- Courier City Satellite Telemetry & Deployment Matrix --- */
 #home.loading .india-explorer-layout {
   display: none !important;
 }
 
 #home.loading .cities {
   position: static !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 20px !important;
+}
+
+#home.loading .city.chosen {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  background: var(--cc-surface-solid) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  border-radius: 14px !important;
+  padding: 24px 32px !important;
+  max-width: 580px !important;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.2) !important;
   opacity: 1 !important;
-  pointer-events: auto !important;
+  transform: none !important;
+}
+
+#home.loading .city.chosen .slot {
+  width: 180px !important;
+  aspect-ratio: 1 !important;
+  margin-bottom: 12px !important;
+}
+
+#home.loading .city.chosen .script {
+  font-size: 24px !important;
+  color: var(--cc-amber) !important;
+}
+
+#home.loading .city.chosen .latin {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+}
+
+#home.loading .city.chosen .about {
+  display: none !important;
+}
+
+#home.loading .city.chosen .step {
+  opacity: 1 !important;
+  font-family: ui-monospace, SFMono-Regular, monospace !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: var(--cc-emerald) !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 6px !important;
+  padding: 8px 16px !important;
+  margin-top: 14px !important;
+  text-align: center !important;
+  min-width: 280px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* --- Fixed Controls Footer (No Overflow / Fits Neatly) --- */
+.foot {
+  position: relative !important;
+  padding: 8px 16px !important;
+  margin: 4px auto 14px !important;
+  width: min(860px, calc(100% - 32px)) !important;
+  box-sizing: border-box !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--cc-border) !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+  z-index: 10 !important;
+}
+
+.foot p {
+  margin: 0 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  color: var(--cc-text-muted) !important;
+}
+
+.foot .keys {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+}
+
+.foot kbd {
+  font: 700 9.5px ui-monospace, monospace !important;
+  color: var(--cc-amber) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  padding: 1px 5px !important;
+  border-radius: 3px !important;
+}
+
+.foot .touchnote {
+  font-size: 10.5px !important;
+  opacity: 0.75 !important;
 }
 
 /* --- In-Game Vehicle Fleet Dock in HUD --- */
 #vehicle-dock {
   position: absolute;
-  top: 18px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(35, 26, 38, 0.85);
-  backdrop-filter: blur(8px);
-  padding: 5px 8px;
-  border-radius: 24px;
-  border: 1px solid rgba(239, 230, 214, 0.3);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  padding: 4px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--cc-border);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
   z-index: 25;
   transition: opacity 0.3s ease;
 }
@@ -470,10 +580,10 @@
 .v-dock-btn {
   background: transparent;
   border: 0;
-  color: #efe6d6;
-  font: 600 12px/1 Mukta, sans-serif;
-  padding: 5px 10px;
-  border-radius: 16px;
+  color: #cbd5e1;
+  font: 700 11.5px/1 var(--font-main);
+  padding: 5px 9px;
+  border-radius: 999px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -482,17 +592,16 @@
 }
 
 .v-dock-btn:hover {
-  background: rgba(247, 239, 224, 0.15);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .v-dock-btn.active {
-  background: #f7b32b;
-  color: #231a26;
-  font-weight: 700;
+  background: var(--cc-amber);
+  color: #0f172a;
 }
 
 .v-dock-btn kbd {
-  font: 10px monospace;
+  font: 9.5px monospace;
   background: rgba(0, 0, 0, 0.2);
   padding: 1px 4px;
   border-radius: 3px;
