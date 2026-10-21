@@ -611,3 +611,10 @@ body:has(#card:not(.gone)) #vehicle-dock,
 body:has(#home:not([hidden])) #vehicle-dock {
   display: none;
 }
+
+/* Permanently suppress floating globes, home canvas, and legacy cards */
+#home-c, canvas#home-c, #card, .card-inner, .inspector-diorama-slot {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
