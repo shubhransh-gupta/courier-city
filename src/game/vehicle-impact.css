@@ -301,3 +301,64 @@ body:has(#menu:not([hidden])) #places-hud {
   font-weight: 700;
 }
 
+/* 3. Floating Music / Next Song HUD Control */
+#music-hud {
+  position: fixed;
+  top: 16px;
+  left: 140px;
+  z-index: 26;
+  pointer-events: auto;
+}
+
+body:has(#menu:not([hidden])) #music-hud {
+  left: 240px;
+}
+
+#next-song-btn {
+  background: rgba(35, 26, 38, 0.88);
+  color: #f7efe0;
+  border: 1.5px solid rgba(247, 239, 224, 0.4);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: 700 13px/1.2 Mukta, system-ui, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+  max-width: 270px;
+}
+
+#next-song-btn:hover {
+  background: rgba(45, 34, 50, 0.96);
+  border-color: #2ed573;
+  transform: translateY(-1px);
+}
+
+#next-song-btn .music-badge {
+  background: rgba(46, 213, 115, 0.25);
+  color: #2ed573;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+#music-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 650px) {
+  #music-hud {
+    top: auto;
+    bottom: 60px;
+    right: 12px;
+    left: auto;
+  }
+}
+
