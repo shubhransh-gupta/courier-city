@@ -1,6 +1,7 @@
 /**
  * Courier City — Vehicle Driving & Pedestrian Impact Blood System
- * Allows driving Auto, Car, Bike, Bus, and renders blood particle splats when striking pedestrians.
+ * Allows driving Auto, Car, Bike, Bus, and renders blood particle splats when striking pedestrians
+ * or when coming in front of ambient traffic buses/cars.
  */
 
 import * as THREE from "three";
@@ -23,13 +24,15 @@ export class VehicleImpactSystem {
     this.particles = [];
     this.splats = [];
     this.hitCooldowns = new WeakMap();
+    this.lastPlayerTrafficHit = 0;
+    this.lastTrafficPedCheck = 0;
 
     this.configs = [
-      { id: "walk", name: "Foot", icon: "🚶", speed: 3.5, hitRadius: 0.8 },
-      { id: "auto", name: "Namma Auto", icon: "🛺", speed: 14.0, hitRadius: 2.2, horn: "autoHorn" },
-      { id: "roadster", name: "Roadster", icon: "🏎️", speed: 22.0, hitRadius: 2.4, horn: "horn" },
-      { id: "bullet", name: "Bullet 350", icon: "🏍️", speed: 17.0, hitRadius: 1.8, horn: "autoHorn" },
-      { id: "bus", name: "Volvo Bus", icon: "🚌", speed: 12.0, hitRadius: 3.2, horn: "busHorn" }
+      { id: "walk", name: "Foot", icon: "🚶", speed: 3.5, hitRadius: 1.0, halfWidth: 0.6, forwardReach: 1.0, rearReach: 0.6 },
+      { id: "auto", name: "Namma Auto", icon: "🛺", speed: 14.0, hitRadius: 2.6, halfWidth: 1.1, forwardReach: 2.2, rearReach: 1.6, horn: "autoHorn" },
+      { id: "roadster", name: "Roadster", icon: "🏎️", speed: 22.0, hitRadius: 3.4, halfWidth: 1.3, forwardReach: 3.2, rearReach: 2.4, horn: "horn" },
+      { id: "bullet", name: "Bullet 350", icon: "🏍️", speed: 17.0, hitRadius: 2.0, halfWidth: 0.8, forwardReach: 2.0, rearReach: 1.4, horn: "autoHorn" },
+      { id: "bus", name: "Volvo Bus", icon: "🚌", speed: 13.5, hitRadius: 5.8, halfWidth: 1.8, forwardReach: 5.6, rearReach: 4.5, horn: "busHorn" }
     ];
 
     this.init();
@@ -88,13 +91,42 @@ export class VehicleImpactSystem {
     window.addEventListener("keydown", (e) => {
       if (e.repeat) return;
       if (e.code === "KeyF") {
-        const next = (this.currentVehicleIndex + 1) % this.configs.length;
-        this.setVehicle(next);
+        this.handleFKeyPress();
       }
       if (e.code === "KeyH") {
         this.honk();
       }
     });
+  }
+
+  handleFKeyPress() {
+    // If on foot, check if standing near an ambient bus or traffic vehicle to board it directly
+    if (this.currentVehicleIndex === 0 && this.ctx?.traffic?.cars && this.player) {
+      let nearestVehicle = null;
+      let minDist = 7.5;
+
+      for (const car of this.ctx.traffic.cars) {
+        const dx = wrapX(car.x - this.player.x);
+        const dz = car.lane.z - this.player.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist < minDist) {
+          minDist = dist;
+          nearestVehicle = car;
+        }
+      }
+
+      if (nearestVehicle) {
+        const isBus = nearestVehicle.kind?.horn === "busHorn" || (nearestVehicle.kind?.size?.l || 0) > 6.0;
+        const isAuto = nearestVehicle.kind?.horn === "autoHorn";
+        const vehicleIndex = isBus ? 4 : (isAuto ? 1 : 2);
+        this.setVehicle(vehicleIndex);
+        return;
+      }
+    }
+
+    // Otherwise cycle through available vehicles
+    const next = (this.currentVehicleIndex + 1) % this.configs.length;
+    this.setVehicle(next);
   }
 
   waitForGameReady() {
@@ -190,19 +222,19 @@ export class VehicleImpactSystem {
     bikeRWheel.position.set(0, 0.38, -0.8);
     bulletGroup.add(bikeRWheel);
 
-    // 4. Volvo Bus Mesh
+    // 4. Volvo Bus Mesh (BMTC / BEST Volvo City Bus)
     const busGroup = new THREE.Group();
     const busBlueMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
-    const busBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.2, 7.5), busBlueMat);
+    const busBody = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.4, 8.2), busBlueMat);
     busBody.position.y = 1.6;
     busGroup.add(busBody);
 
-    const busGlass = new THREE.Mesh(new THREE.BoxGeometry(2.42, 0.85, 6.8), glassMat);
+    const busGlass = new THREE.Mesh(new THREE.BoxGeometry(2.52, 0.95, 7.5), glassMat);
     busGlass.position.set(0, 1.85, 0.2);
     busGroup.add(busGlass);
 
     // Bus Wheels (6 wheels)
-    [[-1.2, 2.2], [1.2, 2.2], [-1.2, -1.8], [1.2, -1.8], [-1.2, -2.8], [1.2, -2.8]].forEach(([x, z]) => {
+    [[-1.25, 2.5], [1.25, 2.5], [-1.25, -2.0], [1.25, -2.0], [-1.25, -3.2], [1.25, -3.2]].forEach(([x, z]) => {
       const w = new THREE.Mesh(carWheelGeo, wheelMat);
       w.position.set(x, 0.35, z);
       busGroup.add(w);
@@ -269,19 +301,16 @@ export class VehicleImpactSystem {
     const inVehicle = this.currentVehicleIndex > 0;
     const cfg = this.configs[this.currentVehicleIndex];
 
-    // 1. Position vehicle mesh with player
+    // 1. Position vehicle mesh with player & apply driving velocity
     if (inVehicle && this.activeVehicleMesh) {
       this.activeVehicleMesh.position.set(this.player.x, this.player.y, this.player.z);
       this.activeVehicleMesh.rotation.y = this.player.yaw;
 
-      // Accelerate driving speed when keys are held
       const keys = this.player.keys;
       const isMoving = keys.has("KeyW") || keys.has("KeyS") || keys.has("KeyA") || keys.has("KeyD") ||
                        keys.has("ArrowUp") || keys.has("ArrowDown") || keys.has("ArrowLeft") || keys.has("ArrowRight");
 
       if (isMoving && !this.player.inOrbit) {
-        // Boost speed along movement direction
-        const speedMultiplier = cfg.speed / 3.5;
         this.player.speed = cfg.speed;
 
         let forward = 0;
@@ -293,84 +322,107 @@ export class VehicleImpactSystem {
 
         if (forward !== 0 || right !== 0) {
           const moveAngle = this.player.yaw + Math.atan2(right, forward);
-          const moveDist = cfg.speed * dt * 0.7; // Controlled speed adjustment
+          const moveDist = cfg.speed * dt * 0.7;
           this.player.x = wrapX(this.player.x + Math.sin(moveAngle) * moveDist);
           this.player.z = this.player.z + Math.cos(moveAngle) * moveDist;
         }
       }
     }
 
-    // 2. Check Pedestrian Hits & Trigger Blood
+    // 2. Check Pedestrian Hits when Player is driving ANY vehicle (Auto, Car, Bike, or Bus)
     if (inVehicle && this.ctx.people && this.ctx.people.people) {
-      this.checkPedestrianCollisions(cfg);
+      this.checkPlayerVehiclePedestrianCollisions(cfg);
     }
 
-    // 3. Update active blood particles and splats
+    // 3. Check Traffic Collisions with Player (e.g. When player comes in front of an ambient bus/car)
+    if (this.ctx?.traffic?.cars) {
+      this.checkTrafficCollisionsWithPlayer();
+    }
+
+    // 4. Check Ambient Traffic Collisions with Pedestrians
+    const now = performance.now();
+    if (this.ctx?.traffic?.cars && this.ctx?.people?.people && (now - this.lastTrafficPedCheck > 120)) {
+      this.lastTrafficPedCheck = now;
+      this.checkTrafficCollisionsWithPedestrians();
+    }
+
+    // 5. Update active blood particles and ground splats
     this.updateBloodParticles(dt);
   }
 
-  checkPedestrianCollisions(cfg) {
+  /**
+   * Evaluates collision when the player is driving a vehicle (like the Bus, Auto, Car, or Bike)
+   * Uses oriented forward-reach bounding box so anyone in front of the vehicle bumper is struck!
+   */
+  checkPlayerVehiclePedestrianCollisions(cfg) {
     const playerX = this.player.x;
     const playerZ = this.player.z;
     const playerY = this.player.y;
-    const hitRadius = cfg.hitRadius;
+    const yaw = this.player.yaw;
     const now = performance.now();
+
+    const forwardReach = cfg.forwardReach || 3.0;
+    const rearReach = cfg.rearReach || 1.5;
+    const halfWidth = cfg.halfWidth || 1.2;
+
+    const sinY = Math.sin(yaw);
+    const cosY = Math.cos(yaw);
 
     const people = this.ctx.people.people;
     for (let i = 0; i < people.length; i++) {
       const p = people[i];
       if (p.hidden) continue;
 
-      // Check cooldown
       const lastHit = this.hitCooldowns.get(p) || 0;
-      if (now - lastHit < 1800) continue; // 1.8s cooldown per person
+      if (now - lastHit < 1800) continue;
 
-      // Distance check on planet torus/cylinder
       const dx = wrapX(p.x - playerX);
       const dz = p.z - playerZ;
-      const dist = Math.hypot(dx, dz);
 
-      if (dist < hitRadius && Math.abs(p.y - playerY) < 2.0) {
-        // STRIKE!
+      // Transform into vehicle's local coordinate frame
+      const localForward = dx * sinY + dz * cosY;
+      const localLateral = -dx * cosY + dz * sinY;
+
+      const isInsideBox = (localForward >= -rearReach && localForward <= forwardReach && Math.abs(localLateral) <= halfWidth);
+      const isInsideRadius = Math.hypot(dx, dz) < (cfg.hitRadius || 2.5);
+
+      if ((isInsideBox || isInsideRadius) && Math.abs(p.y - playerY) < 2.5) {
         this.hitCooldowns.set(p, now);
-        this.handleHit(p, dx, dz, cfg);
+        this.handlePedestrianHit(p, dx, dz, cfg);
         break; // Max 1 hit evaluation per frame
       }
     }
   }
 
-  handleHit(person, dx, dz, cfg) {
-    // 1. Calculate knockback impulse
+  handlePedestrianHit(person, dx, dz, cfg) {
     const knockAngle = Math.atan2(dx, dz);
-    const knockDist = 3.2;
+    const knockDist = cfg.id === "bus" ? 5.2 : 3.5;
     person.x = wrapX(person.x + Math.sin(knockAngle) * knockDist);
     person.z = person.z + Math.cos(knockAngle) * knockDist;
     person.yaw = knockAngle + Math.PI;
 
-    // 2. Visual affect on person: Flash clothing crimson red
+    // Flash pedestrian clothing crimson
     if (person.cols && person.cols[1]) {
       const origColor = person.cols[1].clone();
-      person.cols[1].setHex(0xb91c1c); // Blood crimson
+      person.cols[1].setHex(0xb91c1c);
       setTimeout(() => {
         try { person.cols[1].copy(origColor); } catch (e) {}
       }, 1500);
     }
 
-    // 3. Spawn Stylized Blood Particle Burst
+    // Spawn blood burst & ground splat
     this.spawnBloodBurst(person.x, person.y + 0.8, person.z, knockAngle);
 
-    // 4. Screen Red Flash Feedback
+    // Screen flash
     const flash = document.getElementById("blood-flash");
     if (flash) {
       flash.classList.add("active");
       setTimeout(() => flash.classList.remove("active"), 280);
     }
 
-    // 5. Floating Impact Pop-up
-    this.spawnImpactPopup("⚠️ IMPACT!");
-
-    // 6. Sound & Toast
+    this.spawnImpactPopup(cfg.id === "bus" ? "⚠️ STRUCK BY BUS!" : "⚠️ IMPACT!");
     this.honk();
+
     if (this.ctx.audio) {
       try {
         this.ctx.audio.play("flutter", { volume: 0.8 });
@@ -382,12 +434,127 @@ export class VehicleImpactSystem {
     }
   }
 
+  /**
+   * Evaluates collision when the player steps/walks/drives in front of an ambient traffic vehicle (especially buses).
+   */
+  checkTrafficCollisionsWithPlayer() {
+    const now = performance.now();
+    if (now - this.lastPlayerTrafficHit < 1800) return; // Cooldown
+
+    const px = this.player.x;
+    const pz = this.player.z;
+    const py = this.player.y;
+
+    for (const car of this.ctx.traffic.cars) {
+      const dir = car.lane.dir;
+      const dx = wrapX(px - car.x); // Distance from car to player along road
+      const u = dir * dx;           // Distance in front of car (+u = in front of car)
+      const dz = Math.abs(car.lane.z - pz);
+
+      const carLen = car.kind?.size?.l || 4.5;
+      const carWidth = car.kind?.size?.w || 2.2;
+      const isBus = car.kind?.horn === "busHorn" || carLen > 6.0;
+
+      // Front bumper and vehicle body collision zone
+      const bumperZone = (carLen / 2) + 1.2;
+      const rearZone = -(carLen / 2) - 0.5;
+      const laneWidthZone = (carWidth / 2) + 0.9;
+
+      if (u >= rearZone && u <= bumperZone && dz <= laneWidthZone && Math.abs(py) < 2.8) {
+        this.lastPlayerTrafficHit = now;
+        this.handlePlayerHitByTraffic(car, isBus, dir);
+        break;
+      }
+    }
+  }
+
+  handlePlayerHitByTraffic(car, isBus, dir) {
+    // 1. Calculate knockback impulse away from the vehicle
+    const knockDist = isBus ? 5.8 : 4.0;
+    this.player.x = wrapX(this.player.x + dir * knockDist);
+    this.player.z = this.player.z + (this.player.z > car.lane.z ? 2.5 : -2.5);
+    this.player.vy = isBus ? 4.8 : 3.2;
+
+    // 2. Spawn blood burst & ground splat at player location
+    this.spawnBloodBurst(this.player.x, this.player.y + 0.9, this.player.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+
+    // 3. Screen Red Flash Feedback
+    const flash = document.getElementById("blood-flash");
+    if (flash) {
+      flash.classList.add("active");
+      setTimeout(() => flash.classList.remove("active"), 320);
+    }
+
+    // 4. Floating Impact Pop-up
+    this.spawnImpactPopup(isBus ? "⚠️ HIT BY BUS!" : "⚠️ VEHICLE IMPACT!");
+
+    // 5. Sound & Horn
+    if (this.ctx.audio) {
+      try {
+        this.ctx.audio.play(car.kind?.horn || (isBus ? "busHorn" : "horn"), { volume: 0.9 });
+        this.ctx.audio.play("flutter", { volume: 0.8 });
+      } catch (e) {}
+    }
+
+    // 6. Toast Notification
+    if (this.ctx.toast) {
+      this.ctx.toast("अपघात! वाहनाची धडक", isBus ? "⚠️ Struck by Oncoming City Bus!" : "⚠️ Struck by Oncoming Traffic Vehicle!", true);
+    }
+  }
+
+  /**
+   * Ambient traffic vehicles striking NPC pedestrians crossing roads.
+   */
+  checkTrafficCollisionsWithPedestrians() {
+    const now = performance.now();
+    const cars = this.ctx.traffic.cars;
+    const people = this.ctx.people.people;
+
+    for (let cIdx = 0; cIdx < cars.length; cIdx += 3) { // Sample traffic cars
+      const car = cars[cIdx];
+      const dir = car.lane.dir;
+      const carLen = car.kind?.size?.l || 4.5;
+      const carWidth = car.kind?.size?.w || 2.2;
+      const isBus = car.kind?.horn === "busHorn" || carLen > 6.0;
+
+      for (let pIdx = 0; pIdx < people.length; pIdx += 2) {
+        const p = people[pIdx];
+        if (p.hidden) continue;
+
+        const lastHit = this.hitCooldowns.get(p) || 0;
+        if (now - lastHit < 3000) continue;
+
+        const u = dir * wrapX(p.x - car.x);
+        const dz = Math.abs(car.lane.z - p.z);
+
+        if (u >= -(carLen / 2) && u <= (carLen / 2 + 1.0) && dz <= (carWidth / 2 + 0.8)) {
+          this.hitCooldowns.set(p, now);
+
+          // Knockback NPC
+          p.x = wrapX(p.x + dir * (isBus ? 4.8 : 3.2));
+          p.z += (p.z > car.lane.z ? 1.8 : -1.8);
+
+          if (p.cols && p.cols[1]) {
+            const orig = p.cols[1].clone();
+            p.cols[1].setHex(0xb91c1c);
+            setTimeout(() => {
+              try { p.cols[1].copy(orig); } catch (e) {}
+            }, 1500);
+          }
+
+          this.spawnBloodBurst(p.x, p.y + 0.8, p.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+          break;
+        }
+      }
+    }
+  }
+
   spawnBloodBurst(x, y, z, angle) {
-    const count = 22;
+    const count = 24;
     const bloodRedCols = [0x991b1b, 0xb91c1c, 0xdc2626, 0x7f1d1d];
 
     for (let i = 0; i < count; i++) {
-      const size = 0.06 + Math.random() * 0.08;
+      const size = 0.07 + Math.random() * 0.09;
       const geo = new THREE.BoxGeometry(size, size, size);
       const mat = new THREE.MeshLambertMaterial({
         color: bloodRedCols[Math.floor(Math.random() * bloodRedCols.length)]
@@ -398,9 +565,9 @@ export class VehicleImpactSystem {
 
       // Arc velocities
       const spread = (Math.random() - 0.5) * 4.5;
-      const speed = 2.5 + Math.random() * 4.0;
+      const speed = 2.8 + Math.random() * 4.2;
       const vx = Math.sin(angle + (Math.random() - 0.5) * 1.2) * speed + spread;
-      const vy = 2.0 + Math.random() * 4.5;
+      const vy = 2.2 + Math.random() * 4.8;
       const vz = Math.cos(angle + (Math.random() - 0.5) * 1.2) * speed + spread;
 
       this.particles.push({
@@ -409,7 +576,7 @@ export class VehicleImpactSystem {
         vy,
         vz,
         groundY: y - 0.8,
-        life: 1.0
+        life: 1.1
       });
     }
 
@@ -418,7 +585,7 @@ export class VehicleImpactSystem {
   }
 
   spawnGroundBloodSplat(x, y, z) {
-    const splatRadius = 0.35 + Math.random() * 0.35;
+    const splatRadius = 0.4 + Math.random() * 0.4;
     const geo = new THREE.CircleGeometry(splatRadius, 8);
     geo.rotateX(-Math.PI / 2);
     const mat = new THREE.MeshBasicMaterial({
@@ -433,8 +600,8 @@ export class VehicleImpactSystem {
 
     this.splats.push({
       mesh: splat,
-      life: 5.0, // Stays for 5 seconds
-      maxLife: 5.0
+      life: 5.5, // Stays for 5.5 seconds
+      maxLife: 5.5
     });
   }
 
