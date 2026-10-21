@@ -31,6 +31,10 @@
   <div id="card" class="gone">
     <div class="card-inner">
       <div class="card-script"></div>
+      <div id="card-spawn-selector" class="card-spawn-selector">
+        <div class="card-spawn-heading">📍 Spawn at landmark:</div>
+        <div id="card-places" class="card-places"></div>
+      </div>
       <div class="card-go"><button id="go" disabled>Walk in</button><button id="wander" disabled>Wander</button></div>
       <a class="card-back" href="./">Choose another planet</a>
     </div>
@@ -40,6 +44,8 @@
     <div class="pause-inner" role="dialog" aria-modal="true" aria-labelledby="pause-title">
       <p id="pause-title" class="pause-title">Paused</p>
       <button id="resume">Keep walking</button>
+      <p class="pause-label">Spawn to a place on this planet</p>
+      <div id="pause-places" class="pause-places"></div>
       <p class="pause-label">Go to another planet</p>
       <nav class="pause-cities" aria-label="Planets"></nav>
       <a class="pause-home" href="./">See all the planets</a>
@@ -52,7 +58,18 @@
     <div id="mode"></div>
     <div id="prompt"></div>
     <div id="talk"><div class="k-who"></div><div class="k-native"></div><div class="k-english"></div></div>
-    <div id="hint">WASD walk/drive · Shift run · E interact/get in · L wander/auto roam · V auto · T time · K rain · P planet · M sound · H hide · Esc menu</div>
+
+    <div id="places-hud">
+      <button id="places-btn" aria-label="Spawn to landmark" title="Spawn to places on this planet (Keys 1-6)">
+        <span class="places-icon">📍</span> <span class="places-text">Places</span> <span class="places-badge">[1-6]</span>
+      </button>
+      <div id="places-menu" class="places-menu" hidden>
+        <div class="places-menu-header">Spawn to Landmark:</div>
+        <div id="places-list" class="places-list"></div>
+      </div>
+    </div>
+
+    <div id="hint">WASD walk/drive · 1-6 spawn places · Shift run · E interact/get in · L wander/auto roam · V auto · T time · K rain · P planet · M sound · H hide · Esc menu</div>
     <div id="coords"></div>
   </div>
 </body>
