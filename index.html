@@ -3,14 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Courier City — Bharat 3D Open World</title>
+  <title>Courier City</title>
   <meta name="description" content="Seven Indian cities as small planets you can walk round, each with its train, tram or metro line on the equator. A cel-shaded city in the browser." />
   <meta name="theme-color" content="#efe6d6" />
   <script type="module" crossorigin src="./assets/index-CizabRDk.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/preload-helper-CCnR14CO.js">
   <link rel="stylesheet" crossorigin href="./assets/preload-helper-D1kWgmlw.css">
   <link rel="stylesheet" crossorigin href="./assets/index-Dq-S5-YF.css">
-  <link rel="stylesheet" href="./src/ui/courier-city.css">
 </head>
 <body>
   <canvas id="c"></canvas>
@@ -18,7 +17,7 @@
   <section id="home" hidden>
     <canvas id="home-c"></canvas>
     <header class="masthead">
-      <h1>Gulmohar Local</h1>
+      <h1>Courier City</h1>
       <p class="intro">Seven cities, each a planet small enough to walk round, each with a train, a tram or a metro that never stops circling it. Pick one.</p>
     </header>
     <div class="cities"></div>
@@ -32,29 +31,28 @@
     <div class="card-inner">
       <div class="card-script"></div>
       <div class="card-go"><button id="go" disabled>Walk in</button><button id="wander" disabled>Wander</button></div>
-      <a class="card-back" href="./">Back to Map of India</a>
+      <a class="card-back" href="./">Choose another planet</a>
     </div>
   </div>
 
   <div id="pause" hidden>
     <div class="pause-inner" role="dialog" aria-modal="true" aria-labelledby="pause-title">
-      <p id="pause-title" class="pause-title">City Navigation</p>
-      <button id="resume">Resume Drive / Walk</button>
-      <p class="pause-label">Switch Indian City Hub</p>
-      <nav class="pause-cities" aria-label="Cities"></nav>
-      <a class="pause-home" href="./">Back to Map of India</a>
+      <p id="pause-title" class="pause-title">Paused</p>
+      <button id="resume">Keep walking</button>
+      <p class="pause-label">Go to another planet</p>
+      <nav class="pause-cities" aria-label="Planets"></nav>
+      <a class="pause-home" href="./">See all the planets</a>
     </div>
   </div>
-  <button id="menu" hidden aria-label="Menu: Map & Cities">Map & Cities</button>
+  <button id="menu" hidden aria-label="Menu: the other planets">Planets</button>
 
   <div id="hud">
     <div id="toast"><div class="t-deva"></div><div class="t-latin"></div></div>
     <div id="mode"></div>
     <div id="prompt"></div>
     <div id="talk"><div class="k-who"></div><div class="k-native"></div><div class="k-english"></div></div>
-    <div id="hint">WASD move · Shift sprint · F drive vehicle · E board metro · L wander · T time · K rain · P planet · Esc menu</div>
+    <div id="hint">WASD walk · Shift run · E interact · L wander · V auto · T time · K rain · P planet · M sound · H hide · Esc menu</div>
     <div id="coords"></div>
   </div>
-  <script type="module" src="./src/ui/courier-city-ui.js"></script>
 </body>
 </html>
