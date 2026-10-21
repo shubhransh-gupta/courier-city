@@ -1,113 +1,64 @@
-/* ==========================================================================
-   Courier City — Vehicle Driving Dock & Impact Blood Flash Styling
-   ========================================================================== */
-
-/* Fullscreen red hit vignette on impact */
+/* Fullscreen blood vignette on impact */
 #blood-flash {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 50;
-  background: radial-gradient(circle at center, transparent 40%, rgba(185, 28, 28, 0.45) 85%, rgba(153, 27, 27, 0.75) 100%);
+  z-index: 1000;
+  background: radial-gradient(circle at center, transparent 40%, rgba(185, 28, 28, 0.45) 85%, rgba(127, 29, 29, 0.75) 100%);
   opacity: 0;
-  transition: opacity 0.08s ease-out;
+  transition: opacity 0.1s ease-out;
 }
 
 #blood-flash.active {
   opacity: 1;
 }
 
-/* Vehicle Drive HUD Dock */
-#vehicle-dock {
+/* Stylized Floating Impact Popup */
+.impact-popup {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  background: #b91c1c;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font: 800 13px/1.2 Mukta, sans-serif;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 1001;
+  animation: impact-float 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes impact-float {
+  0% { transform: translate(-50%, -20%) scale(0.7); opacity: 0; }
+  25% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 0; }
+}
+
+/* In-game vehicle indicator badge */
+.vehicle-hud-badge {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(239, 230, 214, 0.92);
-  backdrop-filter: blur(8px);
-  border: 2px solid #231a26;
-  border-radius: 8px;
-  padding: 6px 10px;
-  box-shadow: 3px 3px 0 rgba(35, 26, 38, 0.2);
-  font-family: Mukta, system-ui, sans-serif;
-  user-select: none;
-}
-
-.v-dock-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: transparent;
-  color: #231a26;
-  border: 1.5px solid transparent;
-  border-radius: 4px;
-  padding: 5px 9px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.v-dock-btn:hover {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: #231a26;
-}
-
-.v-dock-btn.active {
-  background: #231a26;
+  background: rgba(35, 26, 38, 0.92);
   color: #f7b32b;
-  border-color: #231a26;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.v-dock-btn kbd {
-  background: rgba(35, 26, 38, 0.12);
-  color: inherit;
-  border: 1px solid rgba(35, 26, 38, 0.3);
-  border-radius: 3px;
-  padding: 1px 4px;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.v-dock-btn.active kbd {
-  background: rgba(247, 179, 43, 0.25);
-  border-color: #f7b32b;
-}
-
-/* Floating floating impact text */
-.impact-popup {
-  position: fixed;
-  color: #ef4444;
-  font: 900 16px/1 monospace;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font: 700 13px/1.2 Mukta, sans-serif;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 15;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
-  z-index: 55;
-  transform: translate(-50%, -100%);
-  animation: popup-float 1.2s ease-out forwards;
 }
 
-@keyframes popup-float {
-  0% { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
-  20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -50px) scale(0.9); }
-}
-
-@media (max-width: 768px) {
-  #vehicle-dock {
-    bottom: 80px;
-    right: 12px;
-    padding: 4px 6px;
-    gap: 4px;
-  }
-  .v-dock-btn {
-    padding: 4px 6px;
-    font-size: 11px;
-  }
-  .v-dock-btn span.v-name {
-    display: none;
-  }
+.vehicle-hud-badge kbd {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 11px;
 }

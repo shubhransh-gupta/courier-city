@@ -4,45 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Courier City</title>
-  <meta name="description" content="Seven Indian cities as 3D diorama worlds mapped to Survey of India coordinates. A cel-shaded transit simulator in the browser." />
+  <meta name="description" content="Seven Indian cities as small planets you can walk round, each with its train, tram or metro line on the equator. A cel-shaded city in the browser." />
   <meta name="theme-color" content="#efe6d6" />
-  <script>
-    // Ensure skip=1 is always present when a city is selected to land directly on the street
-    (function() {
-      try {
-        const url = new URL(window.location.href);
-        const city = url.searchParams.get("city");
-        if (city && !url.searchParams.has("skip")) {
-          url.searchParams.set("skip", "1");
-          window.location.replace(url.toString());
-        }
-      } catch (e) {}
-
-      // Safe RAF fallback for background tabs to prevent engine freeze when user switches tabs
-      var origRAF = window.requestAnimationFrame.bind(window);
-      window.requestAnimationFrame = function(cb) {
-        var called = false;
-        var timer = setTimeout(function() {
-          if (!called) {
-            called = true;
-            cb(performance.now());
-          }
-        }, 32);
-        return origRAF(function(time) {
-          if (!called) {
-            called = true;
-            clearTimeout(timer);
-            cb(time);
-          }
-        });
-      };
-    })();
-  </script>
   <script type="module" crossorigin src="./assets/index-CizabRDk.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/preload-helper-CCnR14CO.js">
   <link rel="stylesheet" crossorigin href="./assets/preload-helper-D1kWgmlw.css">
   <link rel="stylesheet" crossorigin href="./assets/index-Dq-S5-YF.css">
-  <link rel="stylesheet" href="./src/ui/india-map.css">
   <link rel="stylesheet" href="./src/game/vehicle-impact.css">
 </head>
 <body>
@@ -51,12 +18,8 @@
   <section id="home" hidden>
     <canvas id="home-c"></canvas>
     <header class="masthead">
-      <div class="soi-header-badge">
-        <span class="soi-dot"></span>
-        <span>Survey of India · Open 3D Transit Simulator</span>
-      </div>
       <h1>Courier City</h1>
-      <p class="intro">Seven Indian cities mapped to Survey of India geodetic coordinates. Pick a live green city pin on the national map or select a route below to enter and walk/drive in 3D.</p>
+      <p class="intro">Seven cities, each a planet small enough to walk round, each with a train, a tram or a metro that never stops circling it. Pick one.</p>
     </header>
     <div class="cities"></div>
     <footer class="foot">
@@ -69,7 +32,7 @@
     <div class="card-inner">
       <div class="card-script"></div>
       <div class="card-go"><button id="go" disabled>Walk in</button><button id="wander" disabled>Wander</button></div>
-      <a class="card-back" href="./">Return to National Map</a>
+      <a class="card-back" href="./">Choose another planet</a>
     </div>
   </div>
 
@@ -77,22 +40,21 @@
     <div class="pause-inner" role="dialog" aria-modal="true" aria-labelledby="pause-title">
       <p id="pause-title" class="pause-title">Paused</p>
       <button id="resume">Keep walking</button>
-      <p class="pause-label">Switch City</p>
-      <nav class="pause-cities" aria-label="Cities"></nav>
-      <a class="pause-home" href="./">Return to National Map</a>
+      <p class="pause-label">Go to another planet</p>
+      <nav class="pause-cities" aria-label="Planets"></nav>
+      <a class="pause-home" href="./">See all the planets</a>
     </div>
   </div>
-  <button id="menu" hidden aria-label="Menu: Cities">Cities</button>
+  <button id="menu" hidden aria-label="Menu: the other planets">Planets</button>
 
   <div id="hud">
     <div id="toast"><div class="t-deva"></div><div class="t-latin"></div></div>
     <div id="mode"></div>
     <div id="prompt"></div>
     <div id="talk"><div class="k-who"></div><div class="k-native"></div><div class="k-english"></div></div>
-    <div id="hint">WASD walk/drive · Shift run/boost · F vehicle · H honk · E interact · L wander · T time · K rain · P planet · Esc menu</div>
+    <div id="hint">WASD walk/drive · Shift run · F auto rickshaw · H honk · E interact · L wander · V auto · T time · K rain · P planet · M sound · Esc menu</div>
     <div id="coords"></div>
   </div>
-  <script type="module" src="./src/ui/india-map.js"></script>
   <script type="module" src="./src/game/vehicle-impact-system.js"></script>
 </body>
 </html>
