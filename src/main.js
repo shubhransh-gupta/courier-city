@@ -28,6 +28,7 @@ import { InteractiveProps } from './world/InteractiveProps.js';
 import { BrunoToyCar } from './entities/BrunoToyCar.js';
 import { DioramaPostProcessing } from './core/DioramaPostProcessing.js';
 import { AmbientAirTrafficSystem } from './world/AmbientAirTrafficSystem.js';
+import { PerformanceOptimizer } from './world/PerformanceOptimizer.js';
 
 class Game {
   constructor() {
@@ -106,6 +107,9 @@ class Game {
     } catch (err) {
       console.warn('AmbientAirTrafficSystem initialization error:', err);
     }
+    // High-performance Memory Optimization & Frustum Culling
+    this.performanceOptimizer = new PerformanceOptimizer(this.scene);
+    this.performanceOptimizer.enableFrustumCulling(this.scene);
   }
 
   initEntities() {
@@ -649,7 +653,12 @@ class Game {
       this.environment.update(0.016, targetPos);
     }
 
-    // 4. Audio feedback
+    // 4. Trigger memory cleanup on long teleports to release culled resources
+    if (this.performanceOptimizer) {
+      this.performanceOptimizer.cleanupUnusedMemory(this.renderer);
+    }
+
+    // 5. Audio feedback
     if (this.audioManager && typeof this.audioManager.playDoor === 'function') {
       this.audioManager.playDoor();
     }
@@ -961,6 +970,14 @@ class Game {
     this.handleVehicleInteractions();
     this.handleObservationElevators();
     this.updateWaypointAnimation(dt, currentTime);
+
+    // Periodic memory cleanup routine every 15 seconds to keep memory footprint minimal
+    if (!this._lastMemClean || (currentTime - this._lastMemClean > 15000)) {
+      this._lastMemClean = currentTime;
+      if (this.performanceOptimizer) {
+        this.performanceOptimizer.cleanupUnusedMemory(this.renderer);
+      }
+    }
 
     const activeInput = this.isAnyModalOpen() ? (this.idleInput || (this.idleInput = { isDown: () => false, getForward: () => 0, getTurn: () => 0, isSprinting: () => false, isJumping: () => false })) : this.input;
     const cameraYaw = this.cameraController.yaw;

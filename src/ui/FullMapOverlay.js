@@ -31,7 +31,13 @@ export class FullMapOverlay {
       { id: 'tipu_palace', name: "🏰 Tipu Sultan's Summer Palace", x: -140, z: -80, spawnX: -140, spawnZ: -56, icon: '🏰', color: '#b45309', desc: 'Historic 1791 Indo-Islamic teakwood palace & museum in Kalasipalya!' },
       { id: 'mysore_palace', name: '👑 Mysore Palace (Amba Vilas)', x: -300, z: 120, spawnX: -255, spawnZ: 120, icon: '👑', color: '#f59e0b', desc: 'Grand royal palace with 42m golden dome, pink chhatris & 100k night lights!' },
       { id: 'vvpuram_food', name: '🍲 V.V. Puram Food Street (Thindi Beedi)', x: -40, z: 255, spawnX: -40, spawnZ: 228, icon: '🍲', color: '#ef4444', desc: 'Bengaluru street food hub: VB Bakery, Hot Butter Dosa, Gulkand & Filter Coffee!' },
-      { id: 'russell_market', name: '🏛️ Russell Market & Commercial St', x: 100, z: -140, spawnX: 100, spawnZ: -116, icon: '🏛️', color: '#991b1b', desc: 'Colonial 1927 clock tower & bustling Commercial Street shopping alleys!' }
+      { id: 'russell_market', name: '🏛️ Russell Market & Commercial St', x: 100, z: -140, spawnX: 100, spawnZ: -116, icon: '🏛️', color: '#991b1b', desc: 'Colonial 1927 clock tower & bustling Commercial Street shopping alleys!' },
+      { id: 'gateway_mumbai', name: '🏛️ Gateway of India (Maharashtra)', x: -280, z: 340, spawnX: -280, spawnZ: 318, icon: '🏛️', color: '#f59e0b', desc: 'Iconic 1924 basalt Indo-Saracenic triumphal arch overlooking the Arabian Sea in Mumbai!' },
+      { id: 'charminar_hyd', name: '🕌 Charminar (Telangana)', x: 180, z: -60, spawnX: 180, spawnZ: -38, icon: '🕌', color: '#10b981', desc: 'Historic 1591 four-minaret monument with grand open crossroads & stucco galleries in Hyderabad!' },
+      { id: 'hawa_mahal', name: '🏰 Hawa Mahal · Palace of Winds (Rajasthan)', x: -360, z: 20, spawnX: -360, spawnZ: -2, icon: '🏰', color: '#ec4899', desc: '5-tier honeycomb pink sandstone palace with 953 casements and chhatris in Jaipur!' },
+      { id: 'victoria_kolkata', name: '🏛️ Victoria Memorial & Howrah Bridge (West Bengal)', x: 320, z: 120, spawnX: 320, spawnZ: 96, icon: '🏛️', color: '#38bdf8', desc: 'Pristine white Makrana marble palace and soaring steel cantilever Howrah Bridge in Kolkata!' },
+      { id: 'kapaleeshwarar_chennai', name: '🛕 Kapaleeshwarar Gopuram (Tamil Nadu)', x: -180, z: -340, spawnX: -180, spawnZ: -318, icon: '🛕', color: '#ea580c', desc: '7-tiered Dravidian Rajagopuram with vibrant sculpture tiers and gold kalasams in Chennai!' },
+      { id: 'statue_unity', name: '🗽 Statue of Unity (Gujarat)', x: -380, z: 260, spawnX: -380, spawnZ: 236, icon: '🗽', color: '#b45309', desc: 'World’s tallest 55m monumental bronze colossus of Sardar Patel along the scenic riverfront!' }
     ];
 
     // Default target: Vidhana Soudha!

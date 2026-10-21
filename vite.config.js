@@ -9,6 +9,15 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
-    assetsDir: 'assets'
+    assetsDir: 'assets',
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+          cannon: ['cannon-es']
+        }
+      }
+    }
   }
 });

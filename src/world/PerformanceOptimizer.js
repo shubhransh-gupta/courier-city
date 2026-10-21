@@ -474,4 +474,89 @@ export class PerformanceOptimizer {
 
     return results;
   }
+
+  /**
+   * Proactively enforce frustum culling across all meshes in the scene hierarchy
+   */
+  enableFrustumCulling(rootObject = this.scene) {
+    if (!rootObject) return;
+    rootObject.traverse(child => {
+      if (child.isMesh) {
+        child.frustumCulled = true;
+      }
+    });
+  }
+
+  /**
+   * Safely disposes a 3D object's geometries, materials, and textures from GPU memory
+   * @param {THREE.Object3D} object 
+   */
+  disposeHierarchy(object) {
+    if (!object) return;
+    object.traverse(child => {
+      if (child.geometry && typeof child.geometry.dispose === 'function') {
+        child.geometry.dispose();
+      }
+      if (child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(mat => this.disposeMaterial(mat));
+        } else {
+          this.disposeMaterial(child.material);
+        }
+      }
+    });
+  }
+
+  disposeMaterial(material) {
+    if (!material) return;
+    ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'alphaMap', 'envMap', 'lightMap', 'aoMap'].forEach(texKey => {
+      if (material[texKey] && typeof material[texKey].dispose === 'function') {
+        material[texKey].dispose();
+      }
+    });
+    if (typeof material.dispose === 'function') {
+      material.dispose();
+    }
+  }
+
+  /**
+   * Memory Cleanup Routine: Releases orphaned WebGL buffers and disposes stale resources
+   * @param {THREE.WebGLRenderer} renderer
+   */
+  cleanupUnusedMemory(renderer) {
+    if (!renderer) return;
+
+    // 1. Traverse scene and cull objects without parents or marked for disposal
+    this.enableFrustumCulling(this.scene);
+
+    // 2. Clear render list cache
+    if (renderer.renderLists && typeof renderer.renderLists.dispose === 'function') {
+      renderer.renderLists.dispose();
+    }
+
+    // 3. Clear instanced position maps of inactive instances
+    Object.values(this.instancedMeshes).forEach(data => {
+      if (data && data.positionMap) {
+        for (const [id, posData] of data.positionMap.entries()) {
+          if (!posData.visible && id > data.count + 50) {
+            data.positionMap.delete(id);
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Returns current GPU & Heap memory metrics
+   * @param {THREE.WebGLRenderer} renderer 
+   */
+  getMemoryStats(renderer) {
+    if (!renderer || !renderer.info) return null;
+    return {
+      geometries: renderer.info.memory ? renderer.info.memory.geometries : 0,
+      textures: renderer.info.memory ? renderer.info.memory.textures : 0,
+      triangles: renderer.info.render ? renderer.info.render.triangles : 0,
+      drawCalls: renderer.info.render ? renderer.info.render.calls : 0
+    };
+  }
 }

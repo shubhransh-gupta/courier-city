@@ -1,55 +1,290 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Courier City — Bharat 3D Open World</title>
-  <meta name="description" content="Explore Indian cities in real-time 3D. Drive Namma Autos, Royal Enfield Bullets, Bruno Simon sports cars, and BMTC buses across Bengaluru, Mumbai, and Delhi." />
-  <meta name="theme-color" content="#efe6d6" />
-  <script type="module" crossorigin src="./assets/index-CizabRDk.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/preload-helper-CCnR14CO.js">
-  <link rel="stylesheet" crossorigin href="./assets/preload-helper-D1kWgmlw.css">
-  <link rel="stylesheet" crossorigin href="./assets/index-Dq-S5-YF.css">
-  <link rel="stylesheet" href="./src/ui/courier-city.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Courier City — GTA Open World</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%230284c7'/%3E%3C/linearGradient%3E%3ClinearGradient id='accent' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23bg)'/%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-dasharray='4 3' opacity='0.7'/%3E%3Cpath d='M16 44 L32 14 L48 44 L32 36 Z' fill='url(%23accent)' filter='drop-shadow(0 2px 4px rgba(0,0,0,0.5))'/%3E%3Ccircle cx='32' cy='36' r='3.5' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/ui/style.css">
 </head>
 <body>
-  <canvas id="c"></canvas>
+  <div id="game-container">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
 
-  <section id="home" hidden>
-    
-    <header class="masthead">
-      <div class="brand-badge-pill"><span class="pulse-green-dot"></span><span>BHARAT 3D OPEN WORLD · PRESENTED BY SHUBHRANSH GUPTA</span></div>
-      <h1>Courier City</h1>
-      <p class="intro">Explore Indian cities in real-time 3D. Drive Namma Autos, Royal Enfield Bullets, sports cars, and ride Namma Metro lines across Bengaluru, Mumbai, Delhi, and beyond. Select an active green city on the map to explore.</p>
-    </header>
-    <div class="cities"></div>
-    <footer class="foot">
-      <p class="keys">Walk with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> and the mouse. <kbd>E</kbd> to use things, <kbd>P</kbd> to see the whole planet, <kbd>L</kbd> to let it wander on its own. Sound on.</p>
-      <p class="touchnote">Walk with your left thumb, look with your right. Best with headphones.</p>
-    </footer>
-  </section>
+  
+  <!-- Welcome / Landing Screen Modal: Presented by Shubhransh Gupta -->
+  <div id="welcome-landing-modal" class="welcome-modal-overlay">
+    <div class="welcome-card">
+      <div class="welcome-hero-badge">
+        <span class="badge-icon">🏙️</span>
+        <span>OPEN-WORLD BENGALURU 3D</span>
+      </div>
+      <h1 class="welcome-title">Welcome to Courier City</h1>
+      <p class="welcome-presented-by">Presented by <strong>Shubhransh Gupta</strong></p>
+      
+      <div class="welcome-features-pills">
+        <span class="pill" style="border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.12);">🚗 Bruno Simon Roadster</span>
+        <span class="pill">🏎️ Bugatti Veyron 16.4</span>
+        <span class="pill">🛺 Namma Auto</span>
+        <span class="pill">🏍️ Royal Enfield Bullet</span>
+        <span class="pill">🚌 BMTC Volvo Bus</span>
+        <span class="pill">🚊 Namma Metro</span>
+        <span class="pill">🏛️ Gateway of India (MH)</span>
+        <span class="pill">🕌 Charminar (TS)</span>
+        <span class="pill">🏰 Hawa Mahal (RJ)</span>
+        <span class="pill">🏛️ Victoria Memorial (WB)</span>
+        <span class="pill">🛕 Kapaleeshwarar (TN)</span>
+        <span class="pill">🗽 Statue of Unity (GJ)</span>
+        <span class="pill">⚡ Low Memory Optimized</span>
+      </div>
 
-  <div id="card" class="gone" style="display:none !important;"><button id="go" disabled></button><button id="wander" disabled></button></div>
+      <div class="welcome-controls-brief">
+        <div class="brief-item"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Move / Drive / Steer</span></div>
+        <div class="brief-item"><kbd>F</kbd> <span>Drive Auto / Bike / Car / Plane</span></div>
+        <div class="brief-item"><kbd>E</kbd> <span>Board Namma Metro / Elevators</span></div>
+        <div class="brief-item"><kbd>M</kbd> <span>Interactive City GPS Map</span></div>
+      </div>
 
-  <div id="pause" hidden>
-    <div class="pause-inner" role="dialog" aria-modal="true" aria-labelledby="pause-title">
-      <p id="pause-title" class="pause-title">City Navigation</p>
-      <button id="resume">Resume Drive / Walk</button>
-      <p class="pause-label">Switch Indian City Hub</p>
-      <nav class="pause-cities" aria-label="Planets"></nav>
-      <a class="pause-home" href="./">Back to Map of India</a>
+      <div class="welcome-actions">
+        <button id="start-game-btn" class="welcome-start-btn" type="button" onclick="window.dismissWelcomeModal && window.dismissWelcomeModal(event)">
+          <span>START EXPLORING CITY</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
     </div>
   </div>
-  <button id="menu" hidden aria-label="Menu: Map & Cities">Map & Cities</button>
 
-  <div id="hud">
-    <div id="toast"><div class="t-deva"></div><div class="t-latin"></div></div>
-    <div id="mode"></div>
-    <div id="prompt"></div>
-    <div id="talk"><div class="k-who"></div><div class="k-native"></div><div class="k-english"></div></div>
-    <div id="hint">WASD move/steer · Shift sprint/boost · F drive vehicle · H horn · E board metro · L wander · T time · K rain · Esc map</div>
-    <div id="coords"></div>
+  <script>
+    window.dismissWelcomeModal = function(e) {
+      if (e) {
+        try { e.preventDefault(); } catch (_) {}
+        try { e.stopPropagation(); } catch (_) {}
+      }
+      var modal = document.getElementById('welcome-landing-modal');
+      if (modal) {
+        modal.classList.add('welcome-hidden');
+        modal.style.display = 'none';
+        modal.style.pointerEvents = 'none';
+        setTimeout(function() {
+          if (modal && modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+          }
+        }, 300);
+      }
+      if (window.game) {
+        try {
+          if (window.game.audioManager && window.game.audioManager.ctx && window.game.audioManager.ctx.state === 'suspended') {
+            window.game.audioManager.ctx.resume();
+          }
+        } catch (_) {}
+        try {
+          if (window.game.hud && typeof window.game.hud.showToast === 'function') {
+            window.game.hud.showToast('Welcome to Courier City! Presented by Shubhransh Gupta');
+          }
+        } catch (_) {}
+      }
+    };
+  </script>
+
+  <!-- Clean, minimalist Messenger-style HUD -->
+  <div id="ui-layer">
+    <!-- Top Left Game Info -->
+    <div class="hud-header">
+      <span class="hud-game">Courier City</span>
+      <span class="hud-mode" id="mode-badge">Explore</span>
+    </div>
+
+    <!-- Center GPS Waypoint Navigator -->
+    <div id="gps-nav-widget" title="Click or press [M] to open Navigation Map">
+      <span id="gps-icon">✈️</span>
+      <span id="gps-text">Airport: 380m</span>
+      <span id="gps-arrow">↗</span>
+    </div>
+
+    <!-- Top Right Controls & Clock -->
+    <div class="hud-actions">
+      <button id="toggle-controls-btn" class="hud-btn" title="View Game Controls [H]">
+        <span>⌨️ Controls</span>
+      </button>
+      <button id="toggle-map-btn" class="hud-btn" title="Open Map [M]">
+        <span>🗺️ Map</span>
+      </button>
+      <button id="toggle-camera-modal-btn" class="hud-btn" title="Customize Camera View [V]">
+        <span>📷 Camera</span>
+      </button>
+      <span class="hud-clock" id="clock-display">00:00</span>
+      <button id="toggle-time-btn" class="hud-btn" title="Toggle Day/Night Ambience">
+        <span id="ambience-label">Day</span>
+      </button>
+    </div>
+
+    <!-- Contextual interaction prompt -->
+    <div id="interaction-prompt" class="hud-prompt hidden">
+      <span class="prompt-text">Click or press <kbd>F</kbd> to drive</span>
+    </div>
+
+    <!-- Clean, minimal speed label (Only when driving) -->
+    <div id="speedo-container" class="hud-speedo hidden">
+      <span class="speed-val" id="speed-val">0</span>
+      <span class="speed-unit">km/h</span>
+    </div>
+
+    <!-- Realistic 3D Globe Minimap Widget in Corner -->
+    <div id="radar-container" class="globe-minimap-widget" title="Click to open Globe Satellite Map [M]">
+      <canvas id="radar-canvas" width="130" height="130"></canvas>
+      <div class="globe-tap-hint">🌍 BENGALURU GLOBE &bull; TAP TO OPEN</div>
+    </div>
+
+    <!-- Minimal toast message -->
+    <div id="toast-message" class="hud-toast">Explore the city, visit the Zoo, or fly at the Airport!</div>
+
+    <!-- Touch Controls for Mobile -->
+    <div id="touch-controls" class="touch-controls hidden">
+      <div class="touch-joystick">
+        <div class="joystick-base"></div>
+        <div class="joystick-stick"></div>
+      </div>
+      <div class="touch-buttons">
+        <button class="touch-btn" id="touch-btn-jump">↑ Jump</button>
+        <button class="touch-btn" id="touch-btn-enter">↲ Enter</button>
+        <button class="touch-btn" id="touch-btn-sprint">⇑ Sprint</button>
+        <button class="touch-btn" id="touch-btn-handbrake">⇩ Handbrake</button>
+      </div>
+    </div>
   </div>
-  <script type="module" src="./src/ui/courier-city-ui.js"></script>
+
+  <!-- Camera View Customizer Modal -->
+  <div id="camera-modal" class="camera-modal-hidden">
+    <div class="camera-card">
+      <div class="camera-header">
+        <div class="camera-title-group">
+          <span class="camera-badge">📷 VIEW CUSTOMIZER</span>
+          <h3>Camera Angle & Perspective</h3>
+        </div>
+        <button id="close-camera-btn" class="camera-close-btn" type="button" aria-label="Close Camera Customizer">&times;</button>
+      </div>
+
+      <div class="camera-presets-section">
+        <div class="section-label">Select View Preset</div>
+        <div class="camera-presets-grid">
+          <button class="cam-preset-btn active" data-preset="diorama" type="button">🏎️ Diorama Follow</button>
+          <button class="cam-preset-btn" data-preset="isometric" type="button">📐 3/4 Isometric</button>
+          <button class="cam-preset-btn" data-preset="closeChase" type="button">🚗 Close Action</button>
+          <button class="cam-preset-btn" data-preset="topDown" type="button">🦅 Top-Down</button>
+          <button class="cam-preset-btn" data-preset="cockpit" type="button">🎥 Hood / Low</button>
+          <button class="cam-preset-btn" data-preset="free" type="button">🕹️ Free Orbit</button>
+        </div>
+      </div>
+
+      <div class="camera-sliders-group">
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>📏 Distance / Zoom</span>
+            <span id="cam-dist-val" class="cam-val-badge">16m</span>
+          </div>
+          <input type="range" id="cam-dist-slider" min="6" max="50" step="1" value="16">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>📐 Pitch / Angle</span>
+            <span id="cam-pitch-val" class="cam-val-badge">47°</span>
+          </div>
+          <input type="range" id="cam-pitch-slider" min="15" max="85" step="1" value="47">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>⬆️ Height Offset</span>
+            <span id="cam-height-val" class="cam-val-badge">2.0m</span>
+          </div>
+          <input type="range" id="cam-height-slider" min="0.5" max="8" step="0.5" value="2.0">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>👁️ Lens FOV</span>
+            <span id="cam-fov-val" class="cam-val-badge">38°</span>
+          </div>
+          <input type="range" id="cam-fov-slider" min="25" max="75" step="1" value="38">
+        </div>
+
+        <div class="cam-slider-row">
+          <div class="cam-slider-label">
+            <span>⚡ Damping Smoothness</span>
+            <span id="cam-smooth-val" class="cam-val-badge">Smooth (11)</span>
+          </div>
+          <input type="range" id="cam-smooth-slider" min="4" max="25" step="1" value="11">
+        </div>
+      </div>
+
+      <div class="camera-footer">
+        <button id="cam-reset-btn" class="cam-reset-btn" type="button">🔄 Reset to Bruno Simon Default</button>
+        <button id="cam-done-btn" class="cam-done-btn" type="button">✓ Save & Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dropdown / Collapsible Controls Modal -->
+  <div id="controls-modal" class="controls-modal-hidden">
+    <div class="controls-card">
+      <div class="controls-header">
+        <div class="controls-title-group">
+          <span class="controls-badge">GUIDE</span>
+          <h3>Game Controls & Keys</h3>
+        </div>
+        <button id="close-controls-btn" class="controls-close-btn" type="button" aria-label="Close Controls Guide">&times;</button>
+      </div>
+
+      <div class="controls-grid">
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🏃 On Foot</div>
+          <div class="ctrl-row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Walk / Run</span></div>
+          <div class="ctrl-row"><kbd>Shift</kbd> <span>Sprint Boost</span></div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Jump</span></div>
+          <div class="ctrl-row"><kbd>F</kbd> <span>Enter Vehicle / Aircraft</span></div>
+          <div class="ctrl-row"><kbd>E</kbd> <span>Elevator to Summit (Eiffel/Liberty/Taj)</span></div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🚗 Driving Cars</div>
+          <div class="ctrl-row"><kbd>W</kbd> <span>Accelerate</span></div>
+          <div class="ctrl-row"><kbd>S</kbd> <span>Brake / Reverse</span></div>
+          <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Steer</span></div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Handbrake Drift</span></div>
+          <div class="ctrl-row"><kbd>C</kbd> <span>Spawn Sports Car</span></div>
+          <div class="ctrl-row"><kbd>L</kbd> <span>Toggle Headlights</span></div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-cat">✈️ Airplane & Helicopter</div>
+          <div class="ctrl-row"><kbd>Space</kbd> <span>Climb / Lift Off Up</span></div>
+          <div class="ctrl-row"><kbd>Shift</kbd> <span>Descend / Land</span></div>
+          <div class="ctrl-row"><kbd>W</kbd> <span>Throttle Forward</span></div>
+          <div class="ctrl-row"><kbd>A</kbd><kbd>D</kbd> <span>Bank & Steer</span></div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-cat">🎥 Camera & Map</div>
+          <div class="ctrl-row"><kbd>V</kbd> <span>Toggle Camera Customizer</span></div>
+          <div class="ctrl-row"><kbd>M</kbd> <span>Open Fullscreen Map & GPS</span></div>
+          <div class="ctrl-row"><kbd>H</kbd> <span>Toggle Controls Guide</span></div>
+          <div class="ctrl-row"><span>Drag Mouse</span> <span>Orbit / Pitch View</span></div>
+          <div class="ctrl-row"><span>Mouse Wheel</span> <span>Zoom Camera</span></div>
+        </div>
+      </div>
+
+      <div class="controls-footer">
+        <span class="ctrl-tip">Tip: Press <kbd>H</kbd> anytime to open or close this controls guide.</span>
+        <button id="dismiss-controls-btn" class="ctrl-btn-primary" type="button">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>
