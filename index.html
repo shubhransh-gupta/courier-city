@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Courier City</title>
+  <title>Courier City — Bharat 3D Open World</title>
   <meta name="description" content="Seven Indian cities as small planets you can walk round, each with its train, tram or metro line on the equator. A cel-shaded city in the browser." />
   <meta name="theme-color" content="#efe6d6" />
   <script type="module" crossorigin src="./assets/index-CizabRDk.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/preload-helper-CCnR14CO.js">
   <link rel="stylesheet" crossorigin href="./assets/preload-helper-D1kWgmlw.css">
   <link rel="stylesheet" crossorigin href="./assets/index-Dq-S5-YF.css">
+  <link rel="stylesheet" href="./src/ui/courier-city.css">
 </head>
 <body>
   <canvas id="c"></canvas>
@@ -51,8 +52,9 @@
     <div id="mode"></div>
     <div id="prompt"></div>
     <div id="talk"><div class="k-who"></div><div class="k-native"></div><div class="k-english"></div></div>
-    <div id="hint">WASD walk · Shift run · E interact · L wander · V auto · T time · K rain · P planet · M sound · H hide · Esc menu</div>
+    <div id="hint">WASD move · Shift sprint · F drive vehicle · E board metro · L wander · T time · K rain · P planet · Esc menu</div>
     <div id="coords"></div>
   </div>
+  <script type="module" src="./src/ui/courier-city-ui.js"></script>
 </body>
 </html>

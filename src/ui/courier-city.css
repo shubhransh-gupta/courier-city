@@ -1,0 +1,504 @@
+/* ==========================================================================
+   Courier City — Bharat 3D Open World & Interactive India Map Styling
+   Presented by Shubhransh Gupta
+   ========================================================================== */
+
+/* --- Brand Row & Masthead Customization --- */
+.masthead {
+  padding: clamp(16px, 2.5vh, 28px) clamp(16px, 3.5vw, 48px) 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  align-items: flex-start !important;
+}
+
+.brand-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(35, 26, 38, 0.08);
+  border: 1px solid rgba(35, 26, 38, 0.2);
+  padding: 5px 12px 4px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.brand-badge-pill .pulse-green-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  animation: beacon-pulse 2s infinite ease-out;
+}
+
+.masthead h1 {
+  font: 400 clamp(30px, 3.2vw, 44px)/1 "Rozha One", serif !important;
+  margin: 0 !important;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.masthead .intro {
+  margin: 0 !important;
+  max-width: 52em !important;
+  font-size: clamp(13px, 1vw, 15px) !important;
+  line-height: 1.45 !important;
+  color: var(--ink-2);
+}
+
+/* --- Interactive India Explorer Layout --- */
+.india-explorer-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(16px, 2.5vw, 36px);
+  padding: clamp(12px, 2vh, 24px) clamp(16px, 3.5vw, 48px);
+  align-items: center;
+  min-height: 0;
+  flex: 1;
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 980px) {
+  .india-explorer-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    overflow-y: auto;
+  }
+}
+
+/* --- Left: Cartographic India Map Container --- */
+.india-map-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 480px;
+}
+
+.map-control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 6px 14px;
+  background: rgba(230, 218, 198, 0.65);
+  border-radius: 8px;
+  border: 1px solid rgba(93, 81, 89, 0.15);
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.map-control-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.map-legend-items {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dot-beacon {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-beacon.active {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.dot-beacon.upcoming {
+  background: #9ca3af;
+}
+
+.india-map-frame {
+  position: relative;
+  flex: 1;
+  min-height: 440px;
+  background: rgba(239, 230, 214, 0.5);
+  border: 1.5px solid rgba(93, 81, 89, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(35, 26, 38, 0.05), 0 8px 24px rgba(35, 26, 38, 0.06);
+}
+
+.india-map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center center;
+}
+
+/* Graticules and Compass */
+.map-graticule {
+  stroke: rgba(93, 81, 89, 0.15);
+  stroke-dasharray: 3 4;
+  stroke-width: 1;
+}
+
+.compass-rose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Map Country Landmass */
+.india-landmass {
+  fill: #e8dcc8;
+  stroke: #5d5159;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 3px 6px rgba(35, 26, 38, 0.08));
+}
+
+.india-subdivision {
+  fill: none;
+  stroke: rgba(93, 81, 89, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.ocean-relief {
+  fill: none;
+  stroke: rgba(43, 76, 126, 0.12);
+  stroke-width: 1.2;
+}
+
+/* City Pins on Map */
+.map-city-pin {
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s ease;
+}
+
+.map-city-pin:hover,
+.map-city-pin:focus-visible {
+  transform: scale(1.15);
+}
+
+.map-city-pin.active-selected .core-circle {
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  fill: #059669;
+}
+
+.pulse-radar-ring {
+  fill: none;
+  stroke: #10b981;
+  stroke-width: 1.5;
+  opacity: 0.8;
+  animation: radar-expand 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  transform-origin: center;
+}
+
+@keyframes radar-expand {
+  0% {
+    r: 6;
+    opacity: 0.9;
+  }
+  70% {
+    r: 22;
+    opacity: 0.1;
+  }
+  100% {
+    r: 26;
+    opacity: 0;
+  }
+}
+
+@keyframes beacon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.75;
+  }
+}
+
+.pin-label-group text {
+  font-family: Mukta, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.pin-label-group .vernacular-subtext {
+  font-family: "Rozha One", "Noto Serif Kannada", "Noto Serif Bengali", serif;
+  font-size: 12px;
+  fill: var(--accent, #c8402a);
+}
+
+/* --- Right: City Details & Fleet Inspector Card --- */
+.city-inspector-card {
+  background: var(--paper-2);
+  border: 1.5px solid rgba(93, 81, 89, 0.22);
+  border-radius: 12px;
+  padding: clamp(16px, 2.5vw, 24px);
+  box-shadow: 0 10px 30px rgba(35, 26, 38, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  z-index: 6;
+}
+
+.inspector-top-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.live-planet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #10b9811f;
+  border: 1px solid #10b98155;
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 9px 2px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.inspector-diorama-slot {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  position: relative;
+}
+
+.inspector-city-header {
+  text-align: left;
+}
+
+.inspector-script-name {
+  font: 700 clamp(32px, 3vw, 44px)/1.1 "Rozha One", "Noto Serif Kannada", "Noto Serif Bengali", serif;
+  color: var(--accent, var(--flame));
+  letter-spacing: 0.02em;
+}
+
+.inspector-latin-name {
+  font: 700 20px/1.2 "Rozha One", serif;
+  color: var(--ink);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inspector-transit-line {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+
+/* Landmarks Showcase Section */
+.inspector-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.inspector-landmark-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.landmark-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: rgba(35, 26, 38, 0.06);
+  border: 1px solid rgba(35, 26, 38, 0.12);
+  color: var(--ink);
+}
+
+/* Courier City Vehicle Fleet Showcase */
+.fleet-badges-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.fleet-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  background: #ffffff66;
+  border: 1px solid rgba(93, 81, 89, 0.16);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.fleet-badge-item .fleet-icon {
+  font-size: 14px;
+}
+
+/* Action Buttons */
+.inspector-actions {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-enter-city {
+  background: var(--ink);
+  color: var(--paper);
+  border: 0;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font: 700 15px/1 Mukta, sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(35, 26, 38, 0.18);
+}
+
+.btn-enter-city:hover {
+  background: #3e2e42;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(35, 26, 38, 0.25);
+}
+
+.btn-wander-city {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid rgba(35, 26, 38, 0.35);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font: 700 14px/1 Mukta, sans-serif;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-wander-city:hover {
+  border-color: var(--ink);
+  background: rgba(35, 26, 38, 0.05);
+}
+
+/* Hide original 7-card horizontal grid during map selection */
+#home:not(.loading) .cities {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  left: -9999px;
+}
+
+/* When loading a city, hide the map and show the transit checklist */
+#home.loading .india-explorer-layout {
+  display: none !important;
+}
+
+#home.loading .cities {
+  position: static !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* --- In-Game Vehicle Fleet Dock in HUD --- */
+#vehicle-dock {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(35, 26, 38, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 5px 8px;
+  border-radius: 24px;
+  border: 1px solid rgba(239, 230, 214, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  z-index: 25;
+  transition: opacity 0.3s ease;
+}
+
+.v-dock-btn {
+  background: transparent;
+  border: 0;
+  color: #efe6d6;
+  font: 600 12px/1 Mukta, sans-serif;
+  padding: 5px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.v-dock-btn:hover {
+  background: rgba(247, 239, 224, 0.15);
+}
+
+.v-dock-btn.active {
+  background: #f7b32b;
+  color: #231a26;
+  font-weight: 700;
+}
+
+.v-dock-btn kbd {
+  font: 10px monospace;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+body:has(#card:not(.gone)) #vehicle-dock,
+body:has(#home:not([hidden])) #vehicle-dock {
+  display: none;
+}
