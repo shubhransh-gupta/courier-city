@@ -7,6 +7,7 @@ import { INDIA_SOI_PATH } from "./india-svg-path.js";
 
 const CITIES = [
   { id: "delhi", x: 216.8, y: 226.0, name: "Delhi", script: "दिल्ली", line: "Northern Ring Railway", state: "NCR" },
+  { id: "lucknow", x: 288.0, y: 282.0, name: "Lucknow", script: "लखनऊ", line: "Lucknow Metro Red Line & Gomti Riverfront", state: "Uttar Pradesh" },
   { id: "ahmedabad", x: 128.0, y: 382.0, name: "Ahmedabad", script: "અમદાવાદ", line: "Ahmedabad Metro & BRTS", state: "Gujarat" },
   { id: "mumbai", x: 125.5, y: 454.0, name: "Mumbai", script: "मुंबई", line: "Western Railway Fast Local", state: "Maharashtra" },
   { id: "hyderabad", x: 260.0, y: 505.0, name: "Hyderabad", script: "హైదరాబాద్", line: "Hyderabad Metro Red Line", state: "Telangana" },
@@ -17,7 +18,7 @@ const CITIES = [
 
 function createMapSVG() {
   const pins = CITIES.map(c => `
-    <a href="?city=${c.id}&skip=1" class="map-city-pin" data-city="${c.id}" transform="translate(${c.x}, ${c.y})" role="button" aria-label="Enter ${c.name} (${c.script})">
+    <a href="?city=${c.id}" class="map-city-pin" data-city="${c.id}" transform="translate(${c.x}, ${c.y})" role="button" aria-label="Enter ${c.name} (${c.script})">
       <!-- Pulsing Radar Ring -->
       <circle class="pin-radar" r="14"></circle>
       <circle class="pin-ring" r="8"></circle>
@@ -38,7 +39,7 @@ function createMapSVG() {
           <span class="soi-dot-pulse"></span>
           <span>SURVEY OF INDIA · भारतीय सर्वेक्षण विभाग</span>
         </div>
-        <div class="soi-scale">NATIONAL TRANSIT NETWORK · 7 HUBS ACTIVE</div>
+        <div class="soi-scale">NATIONAL TRANSIT NETWORK · 8 HUBS ACTIVE</div>
       </div>
       
       <div class="soi-svg-frame">
@@ -151,7 +152,7 @@ export function initIndiaMap() {
       if (cityBtn && cityBtn.dataset.city) {
         e.preventDefault();
         e.stopPropagation();
-        window.location.href = `?city=${cityBtn.dataset.city}&skip=1`;
+        window.location.href = `?city=${cityBtn.dataset.city}`;
       }
     }, true);
   }
@@ -164,7 +165,7 @@ export function initIndiaMap() {
     const navigate = (e) => {
       e?.preventDefault();
       e?.stopPropagation();
-      window.location.href = `?city=${cityId}&skip=1`;
+      window.location.href = `?city=${cityId}`;
     };
 
     pin.click = navigate;
@@ -204,18 +205,6 @@ export function initIndiaMap() {
         pin.classList.remove("card-hovered");
       });
     });
-
-    // Update pause menu links so switching cities inside the game also uses skip=1
-    const updatePauseMenu = () => {
-      document.querySelectorAll(".pause-cities a").forEach(a => {
-        const href = a.getAttribute("href");
-        if (href && href.startsWith("?city=") && !href.includes("skip=1")) {
-          a.setAttribute("href", `${href}&skip=1`);
-        }
-      });
-    };
-    updatePauseMenu();
-    setInterval(updatePauseMenu, 1000);
   };
 
   setTimeout(syncCityCards, 50);

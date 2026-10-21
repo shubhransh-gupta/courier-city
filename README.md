@@ -42,24 +42,23 @@ Select any city from the interactive **Survey of India** national boundary map, 
 - Live pulsating green status pins for all active cities with instant fly-in planetary reveal transitions.
 - Fully responsive on desktop and mobile browsers.
 
-### 🏙️ 2. Seven Rich Indian Diorama Cities
+### 🏙️ 2. Eight Rich Indian Diorama Cities
 | City | Regional Transit Line | Signature Landscapes & Landmarks |
 |------|------------------------|----------------------------------|
 | 🌊 **Mumbai** | Western Railway Suburban Line | Churchgate, Marine Drive, Chawls, Grand Road, Dadar, Arabian Sea |
 | 🌳 **Bengaluru** | Namma Metro Purple Line | Vidhana Soudha, Cubbon Park, MG Road, Indiranagar, BMTC Volvo Buses |
 | 🏛️ **Delhi** | Yellow Line Metro | Old Delhi, Chandni Chowk, Red Fort, Delhi Junction, Jama Masjid |
+| 👑 **Lucknow** | Lucknow Metro & Gomti Riverfront | Rumi Darwaza, Hazratganj Heritage Colonnades, Charbagh Junction, Gomti Riverfront, Chowk & Aminabad |
 | 🚋 **Kolkata** | Heritage Calcutta Tramway | Howrah Bridge, BBD Bag, Park Street, Victoria Memorial, Hooghly River |
 | 🏖️ **Chennai** | MRTS Elevated Coastal Railway | Marina Beach, Chepauk, Thirumylai, Chintadripet, Bay of Bengal |
 | 🕌 **Hyderabad** | MMTS Transit & Lake Ring | Charminar, Hussain Sagar Lake, Khairatabad, Buddha Statue |
 | 🛕 **Ahmedabad** | Sabarmati Riverfront Transit | Sabarmati Riverfront, Kalupur Heritage Station, Historic Pols |
 
-### 🛺 3. Vehicle Driving System
-Press <kbd>F</kbd> (or tap the on-screen HUD vehicle dock) to mount and drive:
-- 🚶 **Foot**: Walk, sprint with <kbd>Shift</kbd>, and roam alleyways.
-- 🛺 **Namma Auto**: Agile 3-wheeler auto rickshaw with authentic auto horn.
-- 🏎️ **Bruno Roadster**: High-speed road cruiser for fast transit along major avenues.
-- 🏍️ **Bullet 350**: Iconic Royal Enfield style thumper motorcycle.
-- 🚌 **Volvo City Bus**: Heavy BMTC/BEST low-floor city transit bus with pneumatic bus horn.
+### 🛺 3. Authentic Auto Rickshaw Cockpit Ride & Driving System
+- <kbd>V</kbd> summons/dismisses the 3D Auto Rickshaw right in front of you across **all 8 cities**.
+- Approaching the auto prompts `<b>E</b> · Get in the auto`. Pressing <kbd>E</kbd> seats you directly into the 3D cockpit, locking in the authentic driver camera.
+- Drive freely across the planetary ring roads using <kbd>W</kbd> (throttle), <kbd>S</kbd> (reverse/brake), <kbd>A</kbd>/<kbd>D</kbd> (steer with realistic chassis roll and yaw inertia), and <kbd>Space</kbd> / <kbd>H</kbd> (horn).
+- Press <kbd>E</kbd> at any time to step out onto the pavement and resume walking on foot.
 
 ### 🩸 4. Pedestrian Collision & Stylized Blood VFX
 - **Oriented Bounding Box Collision**: Vehicles feature dynamic forward-reach bumper colliders (up to 5.6m reach on the Volvo Bus).
@@ -79,15 +78,17 @@ Press <kbd>F</kbd> (or tap the on-screen HUD vehicle dock) to mount and drive:
 
 | Key | Action |
 |-----|--------|
-| <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> / <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | Walk / Drive Vehicle |
-| <kbd>Shift</kbd> | Sprint on foot / Nitro boost in vehicle |
-| <kbd>F</kbd> | Cycle Vehicle (Walk ➔ Auto ➔ Roadster ➔ Bullet ➔ Bus) or board nearby bus |
-| <kbd>H</kbd> | Sound Vehicle Horn / Bicycle Bell |
-| <kbd>E</kbd> | Interact / Board Train / Talk to locals |
-| <kbd>L</kbd> | Wander mode (Automated cinematic camera) |
+| <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> / <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd> | Walk / Steer & Throttle Vehicle |
+| <kbd>Shift</kbd> | Sprint on foot |
+| <kbd>V</kbd> | Summon / Dismiss Auto Rickshaw |
+| <kbd>E</kbd> | Get In/Out of Auto · Interact with Stalls · Talk to Locals |
+| <kbd>H</kbd> / <kbd>Space</kbd> | Sound Horn |
+| <kbd>L</kbd> | Wander mode (Automated cinematic walk around the city) |
 | <kbd>T</kbd> | Cycle Time of Day (Day ➔ Sunset ➔ Night) |
 | <kbd>K</kbd> | Toggle Monsoon Rain on/off |
 | <kbd>P</kbd> | Planet orbit view (Zoom out to planetary globe) |
+| <kbd>M</kbd> | Toggle Sound on/off |
+| <kbd>H</kbd> | Toggle HUD display on/off |
 | <kbd>Esc</kbd> | Pause Menu & City Selector |
 | Mouse Drag | Look around / Pan camera angle |
 | Scroll Wheel | Zoom camera in / out |
