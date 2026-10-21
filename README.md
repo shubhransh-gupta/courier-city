@@ -6,7 +6,7 @@
 <h3 align="center">✨ Created & Maintained by Shubhransh Gupta ✨</h3>
 
 <p align="center">
-  <b>A cel-shaded 3D browser game rendering seven iconic Indian cities as miniature spherical diorama worlds.</b>
+  <b>A cel-shaded 3D browser game rendering eight iconic Indian cities as miniature spherical diorama worlds.</b>
   <br/>
   Walk on foot, drive an Auto Rickshaw, Roadster, Bullet 350, or Volvo City Bus — explore living streets, equatorial railways, and authentic regional culture directly in your browser.
 </p>
@@ -160,6 +160,40 @@ courier-city/
 
 ---
 
+## 🤝 Contributing to Courier City
+
+We welcome contributions from developers, 3D artists, game designers, and transit enthusiasts of all skill levels! Whether you want to fix a bug, add a new city, or build new vehicles, your contributions make Courier City better for everyone.
+
+### 🌟 Great Ideas to Work On (Good First Issues)
+- 🏙️ **Add New Cities**: Bring your hometown to life! Model iconic landmarks and transit routes for Jaipur, Pune, Varanasi, Chandigarh, or Kochi.
+- 🛺 **New Vehicles**: Implement drivable bicycles, electric e-rickshaws, classic Luna mopeds, or double-decker buses.
+- 🎵 **Regional Audio & Playlists**: Add authentic ambient street sounds, railway announcement chimes, or classic city tunes.
+- 🌦️ **Atmospheric & Weather FX**: Custom monsoons, morning river mist, dust storms, or festival lantern lighting.
+- 📱 **Mobile & Gamepad Controls**: Enhance touch joystick responsiveness or add Web Gamepad API support.
+
+### 🛠️ Contribution Workflow
+1. **Fork the Repository** on GitHub.
+2. **Create a Feature Branch**:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Make Your Changes & Test Locally**:
+   ```bash
+   npm run dev
+   ```
+4. **Build & Verify Production Bundle**:
+   ```bash
+   npm run build
+   ```
+5. **Commit & Push**:
+   ```bash
+   git commit -m "feat: add your awesome feature"
+   git push origin feat/your-feature-name
+   ```
+6. **Open a Pull Request** with a description of your changes and screenshots!
+
+---
+
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
@@ -169,5 +203,5 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 <p align="center">
   <b>Courier City</b> — Created with ❤️ by <b>Shubhransh Gupta</b>
   <br/>
-  <sub>Seven Indian cities as living 3D worlds in the browser.</sub>
+  <sub>Eight Indian cities as living 3D worlds in the browser.</sub>
 </p>
