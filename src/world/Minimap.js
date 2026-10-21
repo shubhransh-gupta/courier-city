@@ -38,13 +38,7 @@ export class Minimap {
       { name: '🏰 Tipu Palace', x: -160, z: -80, color: '#b45309', icon: '🏰' },
       { name: '👑 Mysore Palace', x: -300, z: 120, color: '#f59e0b', icon: '👑' },
       { name: '🍲 Food Street', x: -40, z: 220, color: '#ef4444', icon: '🍲' },
-      { name: '🏛️ Russell Mkt', x: 100, z: -140, color: '#991b1b', icon: '🏛️' },
-      { name: '🏛️ Gateway Mumbai', x: -280, z: 340, color: '#f59e0b', icon: '🏛️' },
-      { name: '🕌 Charminar Hyd', x: 180, z: -60, color: '#10b981', icon: '🕌' },
-      { name: '🏰 Hawa Mahal', x: -360, z: 20, color: '#ec4899', icon: '🏰' },
-      { name: '🏛️ Victoria Kolkata', x: 320, z: 120, color: '#38bdf8', icon: '🏛️' },
-      { name: '🛕 Kapaleeshwarar', x: -180, z: -340, color: '#ea580c', icon: '🛕' },
-      { name: '🗽 Statue of Unity', x: -380, z: 260, color: '#b45309', icon: '🗽' }
+      { name: '🏛️ Russell Mkt', x: 100, z: -140, color: '#991b1b', icon: '🏛️' }
     ];
 
     this.initInteraction();
