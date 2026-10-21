@@ -74,13 +74,19 @@
     </div>
 
     <div id="music-hud">
-      <button id="next-song-btn" aria-label="Next song" title="Play next song (Press N)">
-        <span class="music-icon">🎵</span> <span id="music-title">City Anthem</span> <span class="music-badge">[N ⏭]</span>
-      </button>
+      <div class="music-info">
+        <span class="music-icon">🎵</span>
+        <span id="music-title">City Anthem</span>
+      </div>
+      <div class="music-ctrls">
+        <button id="music-play-btn" class="music-btn" aria-label="Pause / Play" title="Pause / Play (Key M)"><span id="music-play-icon">⏸</span></button>
+        <button id="music-next-btn" class="music-btn" aria-label="Next song" title="Next Song (Key N)">⏭</button>
+      </div>
     </div>
 
-    <div id="hint">WASD walk/drive · 1-6 spawn places · N next song · Shift run · E interact/get in · L wander/auto roam · V auto · T time · K rain · P planet · M sound · H hide · Esc menu</div>
+    <div id="hint">WASD walk/drive · 1-6 spawn places · V auto · E interact/drive · N next song · M sound · Shift run · L wander · T time · K rain · P planet · Esc menu</div>
     <div id="coords"></div>
   </div>
+  <script type="module" src="./assets/auto-system.js"></script>
 </body>
 </html>

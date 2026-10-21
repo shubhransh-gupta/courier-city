@@ -13,6 +13,31 @@
   opacity: 1;
 }
 
+/* Police Strobe Warning Flash */
+#police-strobe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, #dc2626 0%, #2563eb 50%, #dc2626 100%);
+  box-shadow: 0 0 20px #dc2626, 0 0 35px #2563eb;
+  transition: opacity 0.2s ease;
+}
+
+#police-strobe.active {
+  opacity: 1;
+  animation: police-flash 0.35s infinite alternate;
+}
+
+@keyframes police-flash {
+  0% { filter: hue-rotate(0deg) brightness(1.2); }
+  100% { filter: hue-rotate(180deg) brightness(1.8); }
+}
+
 /* Stylized Floating Impact Popup */
 .impact-popup {
   position: fixed;
@@ -33,34 +58,6 @@
   0% { transform: translate(-50%, -20%) scale(0.7); opacity: 0; }
   25% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   100% { transform: translate(-50%, -100%) scale(1); opacity: 0; }
-}
-
-/* In-game vehicle indicator badge */
-.vehicle-hud-badge {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: rgba(35, 26, 38, 0.92);
-  color: #f7b32b;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font: 700 13px/1.2 Mukta, sans-serif;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 15;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.vehicle-hud-badge kbd {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: monospace;
-  font-size: 11px;
 }
 
 /* =========================================================
@@ -125,7 +122,7 @@
   font-family: monospace;
 }
 
-/* 2. Floating Places HUD Button & Popup Menu */
+/* 2. Floating Places HUD Button (TOP LEFT) */
 #places-hud {
   position: fixed;
   top: 16px;
@@ -139,7 +136,7 @@ body:has(#menu:not([hidden])) #places-hud {
 }
 
 #places-btn {
-  background: rgba(35, 26, 38, 0.88);
+  background: rgba(35, 26, 38, 0.9);
   color: #f7efe0;
   border: 1.5px solid rgba(247, 239, 224, 0.4);
   border-radius: 8px;
@@ -155,7 +152,7 @@ body:has(#menu:not([hidden])) #places-hud {
 }
 
 #places-btn:hover {
-  background: rgba(45, 34, 50, 0.96);
+  background: rgba(45, 34, 50, 0.98);
   border-color: #f7b32b;
   transform: translateY(-1px);
 }
@@ -301,64 +298,213 @@ body:has(#menu:not([hidden])) #places-hud {
   font-weight: 700;
 }
 
-/* 3. Floating Music / Next Song HUD Control */
+/* =========================================================
+   FLOATING MUSIC CARD (TOP RIGHT - FULLY SEPARATED FROM PLACES)
+   ========================================================= */
 #music-hud {
   position: fixed;
   top: 16px;
-  left: 140px;
+  right: 16px;
+  left: auto;
   z-index: 26;
   pointer-events: auto;
-}
-
-body:has(#menu:not([hidden])) #music-hud {
-  left: 240px;
-}
-
-#next-song-btn {
-  background: rgba(35, 26, 38, 0.88);
-  color: #f7efe0;
-  border: 1.5px solid rgba(247, 239, 224, 0.4);
-  border-radius: 8px;
-  padding: 8px 14px;
-  font: 700 13px/1.2 Mukta, system-ui, sans-serif;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
+  background: rgba(35, 26, 38, 0.9);
+  color: #f7efe0;
+  border: 1.5px solid rgba(247, 239, 224, 0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   backdrop-filter: blur(8px);
-  max-width: 270px;
+  max-width: 320px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-#next-song-btn:hover {
-  background: rgba(45, 34, 50, 0.96);
+#music-hud:hover {
   border-color: #2ed573;
-  transform: translateY(-1px);
 }
 
-#next-song-btn .music-badge {
-  background: rgba(46, 213, 115, 0.25);
-  color: #2ed573;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-family: monospace;
+.music-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.music-icon {
+  font-size: 13px;
   flex-shrink: 0;
 }
 
 #music-title {
+  font: 700 11.5px/1.2 Mukta, system-ui, sans-serif;
+  color: #f7efe0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 140px;
+}
+
+.music-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.music-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f7efe0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.music-btn:hover {
+  background: rgba(46, 213, 115, 0.25);
+  border-color: #2ed573;
+  color: #2ed573;
+  transform: translateY(-1px);
+}
+
+.music-btn:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   AUTHENTIC DIGITAL AUTO RICKSHAW FARE METER HUD
+   ========================================================= */
+.auto-meter-hud {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 25;
+  pointer-events: none;
+  animation: meter-appear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes meter-appear {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.meter-panel {
+  background: #18121d;
+  color: #f7efe0;
+  border: 2px solid #facc15;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 0, 0, 0.8);
+  width: 210px;
+  font-family: Mukta, system-ui, sans-serif;
+}
+
+.meter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(250, 204, 21, 0.25);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.meter-city-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: 0.05em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.meter-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(247, 239, 224, 0.65);
+}
+
+.meter-fare-box {
+  background: #000000;
+  border: 1.5px solid #27272a;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+.currency-symbol {
+  font-size: 18px;
+  font-weight: 800;
+  color: #2ed573;
+}
+
+.meter-fare-digit {
+  font-family: monospace, monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #2ed573;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(46, 213, 115, 0.6);
+}
+
+.meter-stats {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(247, 239, 224, 0.5);
+  letter-spacing: 0.05em;
+}
+
+.stat-val {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: #facc15;
 }
 
 @media (max-width: 650px) {
+  #places-hud {
+    top: 12px;
+    left: 12px;
+  }
   #music-hud {
-    top: auto;
-    bottom: 60px;
+    top: 12px;
     right: 12px;
-    left: auto;
+    max-width: 220px;
+  }
+  #music-title {
+    max-width: 90px;
+  }
+  .auto-meter-hud {
+    bottom: 60px;
+    left: 12px;
   }
 }
-
