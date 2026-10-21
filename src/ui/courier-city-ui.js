@@ -181,7 +181,7 @@ const UPCOMING_CITIES = [
 let selectedCityId = "bangalore";
 
 /**
- * Initializes the India Map and City Inspector UI inside #home
+ * Initializes the clean India Map and City Inspector UI inside #home
  */
 export function initCourierCityUI() {
   const homeEl = document.getElementById("home");
@@ -197,14 +197,14 @@ export function initCourierCityUI() {
       </div>
       <h1>Courier City</h1>
       <p class="intro">
-        Seven Indian cities as celestial 3D diorama planets. Drive Bruno Simon roadsters, hail detailed Namma Autos, 
-        ride Royal Enfield Bullets, and board rapid transit lines across Bengaluru, Mumbai, and beyond. 
-        Select any active green city on the map to explore.
+        Explore Indian cities in real-time 3D. Drive Namma Autos, Royal Enfield Bullets, sports cars, 
+        and ride rapid transit lines across Bengaluru, Mumbai, Delhi, and beyond. 
+        Select any active green city on the map to enter.
       </p>
     `;
   }
 
-  // 2. Fix the Footer to never overflow
+  // 2. Fix the Footer to fit neatly inside the container without overflow
   const footEl = homeEl.querySelector(".foot");
   if (footEl) {
     footEl.innerHTML = `
@@ -216,21 +216,19 @@ export function initCourierCityUI() {
         <span>·</span>
         <span>Drive Vehicle <kbd>F</kbd></span>
         <span>·</span>
-        <span>Honk <kbd>H</kbd></span>
+        <span>Horn <kbd>H</kbd></span>
         <span>·</span>
-        <span>Board Metro/Elevators <kbd>E</kbd></span>
-        <span>·</span>
-        <span>Planet View <kbd>P</kbd></span>
+        <span>Board Metro <kbd>E</kbd></span>
         <span>·</span>
         <span>Wander <kbd>L</kbd></span>
         <span>·</span>
         <span>Menu <kbd>Esc</kbd></span>
       </div>
-      <div class="touchnote">Touch: Left thumb walks/steers · Drag to look</div>
+      <div class="touchnote">Touch: Left thumb steers · Drag to look</div>
     `;
   }
 
-  // 3. Build the India Map & Inspector Layout
+  // 3. Build the Clean Modern India Map & Inspector Layout (NO floating globes)
   const explorerLayout = document.createElement("div");
   explorerLayout.className = "india-explorer-layout";
   explorerLayout.id = "india-explorer-layout";
@@ -329,16 +327,14 @@ export function initCourierCityUI() {
       <div class="inspector-top-badge">
         <span class="live-planet-pill">
           <span class="pulse-green-dot"></span>
-          <span>🟢 ACTIVE PLANETARY WORLD</span>
+          <span>🟢 ACTIVE OPEN WORLD</span>
         </span>
         <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
-          COURIER CITY FLEET
+          COURIER CITY TELEMETRY
         </span>
       </div>
 
-      <!-- 3D Rotating Planet Slot from Three.js -->
-      <div class="inspector-diorama-slot" id="inspector-slot" aria-hidden="true"></div>
-
+      <!-- Clean City Header (NO floating globes) -->
       <div class="inspector-city-header">
         <div class="inspector-script-name" id="insp-script">ಬೆಂಗಳೂರು</div>
         <div class="inspector-latin-name" id="insp-latin">
@@ -353,7 +349,7 @@ export function initCourierCityUI() {
       <!-- Real-Time Bangalore Landmarks & Buildings -->
       <div>
         <div class="inspector-section-label">
-          <span>🏛️ ICONIC PLACES & BUILDINGS</span>
+          <span>🏛️ REAL-WORLD PLACES & BUILDINGS</span>
         </div>
         <div class="inspector-landmark-pills" id="insp-landmarks">
           <!-- Populated dynamically -->
@@ -446,26 +442,6 @@ function selectCity(cityId) {
       </div>
     `).join("");
   }
-
-  // Move the 3D diorama canvas slot representation
-  syncDioramaSlot(cityId);
-}
-
-/**
- * Connects the 3D rotating planetary diorama slot with the inspector card
- */
-function syncDioramaSlot(cityId) {
-  const inspectorSlot = document.getElementById("inspector-slot");
-  if (!inspectorSlot) return;
-
-  const targetBlock = document.querySelector(`.city[data-city="${cityId}"]`);
-  if (!targetBlock) return;
-
-  const originalSlot = targetBlock.querySelector(".slot");
-  if (originalSlot && !inspectorSlot.contains(originalSlot)) {
-    inspectorSlot.innerHTML = "";
-    inspectorSlot.appendChild(originalSlot);
-  }
 }
 
 /**
@@ -510,7 +486,7 @@ function setupMapInteraction() {
 }
 
 /**
- * Executes cinematic map zoom-in and triggers planet entry with Telemetry Matrix
+ * Executes cinematic map zoom-in and triggers direct street entry with Telemetry Matrix
  */
 function launchCity(cityId, isWander = false) {
   const city = CITY_DATABASE[cityId];
@@ -524,15 +500,7 @@ function launchCity(cityId, isWander = false) {
     mapSvg.style.transform = "scale(5.5)";
   }
 
-  // Return original slot to block before clicking
   const targetBlock = document.querySelector(`.city[data-city="${cityId}"]`);
-  const inspectorSlot = document.getElementById("inspector-slot");
-  if (targetBlock && inspectorSlot) {
-    const slotEl = inspectorSlot.querySelector(".slot");
-    if (slotEl) {
-      targetBlock.insertBefore(slotEl, targetBlock.firstChild);
-    }
-  }
 
   // If wander requested, set sessionStorage
   if (isWander) {
@@ -605,7 +573,7 @@ function setup3DVehicleDriveSystem() {
    */
   function buildVehicleMesh(type) {
     if (!window.__THREE) return null;
-    const { Group, Mesh, BoxGeometry, CylinderGeometry, MeshStandardMaterial, MeshBasicMaterial, Color } = window.__THREE;
+    const { Group, Mesh, BoxGeometry, CylinderGeometry, MeshStandardMaterial, MeshBasicMaterial } = window.__THREE;
     const group = new Group();
 
     if (type === "auto") {
