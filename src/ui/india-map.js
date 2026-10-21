@@ -17,7 +17,7 @@ const CITIES = [
 
 function createMapSVG() {
   const pins = CITIES.map(c => `
-    <g class="map-city-pin" data-city="${c.id}" transform="translate(${c.x}, ${c.y})" tabindex="0" role="button" aria-label="Select ${c.name} (${c.script})">
+    <a href="?city=${c.id}&skip=1" class="map-city-pin" data-city="${c.id}" transform="translate(${c.x}, ${c.y})" role="button" aria-label="Enter ${c.name} (${c.script})">
       <!-- Pulsing Radar Ring -->
       <circle class="pin-radar" r="14"></circle>
       <circle class="pin-ring" r="8"></circle>
@@ -28,7 +28,7 @@ function createMapSVG() {
         <text class="pin-tag-script" x="16" y="-2">${c.script}</text>
         <text class="pin-tag-name" x="16" y="9">${c.name.toUpperCase()}</text>
       </g>
-    </g>
+    </a>
   `).join("");
 
   return `
@@ -103,7 +103,7 @@ function createMapSVG() {
             <text x="12" y="57" class="cartouche-t4">SCALE 1 : 4,000,000</text>
           </g>
 
-          <!-- 7 Active City Pins -->
+          <!-- 7 Active City Pins as Native Hyperlinks -->
           <g class="map-city-pins-layer">
             ${pins}
           </g>
@@ -144,26 +144,36 @@ export function initIndiaMap() {
     home.prepend(wrapper);
   }
 
+  // Intercept any click on the city cards below the map using capture phase
+  if (citiesEl) {
+    citiesEl.addEventListener("click", (e) => {
+      const cityBtn = e.target.closest(".city");
+      if (cityBtn && cityBtn.dataset.city) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = `?city=${cityBtn.dataset.city}&skip=1`;
+      }
+    }, true);
+  }
+
   // Bind clicks and hovers on map city pins
   const pins = wrapper.querySelectorAll(".map-city-pin");
   pins.forEach(pin => {
     const cityId = pin.dataset.city;
 
-    const selectCity = (e) => {
+    const navigate = (e) => {
       e?.preventDefault();
-      // Find matching .city button and click it
-      const cityBtn = document.querySelector(`.city[data-city="${cityId}"]`);
-      if (cityBtn) {
-        cityBtn.click();
-      }
+      e?.stopPropagation();
+      window.location.href = `?city=${cityId}&skip=1`;
     };
 
-    pin.addEventListener("click", selectCity);
-    pin.addEventListener("pointerdown", selectCity);
+    pin.click = navigate;
+    pin.addEventListener("click", navigate);
+    pin.addEventListener("pointerdown", navigate);
 
     pin.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
-        selectCity(e);
+        navigate(e);
       }
     });
 
@@ -179,7 +189,7 @@ export function initIndiaMap() {
     });
   });
 
-  // Also sync hover from city cards back to map pins
+  // Sync hover from city cards back to map pins
   const syncCityCards = () => {
     const cityButtons = document.querySelectorAll(".city[data-city]");
     cityButtons.forEach(btn => {
@@ -194,9 +204,20 @@ export function initIndiaMap() {
         pin.classList.remove("card-hovered");
       });
     });
+
+    // Update pause menu links so switching cities inside the game also uses skip=1
+    const updatePauseMenu = () => {
+      document.querySelectorAll(".pause-cities a").forEach(a => {
+        const href = a.getAttribute("href");
+        if (href && href.startsWith("?city=") && !href.includes("skip=1")) {
+          a.setAttribute("href", `${href}&skip=1`);
+        }
+      });
+    };
+    updatePauseMenu();
+    setInterval(updatePauseMenu, 1000);
   };
 
-  // Give a small moment for .cities to render buttons
   setTimeout(syncCityCards, 50);
 }
 

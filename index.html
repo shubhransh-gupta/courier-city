@@ -4,8 +4,40 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Courier City</title>
-  <meta name="description" content="Seven Indian cities as small planets you can walk round, each with its train, tram or metro line on the equator. A cel-shaded city in the browser." />
+  <meta name="description" content="Seven Indian cities as 3D diorama worlds mapped to Survey of India coordinates. A cel-shaded transit simulator in the browser." />
   <meta name="theme-color" content="#efe6d6" />
+  <script>
+    // Ensure skip=1 is always present when a city is selected to land directly on the street
+    (function() {
+      try {
+        const url = new URL(window.location.href);
+        const city = url.searchParams.get("city");
+        if (city && !url.searchParams.has("skip")) {
+          url.searchParams.set("skip", "1");
+          window.location.replace(url.toString());
+        }
+      } catch (e) {}
+
+      // Safe RAF fallback for background tabs to prevent engine freeze when user switches tabs
+      var origRAF = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = function(cb) {
+        var called = false;
+        var timer = setTimeout(function() {
+          if (!called) {
+            called = true;
+            cb(performance.now());
+          }
+        }, 32);
+        return origRAF(function(time) {
+          if (!called) {
+            called = true;
+            clearTimeout(timer);
+            cb(time);
+          }
+        });
+      };
+    })();
+  </script>
   <script type="module" crossorigin src="./assets/index-CizabRDk.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/preload-helper-CCnR14CO.js">
   <link rel="stylesheet" crossorigin href="./assets/preload-helper-D1kWgmlw.css">
@@ -37,7 +69,7 @@
     <div class="card-inner">
       <div class="card-script"></div>
       <div class="card-go"><button id="go" disabled>Walk in</button><button id="wander" disabled>Wander</button></div>
-      <a class="card-back" href="./">Choose another planet</a>
+      <a class="card-back" href="./">Return to National Map</a>
     </div>
   </div>
 
@@ -45,12 +77,12 @@
     <div class="pause-inner" role="dialog" aria-modal="true" aria-labelledby="pause-title">
       <p id="pause-title" class="pause-title">Paused</p>
       <button id="resume">Keep walking</button>
-      <p class="pause-label">Go to another planet</p>
-      <nav class="pause-cities" aria-label="Planets"></nav>
-      <a class="pause-home" href="./">See all the planets</a>
+      <p class="pause-label">Switch City</p>
+      <nav class="pause-cities" aria-label="Cities"></nav>
+      <a class="pause-home" href="./">Return to National Map</a>
     </div>
   </div>
-  <button id="menu" hidden aria-label="Menu: the other planets">Planets</button>
+  <button id="menu" hidden aria-label="Menu: Cities">Cities</button>
 
   <div id="hud">
     <div id="toast"><div class="t-deva"></div><div class="t-latin"></div></div>
