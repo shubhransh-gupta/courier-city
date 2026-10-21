@@ -144,17 +144,13 @@ Access the latest deployment on any browser:
 ```
 courier-city/
 ├── index.html                     # Entry point & HUD overlay
-├── vite.config.js                 # Rollup chunking & asset optimization
-├── package.json                   # Scripts & dependencies
-├── src/
-│   ├── ui/
-│   │   ├── india-map.js           # Survey of India SVG interactive map & city pins
-│   │   ├── india-svg-path.js      # Official boundary vectors
-│   │   └── india-map.css          # Cel-shaded paper map theme
-│   └── game/
-│       ├── vehicle-impact-system.js # 3D vehicles, collision detection & blood particle VFX
-│       └── vehicle-impact.css      # Screen flash vignette, dock UI & impact popups
-├── assets/                        # City diorama chunks, textures, sounds & fonts
+├── vite.config.js                 # Bundler and development server configuration
+├── package.json                   # Scripts and project dependencies
+├── assets/                        # Authentic city diorama chunks, textures, sounds & fonts
+│   ├── audio/                     # Regional Bollywood anthems and street audio tracks
+│   ├── vehicle-impact.css         # Landmark spawn selector & music HUD styling
+│   └── ...                        # 3D city chunks, textures, shaders, and web fonts
+├── public/                        # Static favicons, touch icons, and domain CNAME
 └── dist/                          # Production distribution bundle
 ```
 
