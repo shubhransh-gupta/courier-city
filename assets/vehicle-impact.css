@@ -381,115 +381,6 @@ body:has(#menu:not([hidden])) #places-hud {
   transform: translateY(0);
 }
 
-/* =========================================================
-   AUTHENTIC DIGITAL AUTO RICKSHAW FARE METER HUD
-   ========================================================= */
-.auto-meter-hud {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 25;
-  pointer-events: none;
-  animation: meter-appear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes meter-appear {
-  0% { transform: translateY(20px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-.meter-panel {
-  background: #18121d;
-  color: #f7efe0;
-  border: 2px solid #facc15;
-  border-radius: 8px;
-  padding: 10px 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 0, 0, 0.8);
-  width: 210px;
-  font-family: Mukta, system-ui, sans-serif;
-}
-
-.meter-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(250, 204, 21, 0.25);
-  padding-bottom: 4px;
-  margin-bottom: 8px;
-}
-
-.meter-city-badge {
-  font-size: 11px;
-  font-weight: 800;
-  color: #facc15;
-  letter-spacing: 0.05em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 120px;
-}
-
-.meter-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: rgba(247, 239, 224, 0.65);
-}
-
-.meter-fare-box {
-  background: #000000;
-  border: 1.5px solid #27272a;
-  border-radius: 4px;
-  padding: 6px 10px;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-  margin-bottom: 8px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
-}
-
-.currency-symbol {
-  font-size: 18px;
-  font-weight: 800;
-  color: #2ed573;
-}
-
-.meter-fare-digit {
-  font-family: monospace, monospace;
-  font-size: 26px;
-  font-weight: 900;
-  color: #2ed573;
-  letter-spacing: 2px;
-  text-shadow: 0 0 8px rgba(46, 213, 115, 0.6);
-}
-
-.meter-stats {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.stat-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-lbl {
-  font-size: 9px;
-  font-weight: 700;
-  color: rgba(247, 239, 224, 0.5);
-  letter-spacing: 0.05em;
-}
-
-.stat-val {
-  font-family: monospace;
-  font-size: 12px;
-  font-weight: 800;
-  color: #facc15;
-}
-
 @media (max-width: 650px) {
   #places-hud {
     top: 12px;
@@ -502,9 +393,5 @@ body:has(#menu:not([hidden])) #places-hud {
   }
   #music-title {
     max-width: 90px;
-  }
-  .auto-meter-hud {
-    bottom: 60px;
-    left: 12px;
   }
 }
