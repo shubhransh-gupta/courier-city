@@ -24,6 +24,10 @@
     <header class="masthead">
       <h1>Courier City</h1>
       <p class="intro">Seven cities, each a planet small enough to walk round, each with a train, a tram or a metro that never stops circling it. Pick one.</p>
+      <div class="disclaimer-banner">
+        <span class="disclaimer-tag">DISCLAIMER</span>
+        <span>This game is created purely for humor, fun, and entertainment purposes. All city elements, traffic, auto driver banter, potholes, and waterlogging are playful tributes—please don't take anything personally! Have fun exploring!</span>
+      </div>
     </header>
     <div class="cities"></div>
     <footer class="foot">
@@ -35,6 +39,9 @@
   <div id="card" class="gone">
     <div class="card-inner">
       <div class="card-script"></div>
+      <div class="card-disclaimer">
+        ⚠️ <em>Disclaimer: Created purely for fun & entertainment purposes. Please don't take it personally!</em>
+      </div>
       <div id="card-spawn-selector" class="card-spawn-selector">
         <div class="card-spawn-heading">📍 Spawn at landmark:</div>
         <div id="card-places" class="card-places"></div>
@@ -58,6 +65,11 @@
   <button id="menu" hidden aria-label="Menu: the other planets">Planets</button>
 
   <div id="hud">
+    <div id="game-disclaimer">
+      <span class="gd-icon">⚠️</span>
+      <span class="gd-text"><strong>Disclaimer:</strong> This game is created purely for fun & entertainment purposes. Please don't take it personally!</span>
+      <button id="gd-close" class="gd-close" aria-label="Dismiss disclaimer">✕</button>
+    </div>
     <div id="toast"><div class="t-deva"></div><div class="t-latin"></div></div>
     <div id="mode"></div>
     <div id="prompt"></div>
@@ -90,5 +102,23 @@
     <div id="coords"></div>
   </div>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const gd = document.getElementById('game-disclaimer');
+      const closeBtn = document.getElementById('gd-close');
+      if (closeBtn && gd) {
+        closeBtn.addEventListener('click', () => {
+          gd.classList.add('hide');
+          setTimeout(() => gd.remove(), 600);
+        });
+        setTimeout(() => {
+          if (gd && !gd.classList.contains('hide')) {
+            gd.classList.add('hide');
+            setTimeout(() => gd.remove(), 600);
+          }
+        }, 9500);
+      }
+    });
+  </script>
 </body>
 </html>
